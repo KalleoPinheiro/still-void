@@ -1,0 +1,180 @@
+/* ============================================================
+   Quiet Tech — theme tokens
+   Import once: `import '@quiet-tech/ui/theme.css'`
+   Theming is attribute-driven and therefore Server-Component
+   safe: render <html data-theme="dark" data-accent="cyan"> on
+   the server and no JS is required for correct first paint.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* dark is the default scheme */
+  --qt-bg: #0a0a0c;
+  --qt-bg-elev: #111114;
+  --qt-surface: #16161b;
+  --qt-surface-2: #1c1c22;
+  --qt-border: rgba(255, 255, 255, 0.08);
+  --qt-border-strong: rgba(255, 255, 255, 0.14);
+  --qt-text: #ededf0;
+  --qt-text-2: #8b8b96;
+  --qt-text-3: #5a5a66;
+
+  /* accent palette */
+  --qt-accent-cyan: oklch(0.78 0.12 210);
+  --qt-accent-violet: oklch(0.72 0.14 295);
+  --qt-accent-mint: oklch(0.78 0.1 160);
+  --qt-accent-amber: oklch(0.78 0.12 75);
+  --qt-accent: var(--qt-accent-cyan);
+
+  /* typography */
+  --qt-font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --qt-font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --qt-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  --qt-text-xs: 0.75rem;
+  --qt-text-sm: 0.8125rem;
+  --qt-text-base: 0.9375rem;
+  --qt-text-md: 1rem;
+  --qt-text-lg: 1.125rem;
+  --qt-text-xl: 1.375rem;
+  --qt-text-2xl: 1.75rem;
+  --qt-text-3xl: 2.25rem;
+  --qt-text-4xl: 2.75rem;
+
+  /* spacing 4→72px */
+  --qt-space-1: 4px;
+  --qt-space-2: 8px;
+  --qt-space-3: 12px;
+  --qt-space-4: 16px;
+  --qt-space-5: 20px;
+  --qt-space-6: 24px;
+  --qt-space-8: 32px;
+  --qt-space-10: 40px;
+  --qt-space-12: 48px;
+  --qt-space-14: 56px;
+  --qt-space-16: 64px;
+  --qt-space-18: 72px;
+
+  /* radii */
+  --qt-radius-sm: 6px;
+  --qt-radius-md: 8px;
+  --qt-radius-lg: 12px;
+  --qt-radius-xl: 16px;
+  --qt-radius-full: 9999px;
+
+  /* motion */
+  --qt-ease-hover: cubic-bezier(0.3, 0.7, 0.4, 1);
+  --qt-duration-fast: 120ms;
+  --qt-duration-base: 200ms;
+  --qt-duration-slow: 320ms;
+
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --qt-bg: #f7f7f5;
+  --qt-bg-elev: #ffffff;
+  --qt-surface: #ffffff;
+  --qt-surface-2: #f2f2ef;
+  --qt-border: rgba(0, 0, 0, 0.08);
+  --qt-border-strong: rgba(0, 0, 0, 0.14);
+  --qt-text: #16161b;
+  --qt-text-2: #5a5a66;
+  --qt-text-3: #8b8b96;
+  color-scheme: light;
+}
+
+/* Accent switching is pure CSS — works in Server Components. */
+[data-accent='cyan'] {
+  --qt-accent: var(--qt-accent-cyan);
+}
+[data-accent='violet'] {
+  --qt-accent: var(--qt-accent-violet);
+}
+[data-accent='mint'] {
+  --qt-accent: var(--qt-accent-mint);
+}
+[data-accent='amber'] {
+  --qt-accent: var(--qt-accent-amber);
+}
+
+/* ============================================================
+   Signature utilities
+   ============================================================ */
+
+/* .qt-gradient-border — the system's visual signature.
+   Never replace with box-shadow. */
+.qt-gradient-border {
+  position: relative;
+  background: var(--qt-surface);
+  border-radius: var(--qt-radius-lg);
+}
+.qt-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    var(--qt-accent) 0%,
+    transparent 40%,
+    transparent 60%,
+    var(--qt-border-strong) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Cards have no shadow — hover lifts via border/transform only. */
+.qt-card-hover {
+  transition:
+    transform var(--qt-duration-base) var(--qt-ease-hover),
+    border-color var(--qt-duration-base) var(--qt-ease-hover),
+    background var(--qt-duration-base) var(--qt-ease-hover);
+}
+.qt-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--qt-border-strong);
+}
+
+.qt-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--qt-surface-2) 25%,
+    var(--qt-surface) 50%,
+    var(--qt-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: qt-skeleton-shimmer 1.4s linear infinite;
+  border-radius: var(--qt-radius-md);
+}
+@keyframes qt-skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.qt-glass {
+  background: color-mix(in srgb, var(--qt-bg-elev) 72%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border-bottom: 1px solid var(--qt-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qt-card-hover,
+  .qt-card-hover:hover {
+    transition: none;
+    transform: none;
+  }
+  .qt-skeleton {
+    animation: none;
+  }
+}
