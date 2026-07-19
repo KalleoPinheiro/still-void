@@ -3,6 +3,22 @@
   "version": "0.1.0",
   "description": "Quiet Tech design system — framework-agnostic TypeScript core (tokens, CSS, recipes, behaviors) with an optional React adapter compatible with Next.js Server Components.",
   "license": "MIT",
+  "author": "Kalleo Pinheiro",
+  "keywords": [
+    "design-system",
+    "ui",
+    "components",
+    "react",
+    "nextjs",
+    "server-components",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "sideEffects": [
     "*.css"
