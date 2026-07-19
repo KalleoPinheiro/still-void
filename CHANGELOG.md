@@ -1,5 +1,11 @@
 # @quiet-tech/ui
 
+## 1.0.0
+
+### Major Changes
+
+- ds first version
+
 ## 0.1.0
 
 Initial extraction from the `blog.kalleopinheiro.dev` prototype.
