@@ -139,8 +139,19 @@ framework code** — open it with `npm run playground` after `npm run build`.
 ## Scripts
 
 ```sh
-npm run build      # tsup (ESM + CJS + .d.ts) + CSS to dist/
-npm test           # vitest (31 tests)
-npm run typecheck  # tsc --noEmit (strict)
-npm run playground # serve the framework-free catalog
+npm run build             # tsup (ESM + CJS + .d.ts) + CSS to dist/
+npm test                  # vitest (31 tests)
+npm run typecheck         # tsc --noEmit (strict)
+npm run playground        # serve the framework-free catalog
+npm run storybook         # component catalog at localhost:6006
+npm run build-storybook   # static Storybook build → storybook-static/
+npm run changeset         # record a change for the next release
+npm run version           # apply pending changesets, bump version, update CHANGELOG
+npm run release           # build + publish to npm
 ```
+
+## Versioning
+
+Releases are managed with [Changesets](https://github.com/changesets/changesets). After a
+change that should ship in the next version, run `npm run changeset` and describe it — the
+changelog and version bump are generated from these entries, not written by hand.

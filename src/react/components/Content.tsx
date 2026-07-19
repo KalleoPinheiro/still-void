@@ -26,14 +26,23 @@ export interface CategoryPillProps extends ComponentPropsWithoutRef<'span'> {
   /** Accent name ('cyan'), category name ('ia'), or any CSS color. */
   color?: string;
   active?: boolean;
+  interactive?: boolean;
 }
 
-export function CategoryPill({ label, color, active, className, style, ...rest }: CategoryPillProps) {
+export function CategoryPill({
+  label,
+  color,
+  active,
+  interactive,
+  className,
+  style,
+  ...rest
+}: CategoryPillProps) {
   const pillStyle: CSSProperties | undefined = color
     ? ({ ...style, '--qt-pill-color': resolveCategoryColor(color) } as CSSProperties)
     : style;
   return (
-    <span className={cx(categoryPill({ active }), className)} style={pillStyle} {...rest}>
+    <span className={cx(categoryPill({ active, interactive }), className)} style={pillStyle} {...rest}>
       <span className={categoryPillClasses.dot} aria-hidden="true" />
       {label}
     </span>

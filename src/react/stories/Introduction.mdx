@@ -1,0 +1,56 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# Quiet Tech
+
+Calm engineering, sharp accents. This catalog covers every component ported from the
+`blog.kalleopinheiro.dev` prototype into `@quiet-tech/ui`.
+
+## Fidelity rules (do not regress)
+
+These are ported literally and must never be "improved" or approximated:
+
+- **Colors** — hex/oklch values are exact, never rounded.
+- **`.qt-gradient-border`** — the system's visual signature. Never replaced with `box-shadow`.
+- **No shadow on cards.** Elevation comes from border + surface tokens and a small `translateY`
+  on hover, nothing else.
+- **`text-wrap: balance`** on every display heading.
+- **Typography** — Sora (display), Manrope (body), JetBrains Mono (code). System fonts are
+  loading fallbacks only; the final family is always the correct one.
+- **Motion** — hover transitions use `cubic-bezier(.3,.7,.4,1)`; the reading progress bar is
+  linear, not eased.
+- **Categories** — a colored dot + label. Never an emoji standing in for an icon.
+
+## Theming
+
+Two independent axes, both pure CSS attributes on `<html>`:
+
+- `data-theme="dark" | "light"` (dark is default)
+- `data-accent="cyan" | "violet" | "mint" | "amber"`
+
+Because switching is attribute-driven, it works with zero client JS in a Next.js Server
+Component — render the attributes server-side and there's no flash of the wrong theme. Use
+the toolbar above (Theme / Accent) to preview every story in each combination.
+
+## Two ways to consume a component
+
+- **`@quiet-tech/ui/react`** — server-safe. No hooks, no browser APIs. Renders inside a Next.js
+  Server Component.
+- **`@quiet-tech/ui/react/client`** — `'use client'` bundle for anything interactive
+  (`ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`).
+
+Interactive behavior is always composed into a server component via a slot prop
+(`actions`, `eyebrow`, `visual`) rather than making the whole component a Client Component.
+
+## Non-React consumers
+
+Every component also has a framework-agnostic recipe — a pure function returning the same
+class names, exported from `@quiet-tech/ui` (no `/react` entry):
+
+```ts
+import { postCard, postCardClasses } from '@quiet-tech/ui';
+```
+
+See [playground/index.html](https://github.com/quiet-tech/ui/blob/main/playground/index.html)
+in the repo for the same catalog rendered with zero framework code.
