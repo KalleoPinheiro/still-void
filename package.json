@@ -1,7 +1,7 @@
 {
-  "name": "@quiet-tech/ui",
+  "name": "@still-void/ui",
   "version": "1.0.0",
-  "description": "Quiet Tech design system — framework-agnostic TypeScript core (tokens, CSS, recipes, behaviors) with an optional React adapter compatible with Next.js Server Components.",
+  "description": "Still Void design system — framework-agnostic TypeScript core (tokens, CSS, recipes, behaviors) with an optional React adapter compatible with Next.js Server Components.",
   "license": "MIT",
   "author": "Kalleo Pinheiro",
   "keywords": [

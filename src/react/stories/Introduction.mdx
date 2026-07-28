@@ -2,17 +2,17 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Introduction" />
 
-# Quiet Tech
+# Still Void
 
 Calm engineering, sharp accents. This catalog covers every component ported from the
-`blog.kalleopinheiro.dev` prototype into `@quiet-tech/ui`.
+`blog.kalleopinheiro.dev` prototype into `@still-void/ui`.
 
 ## Fidelity rules (do not regress)
 
 These are ported literally and must never be "improved" or approximated:
 
 - **Colors** — hex/oklch values are exact, never rounded.
-- **`.qt-gradient-border`** — the system's visual signature. Never replaced with `box-shadow`.
+- **`.sv-gradient-border`** — the system's visual signature. Never replaced with `box-shadow`.
 - **No shadow on cards.** Elevation comes from border + surface tokens and a small `translateY`
   on hover, nothing else.
 - **`text-wrap: balance`** on every display heading.
@@ -35,9 +35,9 @@ the toolbar above (Theme / Accent) to preview every story in each combination.
 
 ## Two ways to consume a component
 
-- **`@quiet-tech/ui/react`** — server-safe. No hooks, no browser APIs. Renders inside a Next.js
+- **`@still-void/ui/react`** — server-safe. No hooks, no browser APIs. Renders inside a Next.js
   Server Component.
-- **`@quiet-tech/ui/react/client`** — `'use client'` bundle for anything interactive
+- **`@still-void/ui/react/client`** — `'use client'` bundle for anything interactive
   (`ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`).
 
 Interactive behavior is always composed into a server component via a slot prop
@@ -46,11 +46,11 @@ Interactive behavior is always composed into a server component via a slot prop
 ## Non-React consumers
 
 Every component also has a framework-agnostic recipe — a pure function returning the same
-class names, exported from `@quiet-tech/ui` (no `/react` entry):
+class names, exported from `@still-void/ui` (no `/react` entry):
 
 ```ts
-import { postCard, postCardClasses } from '@quiet-tech/ui';
+import { postCard, postCardClasses } from '@still-void/ui';
 ```
 
-See [playground/index.html](https://github.com/quiet-tech/ui/blob/main/playground/index.html)
+See [playground/index.html](https://github.com/still-void/ui/blob/main/playground/index.html)
 in the repo for the same catalog rendered with zero framework code.

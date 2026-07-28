@@ -1,5 +1,5 @@
 /**
- * @quiet-tech/ui — framework-agnostic core.
+ * @still-void/ui — framework-agnostic core.
  * Tokens and recipes are pure data/functions (Server Component safe).
  * Behaviors touch the DOM only when called — import anywhere, call on the client.
  */

@@ -14,35 +14,35 @@ describe('cx', () => {
 
 describe('recipes', () => {
   test('postCard applies dense modifier', () => {
-    expect(postCard({ dense: true })).toContain('qt-post-card--dense');
-    expect(postCard()).not.toContain('qt-post-card--dense');
+    expect(postCard({ dense: true })).toContain('sv-post-card--dense');
+    expect(postCard()).not.toContain('sv-post-card--dense');
   });
 
   test('postCard includes hover class unless disabled', () => {
-    expect(postCard()).toContain('qt-card-hover');
-    expect(postCard({ hover: false })).not.toContain('qt-card-hover');
+    expect(postCard()).toContain('sv-card-hover');
+    expect(postCard({ hover: false })).not.toContain('sv-card-hover');
   });
 
   test('header applies glass by default and allows opting out', () => {
-    expect(header()).toContain('qt-glass');
-    expect(header({ glass: false })).not.toContain('qt-glass');
+    expect(header()).toContain('sv-glass');
+    expect(header({ glass: false })).not.toContain('sv-glass');
   });
 
   test('callout maps each kind to its modifier', () => {
-    expect(callout('note')).toContain('qt-callout--note');
-    expect(callout('warn')).toContain('qt-callout--warn');
-    expect(callout('aha')).toContain('qt-callout--aha');
+    expect(callout('note')).toContain('sv-callout--note');
+    expect(callout('warn')).toContain('sv-callout--warn');
+    expect(callout('aha')).toContain('sv-callout--aha');
   });
 
   test('tocLink marks active and indents depth 3', () => {
-    expect(tocLink({ active: true })).toContain('qt-toc__link--active');
-    expect(tocLink({ depth: 3 })).toContain('qt-toc__link--depth-3');
-    expect(tocLink()).toBe('qt-toc__link');
+    expect(tocLink({ active: true })).toContain('sv-toc__link--active');
+    expect(tocLink({ depth: 3 })).toContain('sv-toc__link--depth-3');
+    expect(tocLink()).toBe('sv-toc__link');
   });
 
   test('categoryPill toggles interactive and active states', () => {
     expect(categoryPill({ interactive: true, active: true })).toBe(
-      'qt-pill qt-pill--interactive qt-pill--active',
+      'sv-pill sv-pill--interactive sv-pill--active',
     );
   });
 });

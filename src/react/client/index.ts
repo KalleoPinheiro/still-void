@@ -1,5 +1,5 @@
 /**
- * @quiet-tech/ui/react/client — Client Components.
+ * @still-void/ui/react/client — Client Components.
  * The build prepends 'use client' to this entry; import from here only what
  * needs interactivity and compose into Server Components via slots.
  */

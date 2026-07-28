@@ -12,7 +12,7 @@ type Story = StoryObj<typeof Header>;
 
 export const Default: Story = {
   args: {
-    logo: <Logo label="quiet.tech" />,
+    logo: <Logo label="still.void" />,
     items: [
       { label: 'Home', href: '#', active: true },
       { label: 'Articles', href: '#' },
@@ -24,7 +24,7 @@ export const Default: Story = {
 export const WithActions: Story = {
   args: {
     ...Default.args,
-    actions: <span className="qt-header__link">Search</span>,
+    actions: <span className="sv-header__link">Search</span>,
   },
 };
 

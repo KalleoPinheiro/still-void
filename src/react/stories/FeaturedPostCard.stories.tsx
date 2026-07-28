@@ -36,10 +36,10 @@ export const WithVisual: Story = {
           height="64"
           rx="8"
           fill="none"
-          stroke="var(--qt-accent)"
+          stroke="var(--sv-accent)"
           strokeWidth="1.5"
         />
-        <circle cx="60" cy="40" r="14" fill="var(--qt-accent)" opacity="0.35" />
+        <circle cx="60" cy="40" r="14" fill="var(--sv-accent)" opacity="0.35" />
       </svg>
     ),
   },

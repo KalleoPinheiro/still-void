@@ -1,6 +1,6 @@
 /**
- * Quiet Tech color tokens.
- * Values ported literally from the Quiet Tech spec (blog.kalleopinheiro.dev).
+ * Still Void color tokens.
+ * Values ported literally from the Still Void spec (blog.kalleopinheiro.dev).
  * Do not round or "approximate" — fidelity rule.
  */
 export const colors = {

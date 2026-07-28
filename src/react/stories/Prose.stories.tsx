@@ -20,7 +20,7 @@ export const Default: Story = {
       </p>
       <h2>A section heading</h2>
       <p>Headings balance their line breaks via `text-wrap: balance`.</p>
-      <blockquote>Quiet Tech: calm engineering, sharp accents.</blockquote>
+      <blockquote>Still Void: calm engineering, sharp accents.</blockquote>
     </Prose>
   ),
 };

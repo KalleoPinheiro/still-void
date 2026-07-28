@@ -13,7 +13,7 @@ const withTheme: Decorator = (Story, context) => {
   }, [mode, accent]);
 
   return (
-    <div className="qt-body" style={{ padding: '2rem', minHeight: '100vh' }}>
+    <div className="sv-body" style={{ padding: '2rem', minHeight: '100vh' }}>
       <Story />
     </div>
   );

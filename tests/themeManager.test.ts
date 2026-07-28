@@ -29,7 +29,7 @@ describe('createThemeManager', () => {
   });
 
   test('stored preference wins over server-rendered attributes', () => {
-    window.localStorage.setItem('quiet-tech-theme', JSON.stringify({ mode: 'light', accent: 'amber' }));
+    window.localStorage.setItem('still-void-theme', JSON.stringify({ mode: 'light', accent: 'amber' }));
     document.documentElement.setAttribute('data-theme', 'dark');
     manager = createThemeManager();
     expect(manager.getState()).toEqual({ mode: 'light', accent: 'amber' });
@@ -49,12 +49,12 @@ describe('createThemeManager', () => {
   test('persists state to localStorage', () => {
     manager = createThemeManager();
     manager.setAccent('violet');
-    const stored = JSON.parse(window.localStorage.getItem('quiet-tech-theme') ?? '{}');
+    const stored = JSON.parse(window.localStorage.getItem('still-void-theme') ?? '{}');
     expect(stored.accent).toBe('violet');
   });
 
   test('ignores corrupted storage payloads', () => {
-    window.localStorage.setItem('quiet-tech-theme', 'not-json{');
+    window.localStorage.setItem('still-void-theme', 'not-json{');
     manager = createThemeManager();
     expect(manager.getState().mode).toBe('dark');
   });

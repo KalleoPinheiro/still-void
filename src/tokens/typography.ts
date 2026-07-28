@@ -1,5 +1,5 @@
 /**
- * Quiet Tech typography tokens.
+ * Still Void typography tokens.
  * Families are fixed by the spec: Sora (display), Manrope (body), JetBrains Mono (code).
  * System fallbacks are loading fallbacks only — the final family must be the correct one.
  */

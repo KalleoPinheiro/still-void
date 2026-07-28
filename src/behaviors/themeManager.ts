@@ -30,7 +30,7 @@ export interface ThemeManager {
   destroy: () => void;
 }
 
-const DEFAULT_STORAGE_KEY = 'quiet-tech-theme';
+const DEFAULT_STORAGE_KEY = 'still-void-theme';
 
 function isMode(value: unknown): value is ThemeMode {
   return themeModes.includes(value as ThemeMode);

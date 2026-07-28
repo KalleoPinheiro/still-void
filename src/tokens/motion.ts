@@ -1,5 +1,5 @@
 /**
- * Quiet Tech motion tokens.
+ * Still Void motion tokens.
  * Hover transitions use the signature easing; the reading progress bar is linear.
  */
 export const easings = {

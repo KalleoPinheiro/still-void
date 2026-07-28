@@ -12,14 +12,14 @@ export interface CategoryPillOptions {
 
 export function categoryPill(options: CategoryPillOptions = {}): string {
   return cx(
-    'qt-pill',
-    options.interactive && 'qt-pill--interactive',
-    options.active && 'qt-pill--active',
+    'sv-pill',
+    options.interactive && 'sv-pill--interactive',
+    options.active && 'sv-pill--active',
   );
 }
 
 export const categoryPillClasses = {
-  dot: 'qt-pill__dot',
+  dot: 'sv-pill__dot',
 } as const;
 
 export interface PostCardOptions {
@@ -29,30 +29,30 @@ export interface PostCardOptions {
 
 export function postCard(options: PostCardOptions = {}): string {
   return cx(
-    'qt-post-card',
-    options.dense && 'qt-post-card--dense',
-    options.hover !== false && 'qt-card-hover',
+    'sv-post-card',
+    options.dense && 'sv-post-card--dense',
+    options.hover !== false && 'sv-card-hover',
   );
 }
 
 export const postCardClasses = {
-  meta: 'qt-post-card__meta',
-  title: 'qt-post-card__title',
-  excerpt: 'qt-post-card__excerpt',
+  meta: 'sv-post-card__meta',
+  title: 'sv-post-card__title',
+  excerpt: 'sv-post-card__excerpt',
 } as const;
 
 export function featuredPostCard(): string {
-  return cx('qt-featured-card', 'qt-gradient-border', 'qt-card-hover');
+  return cx('sv-featured-card', 'sv-gradient-border', 'sv-card-hover');
 }
 
 export const featuredPostCardClasses = {
-  body: 'qt-featured-card__body',
-  title: 'qt-featured-card__title',
-  visual: 'qt-featured-card__visual',
+  body: 'sv-featured-card__body',
+  title: 'sv-featured-card__title',
+  visual: 'sv-featured-card__visual',
 } as const;
 
 export function postGrid(): string {
-  return 'qt-post-grid';
+  return 'sv-post-grid';
 }
 
 export interface LayoutOptions {
@@ -60,25 +60,25 @@ export interface LayoutOptions {
 }
 
 export function layout(options: LayoutOptions = {}): string {
-  return cx('qt-layout', options.withSidebar && 'qt-layout--with-sidebar');
+  return cx('sv-layout', options.withSidebar && 'sv-layout--with-sidebar');
 }
 
 export function sidebar(): string {
-  return 'qt-sidebar';
+  return 'sv-sidebar';
 }
 
 export const sidebarClasses = {
-  sectionTitle: 'qt-sidebar__section-title',
+  sectionTitle: 'sv-sidebar__section-title',
 } as const;
 
 export function hero(): string {
-  return 'qt-hero';
+  return 'sv-hero';
 }
 
 export const heroClasses = {
-  eyebrow: 'qt-hero__eyebrow',
-  title: 'qt-hero__title',
-  description: 'qt-hero__description',
+  eyebrow: 'sv-hero__eyebrow',
+  title: 'sv-hero__title',
+  description: 'sv-hero__description',
 } as const;
 
 export interface SkeletonOptions {
@@ -86,9 +86,9 @@ export interface SkeletonOptions {
 }
 
 export function skeletonLine(options: SkeletonOptions = {}): string {
-  return cx('qt-skeleton', 'qt-skeleton-line', options.small && 'qt-skeleton-line--sm');
+  return cx('sv-skeleton', 'sv-skeleton-line', options.small && 'sv-skeleton-line--sm');
 }
 
 export function cardSkeleton(): string {
-  return 'qt-card-skeleton';
+  return 'sv-card-skeleton';
 }

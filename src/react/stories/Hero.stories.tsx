@@ -13,7 +13,7 @@ type Story = StoryObj<typeof Hero>;
 export const Default: Story = {
   args: {
     eyebrow: 'design system',
-    title: 'Quiet Tech — calm engineering, sharp accents',
+    title: 'Still Void — calm engineering, sharp accents',
     description:
       'Framework-agnostic tokens, recipes and behaviors, with first-class Server Component support.',
   },

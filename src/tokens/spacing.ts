@@ -1,5 +1,5 @@
 /**
- * Quiet Tech spacing scale (4→72px) and radii (6/8/12/16/full).
+ * Still Void spacing scale (4→72px) and radii (6/8/12/16/full).
  */
 export const spacing = {
   1: '4px',

@@ -16,7 +16,7 @@ export interface ReadingProgress {
 
 /**
  * Tracks document (or element) reading progress. Writes the
- * `--qt-reading-progress` CSS var consumed by `.qt-reading-progress__bar`.
+ * `--sv-reading-progress` CSS var consumed by `.sv-reading-progress__bar`.
  */
 export function createReadingProgress(options: ReadingProgressOptions = {}): ReadingProgress {
   const varTarget =

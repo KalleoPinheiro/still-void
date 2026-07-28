@@ -6,24 +6,24 @@ import { cx } from './cx';
  */
 
 export function codeBlock(): string {
-  return 'qt-code-block';
+  return 'sv-code-block';
 }
 
 export const codeBlockClasses = {
-  header: 'qt-code-block__header',
-  pre: 'qt-code-block__pre',
-  copy: 'qt-code-block__copy',
-  copyCopied: cx('qt-code-block__copy', 'qt-code-block__copy--copied'),
+  header: 'sv-code-block__header',
+  pre: 'sv-code-block__pre',
+  copy: 'sv-code-block__copy',
+  copyCopied: cx('sv-code-block__copy', 'sv-code-block__copy--copied'),
 } as const;
 
 export type CalloutKind = 'note' | 'warn' | 'aha';
 
 export function callout(kind: CalloutKind): string {
-  return cx('qt-callout', `qt-callout--${kind}`);
+  return cx('sv-callout', `sv-callout--${kind}`);
 }
 
 export const calloutClasses = {
-  label: 'qt-callout__label',
+  label: 'sv-callout__label',
 } as const;
 
 export const calloutLabels: Record<CalloutKind, string> = {
@@ -33,7 +33,7 @@ export const calloutLabels: Record<CalloutKind, string> = {
 };
 
 export function tableOfContents(): string {
-  return 'qt-toc';
+  return 'sv-toc';
 }
 
 export interface TocLinkOptions {
@@ -44,37 +44,37 @@ export interface TocLinkOptions {
 
 export function tocLink(options: TocLinkOptions = {}): string {
   return cx(
-    'qt-toc__link',
-    options.active && 'qt-toc__link--active',
-    options.depth === 3 && 'qt-toc__link--depth-3',
+    'sv-toc__link',
+    options.active && 'sv-toc__link--active',
+    options.depth === 3 && 'sv-toc__link--depth-3',
   );
 }
 
 export function readingProgress(): string {
-  return 'qt-reading-progress';
+  return 'sv-reading-progress';
 }
 
 export const readingProgressClasses = {
-  bar: 'qt-reading-progress__bar',
+  bar: 'sv-reading-progress__bar',
 } as const;
 
-/** CSS var read by `.qt-reading-progress__bar` (0 → 1). */
-export const READING_PROGRESS_VAR = '--qt-reading-progress';
+/** CSS var read by `.sv-reading-progress__bar` (0 → 1). */
+export const READING_PROGRESS_VAR = '--sv-reading-progress';
 
 export function articleHeader(): string {
-  return 'qt-article-header';
+  return 'sv-article-header';
 }
 
 export const articleHeaderClasses = {
-  title: 'qt-article-header__title',
-  meta: 'qt-article-header__meta',
-  author: 'qt-article-header__author',
+  title: 'sv-article-header__title',
+  meta: 'sv-article-header__meta',
+  author: 'sv-article-header__author',
 } as const;
 
 export function prose(): string {
-  return 'qt-prose';
+  return 'sv-prose';
 }
 
 export const proseClasses = {
-  lead: 'qt-prose__lead',
+  lead: 'sv-prose__lead',
 } as const;

@@ -11,9 +11,9 @@ export default meta;
 type Story = StoryObj<typeof Logo>;
 
 export const Default: Story = {
-  args: { label: 'quiet.tech' },
+  args: { label: 'still.void' },
 };
 
 export const CustomHref: Story = {
-  args: { label: 'quiet.tech', href: '/home' },
+  args: { label: 'still.void', href: '/home' },
 };

@@ -1,6 +1,6 @@
-# @quiet-tech/ui
+# @still-void/ui
 
-**Quiet Tech** design system as a framework-agnostic TypeScript library — extracted from the
+**Still Void** design system as a framework-agnostic TypeScript library — extracted from the
 `blog.kalleopinheiro.dev` prototype. Works with React, Angular, Vue, or plain HTML, with
 first-class support for **Next.js Server Components**.
 
@@ -10,18 +10,18 @@ The library is layered so the core never depends on any framework:
 
 | Layer | Entry | Runs where | What it is |
 |---|---|---|---|
-| **Tokens** | `@quiet-tech/ui` | anywhere | Typed constants: colors (hex + oklch), typography, spacing, radii, motion |
-| **Theme CSS** | `@quiet-tech/ui/theme.css` | browser | CSS vars (`--qt-*`), dark/light via `data-theme`, accents via `data-accent`, signature utilities |
-| **Component CSS** | `@quiet-tech/ui/style.css` | browser | All component classes (`qt-*`) |
-| **Recipes** | `@quiet-tech/ui` | anywhere (RSC-safe) | Pure functions returning class strings: `postCard({ dense: true })` |
-| **Behaviors** | `@quiet-tech/ui` | client | Vanilla DOM: `createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard` |
-| **React (server-safe)** | `@quiet-tech/ui/react` | server or client | Components without hooks — render inside Server Components |
-| **React (client)** | `@quiet-tech/ui/react/client` | client | `'use client'` bundle: `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, hooks |
+| **Tokens** | `@still-void/ui` | anywhere | Typed constants: colors (hex + oklch), typography, spacing, radii, motion |
+| **Theme CSS** | `@still-void/ui/theme.css` | browser | CSS vars (`--sv-*`), dark/light via `data-theme`, accents via `data-accent`, signature utilities |
+| **Component CSS** | `@still-void/ui/style.css` | browser | All component classes (`sv-*`) |
+| **Recipes** | `@still-void/ui` | anywhere (RSC-safe) | Pure functions returning class strings: `postCard({ dense: true })` |
+| **Behaviors** | `@still-void/ui` | client | Vanilla DOM: `createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard` |
+| **React (server-safe)** | `@still-void/ui/react` | server or client | Components without hooks — render inside Server Components |
+| **React (client)** | `@still-void/ui/react/client` | client | `'use client'` bundle: `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, hooks |
 
 ## Install
 
 ```sh
-npm install @quiet-tech/ui
+npm install @still-void/ui
 ```
 
 React is an **optional** peer dependency — non-React consumers install nothing extra.
@@ -30,19 +30,19 @@ React is an **optional** peer dependency — non-React consumers install nothing
 
 ```tsx
 // app/layout.tsx (Server Component)
-import '@quiet-tech/ui/theme.css';
-import '@quiet-tech/ui/style.css';
-import { Header, Logo, Footer } from '@quiet-tech/ui/react';
-import { ThemeProvider, ThemeToggle } from '@quiet-tech/ui/react/client';
+import '@still-void/ui/theme.css';
+import '@still-void/ui/style.css';
+import { Header, Logo, Footer } from '@still-void/ui/react';
+import { ThemeProvider, ThemeToggle } from '@still-void/ui/react/client';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // Server-rendered attributes = correct theme on first paint, no flash.
     <html lang="en" data-theme="dark" data-accent="cyan" suppressHydrationWarning>
-      <body className="qt-body">
+      <body className="sv-body">
         <ThemeProvider>
           <Header
-            logo={<Logo label="quiet.tech" />}
+            logo={<Logo label="still.void" />}
             items={[{ label: 'Home', href: '/', active: true }]}
             actions={<ThemeToggle />}
           />
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```tsx
 // app/page.tsx (Server Component — zero client JS for this content)
-import { Hero, PostGrid, PostCard, Layout } from '@quiet-tech/ui/react';
+import { Hero, PostGrid, PostCard, Layout } from '@still-void/ui/react';
 
 export default async function Home() {
   const posts = await getPosts(); // fetch on the server
@@ -74,14 +74,14 @@ export default async function Home() {
 }
 ```
 
-Everything in `@quiet-tech/ui/react` is hook-free and browser-API-free, so it renders on the
-server. Interactive pieces come from `@quiet-tech/ui/react/client` and are composed in via
+Everything in `@still-void/ui/react` is hook-free and browser-API-free, so it renders on the
+server. Interactive pieces come from `@still-void/ui/react/client` and are composed in via
 slots (`actions`, `visual`, `eyebrow`).
 
 ```tsx
 // CodeBlock stays a Server Component; only the copy button hydrates.
-import { CodeBlock } from '@quiet-tech/ui/react';
-import { CopyButton } from '@quiet-tech/ui/react/client';
+import { CodeBlock } from '@still-void/ui/react';
+import { CopyButton } from '@still-void/ui/react/client';
 
 <CodeBlock code={source} language="ts" actions={<CopyButton code={source} />} />;
 ```
@@ -92,7 +92,7 @@ render with Shiki on the server and pass the markup via `rendered`.
 ## Usage — any other framework (recipes + behaviors)
 
 ```ts
-import { postCard, postCardClasses, createThemeManager } from '@quiet-tech/ui';
+import { postCard, postCardClasses, createThemeManager } from '@still-void/ui';
 ```
 
 ```html
@@ -118,12 +118,12 @@ framework code** — open it with `npm run playground` after `npm run build`.
 - Mode: `data-theme="dark" | "light"` on `<html>` (dark is default).
 - Accent: `data-accent="cyan" | "violet" | "mint" | "amber"` — pure CSS, so it works in
   Server Components with no JS.
-- Everything is overridable via CSS vars (`--qt-accent`, `--qt-bg`, …). No `!important` anywhere.
+- Everything is overridable via CSS vars (`--sv-accent`, `--sv-bg`, …). No `!important` anywhere.
 
 ## Fidelity rules (do not regress)
 
 - Color values (hex/oklch) are literal from the spec — never rounded.
-- `.qt-gradient-border` is the visual signature; never replace with `box-shadow`.
+- `.sv-gradient-border` is the visual signature; never replace with `box-shadow`.
 - Cards have **no shadow**.
 - `text-wrap: balance` on every display heading.
 - Fonts: Sora (display) / Manrope (body) / JetBrains Mono (code). System fonts are loading

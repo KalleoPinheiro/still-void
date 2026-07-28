@@ -39,7 +39,7 @@ export function CategoryPill({
   ...rest
 }: CategoryPillProps) {
   const pillStyle: CSSProperties | undefined = color
-    ? ({ ...style, '--qt-pill-color': resolveCategoryColor(color) } as CSSProperties)
+    ? ({ ...style, '--sv-pill-color': resolveCategoryColor(color) } as CSSProperties)
     : style;
   return (
     <span className={cx(categoryPill({ active, interactive }), className)} style={pillStyle} {...rest}>

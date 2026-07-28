@@ -12,29 +12,29 @@ export interface HeaderOptions {
 }
 
 export function header(options: HeaderOptions = {}): string {
-  return cx('qt-header', options.glass !== false && 'qt-glass');
+  return cx('sv-header', options.glass !== false && 'sv-glass');
 }
 
 export const headerClasses = {
-  nav: 'qt-header__nav',
-  link: 'qt-header__link',
-  linkActive: cx('qt-header__link', 'qt-header__link--active'),
-  actions: 'qt-header__actions',
+  nav: 'sv-header__nav',
+  link: 'sv-header__link',
+  linkActive: cx('sv-header__link', 'sv-header__link--active'),
+  actions: 'sv-header__actions',
 } as const;
 
 export function logo(): string {
-  return 'qt-logo';
+  return 'sv-logo';
 }
 
 export const logoClasses = {
-  dot: 'qt-logo__dot',
+  dot: 'sv-logo__dot',
 } as const;
 
 export function footer(): string {
-  return 'qt-footer';
+  return 'sv-footer';
 }
 
 export const footerClasses = {
-  links: 'qt-footer__links',
-  link: 'qt-footer__link',
+  links: 'sv-footer__links',
+  link: 'sv-footer__link',
 } as const;

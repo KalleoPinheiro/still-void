@@ -1,8 +1,8 @@
 /**
- * @quiet-tech/ui/react — Server Component safe React adapter.
+ * @still-void/ui/react — Server Component safe React adapter.
  * Nothing here uses hooks, state, or browser APIs, so every component can
  * render inside a Next.js Server Component. Interactive pieces live in
- * '@quiet-tech/ui/react/client'.
+ * '@still-void/ui/react/client'.
  */
 export * from './components/Shell';
 export * from './components/Content';

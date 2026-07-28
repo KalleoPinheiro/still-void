@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CodeBlock } from '../components/Article';
 import { CopyButton } from '../client/CopyButton';
 
-const sample = `import { createThemeManager } from '@quiet-tech/ui';
+const sample = `import { createThemeManager } from '@still-void/ui';
 
 const theme = createThemeManager();
 theme.setAccent('violet');`;

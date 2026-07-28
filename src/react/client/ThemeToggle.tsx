@@ -12,7 +12,7 @@ export function ThemeToggle({ className, ...rest }: ThemeToggleProps) {
     <button
       type="button"
       onClick={toggleMode}
-      className={cx('qt-header__link', className)}
+      className={cx('sv-header__link', className)}
       aria-label={`Switch to ${next} theme`}
       {...rest}
     >

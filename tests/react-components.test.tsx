@@ -29,7 +29,7 @@ describe('PostCard', () => {
 
   test('dense variant hides excerpt and applies modifier', () => {
     const { container } = render(<PostCard post={post} dense />);
-    expect(container.querySelector('.qt-post-card--dense')).toBeInTheDocument();
+    expect(container.querySelector('.sv-post-card--dense')).toBeInTheDocument();
     expect(screen.queryByText('Server Components explained.')).not.toBeInTheDocument();
   });
 });
@@ -37,15 +37,15 @@ describe('PostCard', () => {
 describe('CategoryPill', () => {
   test('resolves category color to the pill CSS var', () => {
     const { container } = render(<CategoryPill label="IA" color="ia" />);
-    const pill = container.querySelector('.qt-pill') as HTMLElement;
-    expect(pill.style.getPropertyValue('--qt-pill-color')).toBe(accents.violet);
+    const pill = container.querySelector('.sv-pill') as HTMLElement;
+    expect(pill.style.getPropertyValue('--sv-pill-color')).toBe(accents.violet);
   });
 });
 
 describe('Callout', () => {
   test.each(['note', 'warn', 'aha'] as const)('renders %s kind with label', (kind) => {
     const { container } = render(<Callout kind={kind}>Content</Callout>);
-    expect(container.querySelector(`.qt-callout--${kind}`)).toBeInTheDocument();
+    expect(container.querySelector(`.sv-callout--${kind}`)).toBeInTheDocument();
   });
 
   test('accepts custom label', () => {
@@ -75,8 +75,8 @@ describe('Header', () => {
 
 describe('Hero', () => {
   test('renders eyebrow, balanced title and description', () => {
-    render(<Hero eyebrow="blog" title="Quiet Tech" description="Calm engineering notes." />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Quiet Tech' })).toBeInTheDocument();
+    render(<Hero eyebrow="blog" title="Still Void" description="Calm engineering notes." />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Still Void' })).toBeInTheDocument();
     expect(screen.getByText('blog')).toBeInTheDocument();
   });
 });

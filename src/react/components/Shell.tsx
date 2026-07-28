@@ -6,7 +6,7 @@ import type { NavItem } from '../../types';
 /*
  * Shell components are Server Component safe: no hooks, no browser APIs.
  * Interactivity (theme toggle) is composed in via the `actions` slot —
- * pass <ThemeToggle /> from '@quiet-tech/ui/react/client'.
+ * pass <ThemeToggle /> from '@still-void/ui/react/client'.
  */
 
 export interface LogoProps extends ComponentPropsWithoutRef<'a'> {
