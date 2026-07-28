@@ -17,7 +17,8 @@
   --sv-border-strong: rgba(255, 255, 255, 0.14);
   --sv-text: #ededf0;
   --sv-text-2: #8b8b96;
-  --sv-text-3: #5a5a66;
+  /* WCAG AA fix: was #5a5a66 (~2.6:1 on surface) — text3 carries real copy, not decoration. */
+  --sv-text-3: #83838f;
 
   /* accent palette */
   --sv-accent-cyan: oklch(0.78 0.12 210);
@@ -80,7 +81,8 @@
   --sv-border-strong: rgba(0, 0, 0, 0.14);
   --sv-text: #16161b;
   --sv-text-2: #5a5a66;
-  --sv-text-3: #8b8b96;
+  /* WCAG AA fix: was #8b8b96 (~3.1:1 on white) — same reasoning as dark mode. */
+  --sv-text-3: #6f6f78;
   color-scheme: light;
 }
 
@@ -96,6 +98,12 @@
 }
 [data-accent='amber'] {
   --sv-accent: var(--sv-accent-amber);
+}
+
+/* Visible keyboard focus everywhere — never removed without a replacement. */
+:focus-visible {
+  outline: 2px solid var(--sv-accent);
+  outline-offset: 2px;
 }
 
 /* ============================================================

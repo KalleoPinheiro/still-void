@@ -42,10 +42,16 @@ body.sv-body {
   gap: var(--sv-space-5);
 }
 .sv-header__link {
+  appearance: none;
+  border: none;
+  background: none;
+  font-family: inherit;
+  padding: 0;
   color: var(--sv-text-2);
   text-decoration: none;
   font-size: var(--sv-text-sm);
   font-weight: 500;
+  cursor: pointer;
   transition: color var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-header__link:hover,
@@ -126,6 +132,8 @@ body.sv-body {
   flex-shrink: 0;
 }
 .sv-pill--interactive {
+  appearance: none;
+  font-family: inherit;
   cursor: pointer;
   transition:
     color var(--sv-duration-fast) var(--sv-ease-hover),
@@ -255,7 +263,6 @@ body.sv-body {
   gap: var(--sv-space-8);
 }
 .sv-sidebar__section-title {
-  font-family: var(--sv-font-display);
   font-size: var(--sv-text-sm);
   font-weight: 600;
   letter-spacing: 0.08em;

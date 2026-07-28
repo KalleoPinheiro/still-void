@@ -13,7 +13,9 @@ export const colors = {
     borderStrong: 'rgba(255,255,255,0.14)',
     text: '#EDEDF0',
     text2: '#8B8B96',
-    text3: '#5A5A66',
+    // Corrected from #5A5A66 (~2.6:1 on surface) to meet WCAG AA 4.5:1 — text3 is used for
+    // real copy (metadata, TOC links), not decoration, so it must be readable, not just muted.
+    text3: '#83838F',
   },
   light: {
     bg: '#F7F7F5',
@@ -24,7 +26,8 @@ export const colors = {
     borderStrong: 'rgba(0,0,0,0.14)',
     text: '#16161B',
     text2: '#5A5A66',
-    text3: '#8B8B96',
+    // Corrected from #8B8B96 (~3.1:1 on white) to meet WCAG AA 4.5:1, same reasoning as dark.
+    text3: '#6F6F78',
   },
 } as const;
 
