@@ -27,12 +27,22 @@
   /* WCAG AA fix: was #5a5a66 (~2.6:1 on surface) — text3 carries real copy, not decoration. */
   --sv-text-3: #83838f;
 
-  /* accent palette */
+  /* accent palette — surface use (dots, gradient border, progress track). */
   --sv-accent-cyan: oklch(0.78 0.12 210);
   --sv-accent-violet: oklch(0.72 0.14 295);
   --sv-accent-mint: oklch(0.78 0.1 160);
   --sv-accent-amber: oklch(0.78 0.12 75);
   --sv-accent: var(--sv-accent-cyan);
+
+  /* accent "ink" — text/UI-state use (links, active states, focus ring).
+     Dark mode: identical to the surface accent (already ≥6.9:1). Light mode
+     overrides these to a darker step of the same hue so text meets 4.5:1 —
+     see accentsInk in tokens/colors.ts for the derivation. */
+  --sv-accent-cyan-ink: var(--sv-accent-cyan);
+  --sv-accent-violet-ink: var(--sv-accent-violet);
+  --sv-accent-mint-ink: var(--sv-accent-mint);
+  --sv-accent-amber-ink: var(--sv-accent-amber);
+  --sv-accent-ink: var(--sv-accent-cyan-ink);
 
   /* typography */
   --sv-font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
@@ -76,6 +86,24 @@
   --sv-duration-base: 200ms;
   --sv-duration-slow: 320ms;
 
+  /* z-index scale — named steps, never arbitrary values like 999/9999. */
+  --sv-z-dropdown: 10;
+  --sv-z-sticky: 20;
+  --sv-z-backdrop: 30;
+  --sv-z-modal: 40;
+  --sv-z-toast: 50;
+  --sv-z-tooltip: 60;
+
+  /* semantic state colors — fixed regardless of the active site accent. */
+  --sv-danger: oklch(0.68 0.19 25);
+  --sv-success: oklch(0.75 0.15 150);
+  --sv-info: oklch(0.78 0.12 210);
+  --sv-warning: oklch(0.78 0.12 75);
+  --sv-danger-ink: var(--sv-danger);
+  --sv-success-ink: var(--sv-success);
+  --sv-info-ink: var(--sv-info);
+  --sv-warning-ink: var(--sv-warning);
+
   color-scheme: dark;
 }
 
@@ -88,28 +116,48 @@
   --sv-border-strong: rgba(0, 0, 0, 0.14);
   --sv-text: #16161b;
   --sv-text-2: #5a5a66;
-  /* WCAG AA fix: was #8b8b96 (~3.1:1 on white) — same reasoning as dark mode. */
-  --sv-text-3: #6f6f78;
+  /* WCAG AA fix: was #8b8b96 (~3.1:1 on white). #6f6f78 (a first fix) cleared
+     white/paper but was ~4.44:1 on surface2 (#f2f2ef) — still a failure. */
+  --sv-text-3: #6d6d76;
   color-scheme: light;
+
+  /* WCAG AA fix: the dark-mode accent hues read 1.8–2.6:1 as text on light
+     surfaces. Darkened per-hue steps restore ≥4.5:1 without touching the
+     canonical (dark-mode, surface-use) accent values above. */
+  --sv-accent-cyan-ink: oklch(0.525 0.09 210);
+  --sv-accent-violet-ink: oklch(0.545 0.14 295);
+  --sv-accent-mint-ink: oklch(0.52 0.1 160);
+  --sv-accent-amber-ink: oklch(0.535 0.11 75);
+
+  /* Same WCAG AA fix, applied to the semantic state colors. */
+  --sv-danger-ink: oklch(0.555 0.19 25);
+  --sv-success-ink: oklch(0.515 0.14 150);
+  --sv-info-ink: oklch(0.525 0.09 210);
+  --sv-warning-ink: oklch(0.535 0.11 75);
 }
 
 /* Accent switching is pure CSS — works in Server Components. */
 [data-accent='cyan'] {
   --sv-accent: var(--sv-accent-cyan);
+  --sv-accent-ink: var(--sv-accent-cyan-ink);
 }
 [data-accent='violet'] {
   --sv-accent: var(--sv-accent-violet);
+  --sv-accent-ink: var(--sv-accent-violet-ink);
 }
 [data-accent='mint'] {
   --sv-accent: var(--sv-accent-mint);
+  --sv-accent-ink: var(--sv-accent-mint-ink);
 }
 [data-accent='amber'] {
   --sv-accent: var(--sv-accent-amber);
+  --sv-accent-ink: var(--sv-accent-amber-ink);
 }
 
-/* Visible keyboard focus everywhere — never removed without a replacement. */
+/* Visible keyboard focus everywhere — never removed without a replacement.
+   Uses the ink accent so the ring clears 3:1 (WCAG 1.4.11) in light mode too. */
 :focus-visible {
-  outline: 2px solid var(--sv-accent);
+  outline: 2px solid var(--sv-accent-ink);
   outline-offset: 2px;
 }
 
