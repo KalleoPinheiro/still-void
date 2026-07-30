@@ -1,5 +1,27 @@
 # @still-void/ui
 
+## 1.1.0
+
+### Minor Changes
+
+- feat(react): add ThemeScript to prevent flash of wrong theme on load
+
+  feat(tokens): WCAG AA accent/semantic color layer + z-index scale
+
+  fix(security): escape < in ThemeScript's embedded JSON to prevent </script> breakout
+
+  fix(storybook): apply sv-root theme class in preview decorator
+
+  fix(a11y): keyboard-operable CategoryPill + guard color resolvers
+
+  fix(a11y): CSS accessibility & consistency pass
+
+  fix(theme): remove render-blocking Google Fonts @import
+
+  perf(behaviors): rAF-throttle reading progress, quiet ARIA spam
+
+  ci: add GitHub Actions workflow for typecheck/test/build
+
 ## 1.0.0
 
 ### Major Changes
