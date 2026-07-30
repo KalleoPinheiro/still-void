@@ -13,7 +13,12 @@ const withTheme: Decorator = (Story, context) => {
   }, [mode, accent]);
 
   return (
-    <div className="sv-body" style={{ padding: '2rem', minHeight: '100vh' }}>
+    // .sv-root (not .sv-body) — the base-styles selector in style.css is
+    // `.sv-root, [data-sv] body, body.sv-body`; a plain <div class="sv-body">
+    // matches none of those, so the canvas never got the system's
+    // background/text/font tokens and addon-a11y checked contrast against
+    // Storybook's own default white instead of Still Void's real surfaces.
+    <div className="sv-root" style={{ padding: '2rem', minHeight: '100vh' }}>
       <Story />
     </div>
   );
