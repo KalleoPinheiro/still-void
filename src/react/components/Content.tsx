@@ -21,30 +21,60 @@ import type { PostSummary } from '../../types';
 
 /* All components in this file are Server Component safe. */
 
-export interface CategoryPillProps extends ComponentPropsWithoutRef<'span'> {
+interface CategoryPillBaseProps {
   label: string;
   /** Accent name ('cyan'), category name ('ia'), or any CSS color. */
   color?: string;
   active?: boolean;
-  interactive?: boolean;
 }
 
-export function CategoryPill({
-  label,
-  color,
-  active,
-  interactive,
-  className,
-  style,
-  ...rest
-}: CategoryPillProps) {
+export type CategoryPillProps =
+  | (CategoryPillBaseProps & { interactive: true } & Omit<
+        ComponentPropsWithoutRef<'button'>,
+        'color'
+      >)
+  | (CategoryPillBaseProps & { interactive?: false } & Omit<
+        ComponentPropsWithoutRef<'span'>,
+        'color'
+      >);
+
+/**
+ * Categories render as a colored dot + label. When `interactive`, this is a
+ * real <button> (toggle semantics via `aria-pressed`) — a `<span>` with a
+ * pointer cursor is not operable by keyboard or assistive tech.
+ */
+export function CategoryPill({ label, color, active, interactive, className, style, ...rest }: CategoryPillProps) {
   const pillStyle: CSSProperties | undefined = color
     ? ({ ...style, '--sv-pill-color': resolveCategoryColor(color) } as CSSProperties)
     : style;
-  return (
-    <span className={cx(categoryPill({ active, interactive }), className)} style={pillStyle} {...rest}>
+  const content = (
+    <>
       <span className={categoryPillClasses.dot} aria-hidden="true" />
       {label}
+    </>
+  );
+
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        aria-pressed={active ?? false}
+        className={cx(categoryPill({ active, interactive }), className)}
+        style={pillStyle}
+        {...(rest as ComponentPropsWithoutRef<'button'>)}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <span
+      className={cx(categoryPill({ active, interactive }), className)}
+      style={pillStyle}
+      {...(rest as ComponentPropsWithoutRef<'span'>)}
+    >
+      {content}
     </span>
   );
 }

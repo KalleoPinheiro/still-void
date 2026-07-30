@@ -14,17 +14,20 @@ export const defaultCategoryColors: Record<CategoryName, AccentName> = {
   ts: 'cyan',
 };
 
+const hasOwn = <T extends object>(obj: T, key: string): key is Extract<keyof T, string> =>
+  Object.prototype.hasOwnProperty.call(obj, key);
+
 /** Resolve an accent name or raw CSS color to a CSS color value. */
 export function resolveAccentColor(color: AccentName | (string & {})): string {
-  return color in accents ? accents[color as AccentName] : color;
+  return hasOwn(accents, color) ? accents[color] : color;
 }
 
 /** Resolve a category name, accent name, or raw CSS color to a CSS color value. */
 export function resolveCategoryColor(
   color: CategoryName | AccentName | (string & {}),
 ): string {
-  if (color in defaultCategoryColors) {
-    return accents[defaultCategoryColors[color as CategoryName]];
+  if (hasOwn(defaultCategoryColors, color)) {
+    return accents[defaultCategoryColors[color]];
   }
   return resolveAccentColor(color);
 }
