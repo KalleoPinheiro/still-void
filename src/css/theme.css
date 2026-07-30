@@ -240,4 +240,15 @@
   .sv-skeleton {
     animation: none;
   }
+  /* Hover/active color fades across nav, pills and the copy button are
+     non-essential motion too — instant is the reduced-motion default.
+     (The reading progress bar is intentionally excluded: its transition is
+     1:1 with the user's own scroll input, not decorative.) */
+  .sv-header__link,
+  .sv-footer__link,
+  .sv-pill--interactive,
+  .sv-code-block__copy,
+  .sv-toc__link {
+    transition: none;
+  }
 }

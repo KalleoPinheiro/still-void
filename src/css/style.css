@@ -29,7 +29,7 @@ body.sv-body {
 .sv-header {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: var(--sv-z-sticky);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -40,6 +40,36 @@ body.sv-body {
   display: flex;
   align-items: center;
   gap: var(--sv-space-5);
+  /* Lets the row shrink below its content width so overflow-x can scroll
+     it instead of the whole header wrapping or forcing the page wider. */
+  min-width: 0;
+}
+/* No distinct mobile nav pattern by design — a wrapping/collapsing nav adds
+   a second layout to maintain. Below the point where items stop fitting,
+   the row scrolls horizontally instead of overflowing the viewport. */
+@media (max-width: 640px) {
+  .sv-header__nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black var(--sv-space-2),
+      black calc(100% - var(--sv-space-2)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black var(--sv-space-2),
+      black calc(100% - var(--sv-space-2)),
+      transparent 100%
+    );
+  }
+  .sv-header__nav::-webkit-scrollbar {
+    display: none;
+  }
 }
 .sv-header__link {
   appearance: none;
@@ -53,6 +83,10 @@ body.sv-body {
   font-weight: 500;
   cursor: pointer;
   transition: color var(--sv-duration-fast) var(--sv-ease-hover);
+  /* WCAG 2.5.8 (AA): 24×24 CSS px minimum target size. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 .sv-header__link:hover,
 .sv-header__link--active {
@@ -224,6 +258,7 @@ body.sv-body {
   text-decoration: none;
 }
 .sv-featured-card__visual {
+  aspect-ratio: 16 / 10;
   min-height: 160px;
   border-radius: var(--sv-radius-md);
   background: var(--sv-surface-2);
@@ -279,7 +314,7 @@ body.sv-body {
   padding: var(--sv-space-16) 0 var(--sv-space-12);
 }
 .sv-hero__eyebrow {
-  color: var(--sv-accent);
+  color: var(--sv-accent-ink);
   font-family: var(--sv-font-mono);
   font-size: var(--sv-text-sm);
   letter-spacing: 0.08em;
@@ -363,14 +398,19 @@ body.sv-body {
   transition:
     color var(--sv-duration-fast) var(--sv-ease-hover),
     border-color var(--sv-duration-fast) var(--sv-ease-hover);
+  /* WCAG 2.5.8 (AA): 24×24 CSS px minimum target size. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
 }
 .sv-code-block__copy:hover {
   color: var(--sv-text);
   border-color: var(--sv-border-strong);
 }
 .sv-code-block__copy--copied {
-  color: var(--sv-accent);
-  border-color: var(--sv-accent);
+  color: var(--sv-accent-ink);
+  border-color: var(--sv-accent-ink);
 }
 
 /* ---------- Callout ---------- */
@@ -379,7 +419,7 @@ body.sv-body {
   gap: var(--sv-space-3);
   padding: var(--sv-space-4) var(--sv-space-5);
   border: 1px solid var(--sv-border);
-  border-left: 2px solid var(--sv-callout-color, var(--sv-accent));
+  border-inline-start: 2px solid var(--sv-callout-color, var(--sv-accent-ink));
   border-radius: var(--sv-radius-md);
   background: var(--sv-surface);
   color: var(--sv-text-2);
@@ -387,13 +427,13 @@ body.sv-body {
   line-height: 1.5;
 }
 .sv-callout--note {
-  --sv-callout-color: var(--sv-accent-cyan);
+  --sv-callout-color: var(--sv-accent-cyan-ink);
 }
 .sv-callout--warn {
-  --sv-callout-color: var(--sv-accent-amber);
+  --sv-callout-color: var(--sv-accent-amber-ink);
 }
 .sv-callout--aha {
-  --sv-callout-color: var(--sv-accent-violet);
+  --sv-callout-color: var(--sv-accent-violet-ink);
 }
 .sv-callout__label {
   font-family: var(--sv-font-mono);
@@ -401,7 +441,7 @@ body.sv-body {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--sv-callout-color, var(--sv-accent));
+  color: var(--sv-callout-color, var(--sv-accent-ink));
   flex-shrink: 0;
   padding-top: 2px;
 }
@@ -411,10 +451,14 @@ body.sv-body {
   display: flex;
   flex-direction: column;
   gap: var(--sv-space-2);
-  border-left: 1px solid var(--sv-border);
-  padding-left: var(--sv-space-4);
+  border-inline-start: 1px solid var(--sv-border);
+  padding-inline-start: var(--sv-space-4);
 }
 .sv-toc__link {
+  display: inline-flex;
+  align-items: center;
+  /* WCAG 2.5.8 (AA): 24×24 CSS px minimum target size. */
+  min-height: 24px;
   color: var(--sv-text-3);
   text-decoration: none;
   font-size: var(--sv-text-sm);
@@ -425,10 +469,10 @@ body.sv-body {
   color: var(--sv-text-2);
 }
 .sv-toc__link--active {
-  color: var(--sv-accent);
+  color: var(--sv-accent-ink);
 }
 .sv-toc__link--depth-3 {
-  padding-left: var(--sv-space-4);
+  padding-inline-start: var(--sv-space-4);
 }
 
 /* ---------- ReadingProgress ---------- */
@@ -438,14 +482,14 @@ body.sv-body {
   left: 0;
   right: 0;
   height: 2px;
-  z-index: 50;
+  z-index: var(--sv-z-toast);
   background: transparent;
   pointer-events: none;
 }
 .sv-reading-progress__bar {
   height: 100%;
   width: 100%;
-  background: var(--sv-accent);
+  background: var(--sv-accent-ink);
   transform-origin: 0 50%;
   transform: scaleX(var(--sv-reading-progress, 0));
   /* progress is linear by spec — no hover easing here */
@@ -484,7 +528,10 @@ body.sv-body {
 
 /* ---------- Prose ---------- */
 .sv-prose {
-  color: var(--sv-text-2);
+  /* Article body is the primary content, not metadata — --sv-text-2 (muted)
+     reads as an AI-slop tell here (long-form copy dimmed "for elegance")
+     and is the wrong semantic role: --sv-text-2 is for secondary/meta text. */
+  color: var(--sv-text);
   font-family: var(--sv-font-body);
   font-size: var(--sv-text-md);
   line-height: 1.7;
@@ -516,7 +563,7 @@ body.sv-body {
   color: var(--sv-text);
 }
 .sv-prose a {
-  color: var(--sv-accent);
+  color: var(--sv-accent-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -535,16 +582,16 @@ body.sv-body {
 }
 .sv-prose ul,
 .sv-prose ol {
-  padding-left: var(--sv-space-5);
+  padding-inline-start: var(--sv-space-5);
   margin: 0 0 var(--sv-space-5);
 }
 .sv-prose li {
   margin-bottom: var(--sv-space-2);
 }
 .sv-prose blockquote {
-  border-left: 2px solid var(--sv-accent);
+  border-inline-start: 2px solid var(--sv-accent);
   margin: var(--sv-space-6) 0;
-  padding-left: var(--sv-space-5);
+  padding-inline-start: var(--sv-space-5);
   color: var(--sv-text);
   font-style: italic;
 }
