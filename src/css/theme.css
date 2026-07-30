@@ -4,8 +4,15 @@
    Theming is attribute-driven and therefore Server-Component
    safe: render <html data-theme="dark" data-accent="cyan"> on
    the server and no JS is required for correct first paint.
+
+   Fonts (Sora, Manrope, JetBrains Mono) are NOT loaded here. A
+   render-blocking @import of a third-party font stylesheet inside
+   this file would serialize "download theme.css" → "discover font
+   URLs" → "download fonts" on every consumer's critical path, and
+   forces a runtime dependency on Google's CDN. Load fonts yourself
+   — see the README's Fonts section for `next/font` and self-hosted
+   examples — the family names below already match what you load.
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   /* dark is the default scheme */

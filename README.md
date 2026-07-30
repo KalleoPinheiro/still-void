@@ -113,6 +113,34 @@ theme.setAccent('violet');
 See [playground/index.html](playground/index.html) for the full catalog rendered with **zero
 framework code** — open it with `npm run playground` after `npm run build`.
 
+## Fonts
+
+`theme.css` sets `--sv-font-display`/`--sv-font-body`/`--sv-font-mono` to Sora, Manrope and
+JetBrains Mono, but does **not** load them — that's a render-blocking `@import` on every
+consumer's critical path, and a runtime dependency on a third-party CDN. Load them yourself:
+
+```tsx
+// app/layout.tsx — next/font self-hosts and inlines the @font-face rules, no network request
+import { Sora, Manrope, JetBrains_Mono } from 'next/font/google';
+
+const sora = Sora({ subsets: ['latin'], weight: ['400', '600', '700'], variable: '--sv-font-display' });
+const manrope = Manrope({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--sv-font-body' });
+const mono = JetBrains_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--sv-font-mono' });
+```
+
+```html
+<!-- any other framework: preconnect + stylesheet -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+```
+
+System-font fallbacks (`ui-sans-serif`, `system-ui`, `ui-monospace`) already cover the gap
+before your chosen font loads — see [Fidelity rules](#fidelity-rules-do-not-regress).
+
 ## Theming
 
 - Mode: `data-theme="dark" | "light"` on `<html>` (dark is default).
