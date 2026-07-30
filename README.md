@@ -32,13 +32,18 @@ React is an **optional** peer dependency — non-React consumers install nothing
 // app/layout.tsx (Server Component)
 import '@still-void/ui/theme.css';
 import '@still-void/ui/style.css';
-import { Header, Logo, Footer } from '@still-void/ui/react';
+import { Header, Logo, Footer, ThemeScript } from '@still-void/ui/react';
 import { ThemeProvider, ThemeToggle } from '@still-void/ui/react/client';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // Server-rendered attributes = correct theme on first paint, no flash.
+    // Server-rendered attributes = correct theme for a first-time visitor.
+    // <ThemeScript /> runs before paint and re-applies a *returning* visitor's
+    // stored preference, so there's no flash of the wrong theme either way.
     <html lang="en" data-theme="dark" data-accent="cyan" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className="sv-body">
         <ThemeProvider>
           <Header
