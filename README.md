@@ -1,5 +1,8 @@
 # @still-void/ui
 
+[![npm](https://img.shields.io/npm/v/@still-void/ui?color=6b5bd6)](https://www.npmjs.com/package/@still-void/ui)
+[![CI](https://github.com/KalleoPinheiro/still-void/actions/workflows/ci.yml/badge.svg)](https://github.com/KalleoPinheiro/still-void/actions/workflows/ci.yml)
+
 **Still Void** design system as a framework-agnostic TypeScript library — extracted from the
 `blog.kalleopinheiro.dev` prototype. Works with React, Angular, Vue, or plain HTML, with
 first-class support for **Next.js Server Components**.
@@ -175,16 +178,31 @@ before your chosen font loads — see [Fidelity rules](#fidelity-rules-do-not-re
 npm run build             # tsup (ESM + CJS + .d.ts) + CSS to dist/
 npm test                  # vitest (31 tests)
 npm run typecheck         # tsc --noEmit (strict)
+npm run lint:package      # publint + are-the-types-wrong on the packed tarball
 npm run playground        # serve the framework-free catalog
 npm run storybook         # component catalog at localhost:6006
 npm run build-storybook   # static Storybook build → storybook-static/
 npm run changeset         # record a change for the next release
-npm run version           # apply pending changesets, bump version, update CHANGELOG
-npm run release           # build + publish to npm
+npm run version-packages  # apply pending changesets, bump version, update CHANGELOG (CI does this)
+npm run release           # build + publish to npm (CI does this)
 ```
 
 ## Versioning
 
-Releases are managed with [Changesets](https://github.com/changesets/changesets). After a
-change that should ship in the next version, run `npm run changeset` and describe it — the
-changelog and version bump are generated from these entries, not written by hand.
+Releases are managed with [Changesets](https://github.com/changesets/changesets) and are
+fully automated — nobody publishes from a laptop:
+
+1. A pull request that touches `src/` must carry a changeset (`npm run changeset`); CI
+   fails without one.
+2. Merging into `main` opens a **`chore: version packages`** pull request with the version
+   bump and the generated `CHANGELOG.md`.
+3. Merging *that* publishes to npm with
+   [provenance](https://docs.npmjs.com/generating-provenance-statements), tags `v<version>`,
+   creates the GitHub release and redeploys Storybook.
+
+The changelog and the version are generated from changeset entries, never written by hand.
+Unreleased changes can be tried out from a `canary` snapshot before they ship.
+
+Bump levels for a design system (what counts as breaking, and why a corrected token is a
+patch while a redesigned one is a major) are documented in
+[CONTRIBUTING.md](CONTRIBUTING.md).

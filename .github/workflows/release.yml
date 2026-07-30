@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never cancel a release mid-flight: an interrupted `changeset publish` can
+# leave the registry and the git tags out of sync.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  release:
+    name: Version or publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the version bump, push tags, create the release
+      pull-requests: write # open/update the "Version Packages" PR
+      id-token: write # npm provenance attestation
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      # Full quality gate before anything reaches the registry. `npm run
+      # release` rebuilds after the version bump, so dist/ always matches the
+      # version being published.
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run lint:package
+
+      - name: Create release PR or publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: npm run version-packages
+          publish: npm run release
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Summarize
+        run: |
+          if [ "${{ steps.changesets.outputs.published }}" = "true" ]; then
+            echo "### Published" >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            echo '${{ steps.changesets.outputs.publishedPackages }}' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No publish this run — release PR opened/updated, or no pending changesets." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  storybook:
+    name: Deploy Storybook
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/storybook.yml

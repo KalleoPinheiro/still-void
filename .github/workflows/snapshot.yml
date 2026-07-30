@@ -1,0 +1,110 @@
+name: Snapshot release
+
+# Publishes a throwaway version (0.0.0-<tag>-<timestamp>) under a non-`latest`
+# dist-tag so a change can be installed in a real app before it ships.
+#
+# Deliberately uses `pull_request`, never `pull_request_target`: this workflow
+# builds and publishes the PR's code, so it must not run with the base repo's
+# secrets for untrusted forks. Fork PRs get no secrets and the label trigger is
+# additionally restricted to same-repo branches.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'npm dist-tag to publish under'
+        required: false
+        default: canary
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: snapshot-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  snapshot:
+    name: Publish snapshot
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.label.name == 'canary' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Resolve dist-tag
+        id: tag
+        run: echo "value=${{ github.event.inputs.tag || 'canary' }}" >> "$GITHUB_OUTPUT"
+
+      # A snapshot needs at least one pending changeset to have something to
+      # bump. Canaries are for testing unreleased code, so synthesize one when
+      # the branch has none — it is never committed.
+      - name: Ensure a pending changeset
+        run: |
+          if ! ls .changeset/*.md 2>/dev/null | grep -qv 'README.md'; then
+            cat > .changeset/zz-snapshot-placeholder.md <<'EOF'
+          ---
+          '@still-void/ui': patch
+          ---
+
+          Snapshot build — not a real release.
+          EOF
+          fi
+
+      - name: Version as snapshot
+        run: npx changeset version --snapshot ${{ steps.tag.outputs.value }}
+
+      - run: npm run build
+      - run: npm run lint:package
+
+      - name: Publish
+        id: publish
+        run: |
+          npx changeset publish --tag ${{ steps.tag.outputs.value }} --no-git-tag
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
+      - name: Comment on the pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          VERSION: ${{ steps.publish.outputs.version }}
+        with:
+          script: |
+            const version = process.env.VERSION;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                `📦 Snapshot published: \`@still-void/ui@${version}\``,
+                '',
+                '```sh',
+                `npm install @still-void/ui@${version}`,
+                '```',
+                '',
+                '_Not a release — this version is never promoted to `latest`._',
+              ].join('\n'),
+            });
+
+      - name: Summarize
+        run: |
+          echo "Published \`@still-void/ui@${{ steps.publish.outputs.version }}\` under dist-tag \`${{ steps.tag.outputs.value }}\`." >> "$GITHUB_STEP_SUMMARY"

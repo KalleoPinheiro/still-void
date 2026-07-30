@@ -9,6 +9,15 @@
 
 Read both before making component or visual decisions. In one line: **port, don't redesign** — every token value is literal from the spec; approximating a color "for elegance" is a regression.
 
+## Release
+
+Versioning and publishing are automated with Changesets + GitHub Actions — see [CONTRIBUTING.md](CONTRIBUTING.md) for the full flow. The rules that bind every change:
+
+- **Every change under `src/` or `scripts/` needs a changeset** (`npm run changeset`). CI fails the PR otherwise. Write the description for a consumer of the library — it ships verbatim in the changelog.
+- **Never hand-edit `version` in `package.json` or `CHANGELOG.md`.** Both are generated; `npm run version-packages` and the release workflow own them.
+- **Bump levels:** patch = bug/a11y/CSS fix with no rename; minor = new component, recipe, token, prop or export; major = removing or renaming an export, an `sv-*` class or a `--sv-*` variable, or raising `engines.node`/peer ranges. A token value **corrected against the spec is a patch**; a token value **changed by aesthetic choice is a major** — that is the versioning form of *port, don't redesign*.
+- **The `exports` map is public API.** Its five subpaths, plus the `sv-*` classes and `--sv-*` variables, are what consumers depend on. `npm run lint:package` (publint + are-the-types-wrong) runs in CI and must stay green.
+
 <!-- ai-memory:start -->
 ## Long-term memory (ai-memory)
 
