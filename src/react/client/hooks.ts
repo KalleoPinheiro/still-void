@@ -17,17 +17,30 @@ export function useScrollSpy(ids: readonly string[], rootMargin?: string): strin
   return activeId;
 }
 
-/** Reading progress of the page (or target element), in [0, 1]. */
-export function useReadingProgress(target?: HTMLElement | null): number {
+/**
+ * Reading progress of the page (or target element), in [0, 1].
+ *
+ * The visual bar is driven by the `--sv-reading-progress` CSS var (written on
+ * every rAF-throttled scroll tick regardless of this hook), so React state
+ * only needs to update when the *reported* value's bucket changes — not on
+ * every scroll frame. `step` sets the bucket size; the default (1, i.e. only
+ * the 0 and 1 buckets) keeps re-renders to a couple per page for consumers
+ * that don't need the numeric value, while `announce` on `<ReadingProgress>`
+ * passes 0.1 for a coarse 10%-step live value.
+ */
+export function useReadingProgress(target?: HTMLElement | null, step = 1): number {
   const [percent, setPercent] = useState(0);
 
   useEffect(() => {
     const progress = createReadingProgress({
       target: target ?? undefined,
-      onChange: setPercent,
+      onChange: (value) => {
+        const bucket = step > 0 ? Math.round(value / step) * step : value;
+        setPercent((prev) => (prev === bucket ? prev : bucket));
+      },
     });
     return () => progress.destroy();
-  }, [target]);
+  }, [target, step]);
 
   return percent;
 }

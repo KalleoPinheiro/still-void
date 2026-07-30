@@ -1,5 +1,16 @@
 import { READING_PROGRESS_VAR } from '../recipes/article';
 
+// jsdom (used in tests) doesn't implement requestAnimationFrame; fall back to
+// a timer so the throttling logic stays testable outside a real browser.
+const raf: (cb: () => void) => number =
+  typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'
+    ? (cb) => window.requestAnimationFrame(cb)
+    : (cb) => setTimeout(cb, 16) as unknown as number;
+const cancelRaf: (id: number) => void =
+  typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function'
+    ? (id) => window.cancelAnimationFrame(id)
+    : (id) => clearTimeout(id as unknown as ReturnType<typeof setTimeout>);
+
 export interface ReadingProgressOptions {
   /** Element whose scroll extent defines 100%. Defaults to the document. */
   target?: HTMLElement;
@@ -43,15 +54,28 @@ export function createReadingProgress(options: ReadingProgressOptions = {}): Rea
     options.onChange?.(percent);
   }
 
+  // Coalesce scroll/resize bursts into one measurement per animation frame —
+  // without this, `measure()` (a forced layout read) runs once per event.
+  let frame: number | null = null;
+  function onFrame(): void {
+    frame = null;
+    update();
+  }
+  function schedule(): void {
+    if (frame !== null) return;
+    frame = raf(onFrame);
+  }
+
   update();
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update, { passive: true });
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
 
   return {
     getPercent: () => percent,
     destroy() {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      if (frame !== null) cancelRaf(frame);
     },
   };
 }
