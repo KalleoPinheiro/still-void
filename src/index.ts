@@ -10,6 +10,7 @@ export * from './tokens/typography';
 export * from './tokens/spacing';
 export * from './tokens/motion';
 export * from './tokens/categories';
+export * from './tokens/zIndex';
 
 // data contracts
 export * from './types';

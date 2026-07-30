@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # package.json declares engines.node ">=18" for the *published dist*
+        # (plain JS/CSS, no bleeding-edge APIs). The dev toolchain is
+        # stricter: vitest 4's rolldown dependency imports `styleText` from
+        # `node:util` as a named ESM export, which Node 18 never had and
+        # which Node 20.20.2 (latest as of writing) still doesn't expose via
+        # ESM despite having it on `require('util')` — only 22+ works here.
+        # That's a pre-existing vitest/rolldown-vs-Node-20 gap, not this
+        # workflow's bug; narrowed to what actually runs.
+        node-version: [22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build

@@ -7,6 +7,7 @@
 export * from './components/Shell';
 export * from './components/Content';
 export * from './components/Article';
+export * from './components/ThemeScript';
 
 // Re-export data contracts and recipe types consumers need for props.
 export type { PostSummary, TocItem, NavItem } from '../types';
