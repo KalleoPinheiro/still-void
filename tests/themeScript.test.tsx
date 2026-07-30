@@ -28,6 +28,17 @@ describe('ThemeScript', () => {
     expect(content).not.toMatch(/[^\\]"\};alert/);
   });
 
+  test('a storageKey containing "</script>" cannot break out of the script tag', () => {
+    const malicious = '</script><script>window.__pwned=1</script>';
+    const { container } = render(<ThemeScript storageKey={malicious} />);
+    // If `<` weren't escaped, the HTML parser (which tokenizes raw script
+    // content looking for a literal closing tag, independent of JS string
+    // syntax) would split this into multiple script elements here.
+    expect(container.querySelectorAll('script')).toHaveLength(1);
+    expect(scriptContent(container)).not.toContain('</script>');
+    expect((window as { __pwned?: number }).__pwned).toBeUndefined();
+  });
+
   test('forwards a CSP nonce to the script tag', () => {
     const { container } = render(<ThemeScript nonce="abc123" />);
     expect(container.querySelector('script')).toHaveAttribute('nonce', 'abc123');
