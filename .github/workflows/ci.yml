@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -20,8 +23,8 @@ jobs:
         # workflow's bug; narrowed to what actually runs.
         node-version: [22]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -29,3 +32,58 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Guards the five documented export subpaths: publint checks the
+      # manifest, attw resolves the .d.ts/.d.cts pair from ESM, CJS, node10
+      # and bundler. The CSS entrypoints are excluded — they are stylesheets,
+      # not modules, so "no type declarations" is the intended state.
+      - run: npm run lint:package
+
+  changeset:
+    name: changeset
+    runs-on: ubuntu-latest
+    # The release PR bumps the version itself, and bot commits never carry a
+    # changeset. `no-changeset` is the escape hatch for docs/CI-only PRs that
+    # still happen to touch src/.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref != 'changeset-release/main' &&
+      github.actor != 'github-actions[bot]' &&
+      !contains(github.event.pull_request.labels.*.name, 'no-changeset')
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+      - name: Require a changeset for source changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          changed="$(git diff --name-only "$BASE_SHA"...HEAD)"
+
+          if ! printf '%s\n' "$changed" | grep -qE '^(src|scripts)/'; then
+            echo "No changes under src/ or scripts/ — no changeset required."
+            exit 0
+          fi
+
+          if printf '%s\n' "$changed" \
+            | grep -E '^\.changeset/.+\.md$' \
+            | grep -qv '^\.changeset/README\.md$'; then
+            echo "Changeset found."
+            exit 0
+          fi
+
+          echo "::error::This PR changes src/ or scripts/ but has no changeset."
+          {
+            echo "### Missing changeset"
+            echo
+            echo "This PR touches \`src/\` or \`scripts/\` without recording a changeset,"
+            echo "so the release would ship without a changelog entry."
+            echo
+            echo "Run \`npm run changeset\`, describe the change, and commit the"
+            echo "generated \`.changeset/*.md\` file."
+            echo
+            echo "Bump levels are documented in [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md)."
+            echo
+            echo "If the change genuinely has no consumer-visible effect, add the"
+            echo "\`no-changeset\` label to this PR."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1

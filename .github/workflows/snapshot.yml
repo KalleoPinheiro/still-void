@@ -1,0 +1,130 @@
+name: Snapshot release
+
+# Publishes a throwaway version (0.0.0-<tag>-<timestamp>) under a non-`latest`
+# dist-tag so a change can be installed in a real app before it ships.
+#
+# Deliberately uses `pull_request`, never `pull_request_target`: this workflow
+# builds and publishes the PR's code, so it must not run with the base repo's
+# secrets for untrusted forks. Fork PRs get no secrets and the label trigger is
+# additionally restricted to same-repo branches.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'npm dist-tag to publish under'
+        required: false
+        default: canary
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: snapshot-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  snapshot:
+    name: Publish snapshot
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.label.name == 'canary' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      # The workflow_dispatch tag is free text from whoever triggers the run.
+      # Route it through `env` (never interpolate `${{ }}` inside `run:`) and
+      # reject anything outside the small set of dist-tags this repo uses, so
+      # it can never reach a shell or an `npm publish --tag` as raw input.
+      - name: Resolve dist-tag
+        id: tag
+        env:
+          REQUESTED_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          tag="${REQUESTED_TAG:-canary}"
+          case "$tag" in
+            canary|next|beta|alpha) ;;
+            *)
+              echo "::error::Unsupported dist-tag '$tag'. Allowed: canary, next, beta, alpha."
+              exit 1
+              ;;
+          esac
+          echo "value=$tag" >> "$GITHUB_OUTPUT"
+
+      # A snapshot needs at least one pending changeset to have something to
+      # bump. Canaries are for testing unreleased code, so synthesize one when
+      # the branch has none — it is never committed.
+      - name: Ensure a pending changeset
+        run: |
+          if ! ls .changeset/*.md 2>/dev/null | grep -qv 'README.md'; then
+            cat > .changeset/zz-snapshot-placeholder.md <<'EOF'
+          ---
+          '@still-void/ui': patch
+          ---
+
+          Snapshot build — not a real release.
+          EOF
+          fi
+
+      - name: Version as snapshot
+        env:
+          DIST_TAG: ${{ steps.tag.outputs.value }}
+        run: npx changeset version --snapshot "$DIST_TAG"
+
+      - run: npm run build
+      - run: npm run lint:package
+
+      - name: Publish
+        id: publish
+        env:
+          DIST_TAG: ${{ steps.tag.outputs.value }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+        run: |
+          npx changeset publish --tag "$DIST_TAG" --no-git-tag
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on the pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        env:
+          VERSION: ${{ steps.publish.outputs.version }}
+        with:
+          script: |
+            const version = process.env.VERSION;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                `📦 Snapshot published: \`@still-void/ui@${version}\``,
+                '',
+                '```sh',
+                `npm install @still-void/ui@${version}`,
+                '```',
+                '',
+                '_Not a release — this version is never promoted to `latest`._',
+              ].join('\n'),
+            });
+
+      - name: Summarize
+        run: |
+          echo "Published \`@still-void/ui@${{ steps.publish.outputs.version }}\` under dist-tag \`${{ steps.tag.outputs.value }}\`." >> "$GITHUB_STEP_SUMMARY"

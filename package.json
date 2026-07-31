@@ -13,12 +13,22 @@
     "server-components",
     "typescript"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KalleoPinheiro/still-void.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KalleoPinheiro/still-void/issues"
+  },
+  "homepage": "https://github.com/KalleoPinheiro/still-void#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "engines": {
     "node": ">=18"
   },
+  "packageManager": "npm@10.9.7",
   "type": "module",
   "sideEffects": [
     "*.css"
@@ -28,25 +38,52 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./react": {
-      "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs"
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
+      }
     },
     "./react/client": {
-      "types": "./dist/react/client/index.d.ts",
-      "import": "./dist/react/client/index.js",
-      "require": "./dist/react/client/index.cjs"
+      "import": {
+        "types": "./dist/react/client/index.d.ts",
+        "default": "./dist/react/client/index.js"
+      },
+      "require": {
+        "types": "./dist/react/client/index.d.cts",
+        "default": "./dist/react/client/index.cjs"
+      }
     },
     "./theme.css": "./dist/theme.css",
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/react/index.d.ts"
+      ],
+      "react/client": [
+        "./dist/react/client/index.d.ts"
+      ]
+    }
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup && npm run build:css",
@@ -55,9 +92,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
+    "lint:package": "publint --strict && attw --pack . --exclude-entrypoints theme.css style.css",
     "playground": "npx serve .",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
     "release": "npm run build && changeset publish",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -75,20 +113,23 @@
     }
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.31.1",
+    "@storybook/addon-a11y": "^10.5.2",
+    "@storybook/addon-docs": "^10.5.2",
+    "@storybook/react-vite": "^10.5.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "jsdom": "^29.1.1",
+    "publint": "^0.3.22",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "storybook": "^10.5.2",
     "tsup": "^8.3.5",
     "typescript": "^5",
-    "vitest": "^4.1.10",
-    "storybook": "^10.5.2",
-    "@storybook/react-vite": "^10.5.2",
-    "@storybook/addon-a11y": "^10.5.2",
-    "@storybook/addon-docs": "^10.5.2"
+    "vitest": "^4.1.10"
   }
 }
