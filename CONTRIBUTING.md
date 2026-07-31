@@ -90,6 +90,11 @@ The automation depends on:
 
 | What | Where |
 | --- | --- |
-| `NPM_TOKEN` secret — npm **Automation** token | Settings → Secrets and variables → Actions |
+| `NPM_TOKEN` secret — npm granular access token, **Read and write** on `@still-void/ui`, with **Bypass 2FA** enabled | Settings → Secrets and variables → Actions |
 | *Allow GitHub Actions to create and approve pull requests* | Settings → Actions → General → Workflow permissions |
 | Pages source: **GitHub Actions** | Settings → Pages |
+
+npm retired classic tokens (including the old "Automation" type) in December 2025 — every
+publish token is now a granular access token, capped at a 90-day lifetime, so `NPM_TOKEN`
+needs rotating before it expires. See [RELEASE_SETUP_TODO.md](RELEASE_SETUP_TODO.md) for
+the exact steps, including the OIDC trusted-publishing alternative npm now recommends.

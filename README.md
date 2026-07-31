@@ -192,8 +192,8 @@ npm run release           # build + publish to npm (CI does this)
 Releases are managed with [Changesets](https://github.com/changesets/changesets) and are
 fully automated — nobody publishes from a laptop:
 
-1. A pull request that touches `src/` must carry a changeset (`npm run changeset`); CI
-   fails without one.
+1. A pull request that touches `src/` or `scripts/` must carry a changeset
+   (`npm run changeset`); CI fails without one.
 2. Merging into `main` opens a **`chore: version packages`** pull request with the version
    bump and the generated `CHANGELOG.md`.
 3. Merging *that* publishes to npm with

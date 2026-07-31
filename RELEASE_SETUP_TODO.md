@@ -9,11 +9,23 @@ do primeiro ciclo real.
 ## 1. Segredos e permissões do repositório (bloqueante — nada publica sem isso)
 
 - [ ] **Criar o token `NPM_TOKEN`**
-  - No [npmjs.com](https://www.npmjs.com) → Access Tokens → **Generate New Token** → tipo
-    **Automation** (não "Publish" — Automation ignora 2FA no CI, que é obrigatório para
-    rodar sem prompt interativo).
+  - npm descontinuou os tokens clássicos (incluindo o antigo tipo "Automation") em
+    dezembro de 2025 — hoje só existem **granular access tokens**.
+  - No [npmjs.com](https://www.npmjs.com) → *Access Tokens* → **Generate New Token** →
+    **Granular Access Token**:
+    - Packages and scopes: restringir a `@still-void/ui` (ou ao escopo `@still-void`),
+      permissão **Read and write**.
+    - Marcar **Bypass 2FA** — sem isso o `npm publish` do CI para pedir confirmação
+      interativa.
+    - Definir uma expiração (máximo permitido: 90 dias) e agendar a rotação antes de
+      vencer — um `NPM_TOKEN` expirado quebra o publish silenciosamente até alguém notar.
   - GitHub → repositório → **Settings → Secrets and variables → Actions → New repository
     secret** → nome `NPM_TOKEN`, valor o token gerado.
+  - *(Alternativa mais robusta, sem token para rotacionar)*: migrar para
+    [OIDC trusted publishing](https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow/),
+    que o npm recomenda como sucessor dos tokens de longa duração. Fica de fora do escopo
+    deste PR — os workflows já concedem `id-token: write` onde seria necessário, mas a
+    migração do passo de publish para OIDC é um trabalho à parte.
 - [ ] **Permitir que Actions abra PRs**
   - GitHub → **Settings → Actions → General → Workflow permissions** → marcar
     *"Allow GitHub Actions to create and approve pull requests"* → Save.
@@ -50,13 +62,11 @@ uma `v1.1.0` anterior para comparar.
 
 ## 4. Primeiro ciclo real de release (validação end-to-end)
 
-Depois do merge acima, `release.yml` roda no primeiro push a `main`. Como não há
-changeset pendente naquele ponto (o único mudou a superfície de tipos e já foi
-consumido no próprio PR de automação), **nada é publicado ainda** — isso é esperado.
+Este próprio PR carrega um changeset (`.changeset/rotten-doors-repeat.md`, para o fix do
+`exports` map), então `release.yml` já encontra algo pendente no primeiro push a `main` —
+não é preciso criar uma mudança à parte para disparar o primeiro ciclo.
 
-- [ ] Fazer qualquer mudança real em `src/` (bugfix, componente novo, o que vier primeiro)
-      acompanhada de `npm run changeset`.
-- [ ] Merge desse PR em `main` → confirmar que `release.yml` abre o PR
+- [ ] Depois do merge deste PR, confirmar que `release.yml` abre o PR
       **"chore: version packages"** automaticamente, com `CHANGELOG.md`, `package.json`
       e `package-lock.json` atualizados.
 - [ ] Revisar o changelog gerado — é a última chance de ler antes de ficar público.
