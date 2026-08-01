@@ -96,5 +96,6 @@ The automation depends on:
 
 npm retired classic tokens (including the old "Automation" type) in December 2025 — every
 publish token is now a granular access token, capped at a 90-day lifetime, so `NPM_TOKEN`
-needs rotating before it expires. See [RELEASE_SETUP_TODO.md](RELEASE_SETUP_TODO.md) for
-the exact steps, including the OIDC trusted-publishing alternative npm now recommends.
+needs rotating before it expires. [OIDC trusted publishing](https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow/)
+is the longer-term alternative npm now recommends, which removes the rotation burden
+entirely — worth revisiting once the workflow supports it.
