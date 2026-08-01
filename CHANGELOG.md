@@ -1,5 +1,17 @@
 # @still-void/ui
 
+## 1.1.1
+
+### Patch Changes
+
+- [#2](https://github.com/KalleoPinheiro/still-void/pull/2) [`7001676`](https://github.com/KalleoPinheiro/still-void/commit/7001676e20e9dd72269d347826d0546d25fefde8) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Fix the types shipped to CommonJS consumers. Every export subpath advertised a single
+  `types` entry pointing at the ESM `.d.ts`, so anything using `require('@still-void/ui')`
+  resolved ESM type declarations against a CommonJS runtime file (attw: "Masquerading as
+  ESM"), and `@still-void/ui/react` / `@still-void/ui/react/client` resolved to nothing at
+  all under the legacy `node10` module resolution. `exports` now carries per-condition
+  `types` (`.d.ts` for `import`, the already-built `.d.cts` for `require`), plus
+  `typesVersions` for `node10` consumers and a `./package.json` export.
+
 ## 1.1.0
 
 ### Minor Changes
