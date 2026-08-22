@@ -59,3 +59,31 @@ New changeset: `major` bump. Description (consumer-facing): removal of the frame
 3. **Migration guide + changeset** — `docs/migration-v1-to-v2.md`, major changeset.
 
 3 phases ≤ 3 → execute inline, no sub-agent delegation offer needed.
+
+---
+
+## Revision — 2026-08-22: test-coverage / security / performance audit
+
+Post-ship revision requested by user: find technical gaps, bring unit-test coverage to 100%, review security and performance across the feature's file surface (`src/**`).
+
+### Risks & Concerns
+
+| Concern | Location (file:line) | Impact | Mitigation |
+| ------- | -------------------- | ------ | ---------- |
+| Security — `copyToClipboard` reads `navigator.clipboard` unguarded for the case `navigator` itself is undefined | `src/behaviors/clipboard.ts:3` | If ever invoked outside a DOM environment (e.g. accidentally imported into a server path, or a future non-browser test harness) this throws an uncaught `ReferenceError` instead of returning `false` per its own doc contract ("Returns false when the Clipboard API is unavailable") | Add `typeof navigator === 'undefined'` guard; add regression test for both "no navigator" and "no Clipboard API" paths |
+| Test coverage gap — 0 tests for every shadcn primitive | `src/components/ui/{alert,badge,button,card,dialog,dropdown-menu,input,select,tabs,tooltip}.tsx` | Regressions in variant class logic (button/badge), `forwardRef` wiring, or Radix composition ship undetected | Add RTL render tests per component: default render, ref forwarding, variant class branches, `className` merge via `cn` |
+| Test coverage gap — `cn` (`clsx` + `tailwind-merge`) has no direct test | `src/lib/utils.ts:4` | Silent regression in class-merge precedence (e.g. Tailwind conflict resolution) goes unnoticed | Unit test covering merge/override/falsy-filtering behavior |
+| Test coverage gap — client wrapper components untested directly (only their underlying `behaviors/*` are) | `src/react/client/ReadingProgress.tsx`, `src/react/client/TableOfContents.tsx`, `src/react/client/ThemeToggle.tsx`, `src/react/client/hooks.ts` | Wiring bugs between hook output and rendered markup/ARIA attrs (e.g. `announce` branch, `aria-current`) would not be caught even though the underlying behavior is | Add RTL tests per wrapper: default + `announce` prop, `TableOfContents` active-link wiring, `ThemeToggle` inside/requires `ThemeProvider` |
+| Test coverage gap — `ThemeProvider`/`useTheme` untested | `src/react/client/ThemeProvider.tsx:83-87` | The documented `throw` when `useTheme` is used outside a provider, and the mount→subscribe→unsubscribe lifecycle, are unverified | Add tests: throws outside provider, provides state, updates on `setMode`/`setAccent`/`toggleMode`, unsubscribes on unmount |
+| Test coverage gap — several server-safe presentational components exported but never rendered in tests | `src/react/components/Article.tsx` (`ArticleHeader`, `Prose`, `Lead`), `src/react/components/Content.tsx` (`FeaturedPostCard`, `PostGrid`, `Layout`, `Sidebar`, `SidebarSection`, `Skeleton`, `CardSkeleton`), `src/react/components/Shell.tsx` (`Logo`, `Footer`) | Conditional branches (e.g. `ArticleHeader` meta row only when `author`/`date`/`readMinutes` present; `FeaturedPostCard` visual slot) unverified | Add RTL render tests per component covering conditional branches |
+| Test coverage gap — `src/react/client/shadcn.ts` re-export barrel unverified | `src/react/client/shadcn.ts` | A broken re-export (typo, wrong source path) would only surface at build/typecheck time, not test time, delaying feedback | Add a smoke test importing every named export and asserting it is defined |
+| Tooling gap — no coverage provider configured | `vitest.config.ts` | "100% coverage" is unverifiable without instrumentation; can't gate future regressions | Add `@vitest/coverage-v8`, wire a `coverage` npm script, set `thresholds` in `vitest.config.ts` |
+| Performance — reviewed, no action needed | `src/behaviors/readingProgress.ts`, `src/behaviors/scrollSpy.ts`, `src/react/client/ThemeProvider.tsx` | n/a | Already rAF-throttled (readingProgress), IntersectionObserver-based (scrollSpy), and context value is `useMemo`'d (ThemeProvider) — no bottleneck found |
+
+### Tech Decisions
+
+| Decision | Choice | Rationale |
+| -------- | ------ | --------- |
+| Coverage provider | `@vitest/coverage-v8` | Already using Vitest; v8 provider needs no extra instrumentation step, matches Node/browser (jsdom) runtime already configured |
+| Coverage scope | `src/**` excluding `src/react/stories/**` (Storybook demos, not shipped logic) and `src/css/**` | Stories are documentation fixtures, not testable units — including them would force meaningless tests just to hit a number |
+| Coverage threshold | 100% lines/branches/functions/statements on in-scope files, enforced via `vitest.config.ts` `test.coverage.thresholds` | Matches the user's explicit "100%" requirement; hard-gates future PRs, not just a one-time report |
