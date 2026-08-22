@@ -1,6 +1,6 @@
 ---
 name: Still Void
-description: Framework-agnostic design system — calm dark-first surfaces, one sharp accent, zero decoration.
+description: React/Next.js design system — calm dark-first surfaces, one sharp accent, zero decoration.
 colors:
   bg-dark: "#0A0A0C"
   bg-elev-dark: "#111114"

@@ -3,23 +3,22 @@
 [![npm](https://img.shields.io/npm/v/@still-void/ui?color=6b5bd6)](https://www.npmjs.com/package/@still-void/ui)
 [![CI](https://github.com/KalleoPinheiro/still-void/actions/workflows/ci.yml/badge.svg)](https://github.com/KalleoPinheiro/still-void/actions/workflows/ci.yml)
 
-**Still Void** design system as a framework-agnostic TypeScript library — extracted from the
-`blog.kalleopinheiro.dev` prototype. Works with React, Angular, Vue, or plain HTML, with
-first-class support for **Next.js Server Components**.
+**Still Void** design system for **React and Next.js** — extracted from the
+`blog.kalleopinheiro.dev` prototype. Ships as two entry points: a server-safe entry that
+renders inside Next.js Server Components with zero hydration cost, and a `'use client'`
+entry for interactive pieces. See [docs/design-system.md](docs/design-system.md) for the
+full architecture and component catalog, and
+[docs/migration-v1-to-v2.md](docs/migration-v1-to-v2.md) if you're upgrading from the
+framework-agnostic `1.x` line.
 
 ## Architecture
 
-The library is layered so the core never depends on any framework:
-
 | Layer | Entry | Runs where | What it is |
 |---|---|---|---|
-| **Tokens** | `@still-void/ui` | anywhere | Typed constants: colors (hex + oklch), typography, spacing, radii, motion |
 | **Theme CSS** | `@still-void/ui/theme.css` | browser | CSS vars (`--sv-*`), dark/light via `data-theme`, accents via `data-accent`, signature utilities |
 | **Component CSS** | `@still-void/ui/style.css` | browser | All component classes (`sv-*`) |
-| **Recipes** | `@still-void/ui` | anywhere (RSC-safe) | Pure functions returning class strings: `postCard({ dense: true })` |
-| **Behaviors** | `@still-void/ui` | client | Vanilla DOM: `createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard` |
-| **React (server-safe)** | `@still-void/ui/react` | server or client | Components without hooks — render inside Server Components |
-| **React (client)** | `@still-void/ui/react/client` | client | `'use client'` bundle: `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, hooks |
+| **React (server-safe)** | `@still-void/ui/react` | server or client | Tokens, recipes, and components without hooks — render inside Server Components |
+| **React (client)** | `@still-void/ui/react/client` | client | `'use client'` bundle: DOM behaviors (`createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard`), `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, hooks |
 
 ## Install
 
@@ -27,7 +26,7 @@ The library is layered so the core never depends on any framework:
 npm install @still-void/ui
 ```
 
-React is an **optional** peer dependency — non-React consumers install nothing extra.
+`react` and `react-dom` (>=18) are required peer dependencies.
 
 ## Usage — Next.js (App Router, Server Components)
 
@@ -97,29 +96,20 @@ import { CopyButton } from '@still-void/ui/react/client';
 Syntax highlighting is bring-your-own (by design — the prototype tokenizer was demo-only):
 render with Shiki on the server and pass the markup via `rendered`.
 
-## Usage — any other framework (recipes + behaviors)
+## Recipes and behaviors
+
+Recipes are pure class-name builders (server-safe, exported from `@still-void/ui/react`);
+behaviors are plain DOM and return a `destroy()` (client-only, exported from
+`@still-void/ui/react/client`):
 
 ```ts
-import { postCard, postCardClasses, createThemeManager } from '@still-void/ui';
-```
+import { postCard, postCardClasses } from '@still-void/ui/react';
+import { createThemeManager } from '@still-void/ui/react/client';
 
-```html
-<!-- Angular -->
-<article [class]="postCard({ dense: true })">
-  <h3 [class]="postCardClasses.title">{{ post.title }}</h3>
-</article>
-```
-
-Behaviors are plain DOM and return a `destroy()`:
-
-```ts
 const theme = createThemeManager(); // drives data-theme / data-accent, persists to localStorage
 theme.toggleMode();
 theme.setAccent('violet');
 ```
-
-See [playground/index.html](playground/index.html) for the full catalog rendered with **zero
-framework code** — open it with `npm run playground` after `npm run build`.
 
 ## Fonts
 
