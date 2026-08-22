@@ -54,8 +54,19 @@ describe('Select family', () => {
     expect(document.querySelector('[aria-hidden="true"].bg-sv-border')).toBeInTheDocument();
   });
 
-  test('position=item-aligned renders without the popper viewport sizing classes', () => {
+  test('position=popper applies the popper translate and viewport sizing classes', () => {
+    renderSelect('popper');
+    const content = screen.getByRole('listbox');
+    expect(content.className).toContain('data-[side=bottom]:translate-y-1');
+    const viewport = document.querySelector('[data-radix-select-viewport]') as HTMLElement;
+    expect(viewport.className).toContain('h-[var(--radix-select-trigger-height)]');
+  });
+
+  test('position=item-aligned omits the popper translate and viewport sizing classes', () => {
     renderSelect('item-aligned');
-    expect(screen.getByText('Apple')).toBeInTheDocument();
+    const content = screen.getByRole('listbox');
+    expect(content.className).not.toContain('data-[side=bottom]:translate-y-1');
+    const viewport = document.querySelector('[data-radix-select-viewport]') as HTMLElement;
+    expect(viewport.className).not.toContain('h-[var(--radix-select-trigger-height)]');
   });
 });
