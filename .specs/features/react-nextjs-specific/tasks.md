@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/react-nextjs-specific/design.md` (see "Revision — 2026-08-22" section)
-**Status**: In Progress
+**Status**: Done
 **Execution mode**: Inline (user declined per-phase sub-agents)
 
 ---
