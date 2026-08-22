@@ -156,6 +156,65 @@ before your chosen font loads — see [Fidelity rules](#fidelity-rules-do-not-re
   Server Components with no JS.
 - Everything is overridable via CSS vars (`--sv-accent`, `--sv-bg`, …). No `!important` anywhere.
 
+## shadcn/ui Components
+
+A selection of **shadcn/ui** components has been ported to Still Void with the design system's palette, typography, and spacing applied. Both server-safe and client-only variants are available:
+
+**Server-safe components** (import from `@still-void/ui/react`):
+- `Button` — with variants (default, destructive, outline, secondary, ghost, link) and sizes (sm, default, lg, icon)
+- `Card` — with header, title, description, content, footer
+- `Input` — text input with placeholder, disabled, and focus states
+- `Alert` — with optional title and description
+- `Badge` — with variants (default, secondary, destructive, outline)
+
+**Client-only components** (import from `@still-void/ui/react/client`):
+- `Dialog` — modal with trigger, content, header, footer, title, description
+- `Select` — dropdown with groups, labels, and scroll
+- `Dropdown` — menu with items, checkboxes, radio groups, labels, separators
+- `Tabs` — tabbed interface with triggers and content
+- `Tooltip` — positioned tooltip with provider
+
+### Usage
+
+```tsx
+// Server Component
+import { Button, Card, CardHeader, CardTitle, CardContent } from '@still-void/ui/react';
+
+export default function MyPage() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Settings</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button>Save</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+```tsx
+// Client Component ('use client')
+import { Dialog, DialogTrigger, DialogContent } from '@still-void/ui/react/client';
+import { Button } from '@still-void/ui/react';
+
+export function SettingsDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Settings</Button>
+      </DialogTrigger>
+      <DialogContent>
+        {/* modal content */}
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Note:** Tailwind CSS is now a peer dependency when using shadcn/ui components. Configure your `tailwind.config.ts` to extend Still Void's tokens (see [DESIGN.md](DESIGN.md) for the full config).
+
 ## Fidelity rules (do not regress)
 
 - Color values (hex/oklch) are literal from the spec — never rounded.

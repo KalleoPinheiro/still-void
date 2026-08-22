@@ -17,6 +17,32 @@ npm run storybook    # component catalog at localhost:6006
 Node **22+** is required for development (`.nvmrc`). The published package still supports
 Node ≥ 18 — the stricter floor comes from vitest 4/rolldown, not from the library.
 
+## Adding or updating shadcn/ui components
+
+All shadcn components must follow Still Void design rules — they are not optional, and
+deviations are regressions:
+
+1. **No box-shadow.** Remove all `box-shadow` from the component's CSS; use border + tonal
+   layering instead (see DESIGN.md, "Elevation").
+2. **Correct fonts:** Sora on headings (via `--sv-font-display`), Manrope on body/labels
+   (via `--sv-font-body`), JetBrains Mono on code (via `--sv-font-mono`).
+3. **One accent at a time:** Component focus states, button variants, and overlay colors
+   respect `data-accent` and never mix multiple accent hues on the same page.
+4. **Spacing and radii literal:** Every padding and border-radius comes from `src/tokens/`
+   — no "prettier" rounding or approximation.
+5. **Add Storybook story:** Create `src/react/stories/[ComponentName].stories.tsx` showing
+   the component in dark/light modes and with multiple accent variants. Run Storybook
+   (`npm run storybook`) and visually verify shadows are gone and fonts render correctly.
+
+**Before committing a new shadcn component:**
+```sh
+npm run build       # build must succeed
+npm run typecheck   # strict types must pass
+npm run storybook   # verify visually in dark/light + accents
+```
+
+See DESIGN.md section 6 for the full theme integration strategy and component guarantees.
+
 ## Every source change needs a changeset
 
 CI fails a pull request that touches `src/` or `scripts/` without a changeset:
