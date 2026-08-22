@@ -203,7 +203,7 @@ export function SettingsDialog() {
 }
 ```
 
-**Note:** Tailwind CSS is now a peer dependency when using shadcn/ui components. Configure your `tailwind.config.ts` to extend Still Void's tokens (see [DESIGN.md](DESIGN.md) for the full config).
+**Note:** shadcn/ui components use Tailwind utility classes, so your app needs Tailwind CSS installed and configured to extend Still Void's tokens (see [DESIGN.md](DESIGN.md) for the full config).
 
 ## Fidelity rules (do not regress)
 
@@ -225,10 +225,9 @@ export function SettingsDialog() {
 
 ```sh
 npm run build             # tsup (ESM + CJS + .d.ts) + CSS to dist/
-npm test                  # vitest (31 tests)
+npm test                  # vitest (320 tests)
 npm run typecheck         # tsc --noEmit (strict)
 npm run lint:package      # publint + are-the-types-wrong on the packed tarball
-npm run playground        # serve the framework-free catalog
 npm run storybook         # component catalog at localhost:6006
 npm run build-storybook   # static Storybook build → storybook-static/
 npm run changeset         # record a change for the next release
