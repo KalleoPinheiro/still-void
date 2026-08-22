@@ -28,6 +28,7 @@ describe('DropdownMenu family', () => {
         <DropdownMenuPortal>
           <DropdownMenuContent>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel inset>Inset label</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem>Plain item</DropdownMenuItem>
               <DropdownMenuItem inset>Inset item</DropdownMenuItem>
@@ -57,6 +58,7 @@ describe('DropdownMenu family', () => {
     );
 
     expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getByText('Inset label')).toHaveClass('pl-8');
     expect(screen.getByText('Plain item')).toBeInTheDocument();
     expect(screen.getByText('Inset item')).toHaveClass('pl-8');
     expect(screen.getByText('Checkbox item')).toBeInTheDocument();

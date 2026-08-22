@@ -58,4 +58,19 @@ describe('createThemeManager', () => {
     manager = createThemeManager();
     expect(manager.getState().mode).toBe('dark');
   });
+
+  test('ignores a stored payload that is not a JSON object', () => {
+    window.localStorage.setItem('still-void-theme', '"just a string"');
+    manager = createThemeManager();
+    expect(manager.getState()).toEqual({ mode: 'dark', accent: 'cyan' });
+  });
+
+  test('ignores unknown mode/accent values in an otherwise valid object payload', () => {
+    window.localStorage.setItem(
+      'still-void-theme',
+      JSON.stringify({ mode: 'sepia', accent: 'chartreuse' }),
+    );
+    manager = createThemeManager();
+    expect(manager.getState()).toEqual({ mode: 'dark', accent: 'cyan' });
+  });
 });
