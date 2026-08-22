@@ -18,5 +18,17 @@ export { Input, type InputProps } from '../components/ui/input';
 
 // Re-export data contracts and recipe types consumers need for props.
 export type { PostSummary, TocItem, NavItem } from '../types';
-export type { CalloutKind } from '../recipes/article';
-export type { ThemeMode, AccentName } from '../tokens/colors';
+
+// Design tokens — pure data, server-safe.
+export * from '../tokens/colors';
+export * from '../tokens/typography';
+export * from '../tokens/spacing';
+export * from '../tokens/motion';
+export * from '../tokens/categories';
+export * from '../tokens/zIndex';
+
+// Recipes — pure class-name builders, server-safe.
+export * from '../recipes/cx';
+export * from '../recipes/shell';
+export * from '../recipes/content';
+export * from '../recipes/article';

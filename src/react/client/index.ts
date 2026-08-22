@@ -12,3 +12,13 @@ export * from './hooks';
 
 // Client-only shadcn/ui components (require state, browser APIs, Radix UI interactivity)
 export * from './shadcn';
+
+// DOM/localStorage behaviors — client-only.
+export * from '../../behaviors/themeManager';
+export * from '../../behaviors/scrollSpy';
+export {
+  createReadingProgress,
+  type ReadingProgressOptions,
+  type ReadingProgress as ReadingProgressController,
+} from '../../behaviors/readingProgress';
+export * from '../../behaviors/clipboard';
