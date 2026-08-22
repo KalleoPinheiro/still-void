@@ -5,3 +5,5 @@ coverage/
 
 *storybook.log
 storybook-static
+
+.claude/worktrees/
