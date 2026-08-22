@@ -1,5 +1,11 @@
 # @still-void/ui
 
+## 2.0.1
+
+### Patch Changes
+
+- [#8](https://github.com/KalleoPinheiro/still-void/pull/8) [`854f674`](https://github.com/KalleoPinheiro/still-void/commit/854f6743ce2b1f258681fcb80c7724575255d93d) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Refresh README to match the v2.0.0 shape: correct test count (31 → 320), remove the dead `npm run playground` script reference (the framework-free catalog was removed with the core entry point), and correct the note about Tailwind CSS — it's a required app dependency for shadcn/ui components, not a declared peer dependency of this package.
+
 ## 2.0.0
 
 ### Major Changes
