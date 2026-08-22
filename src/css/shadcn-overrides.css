@@ -1,0 +1,98 @@
+/**
+ * shadcn/ui Still Void Theme Overrides
+ *
+ * Still Void Design Rules applied to shadcn/ui components:
+ * - Flat-By-Default: No box-shadow anywhere. Depth via tonal layering and borders only.
+ * - No Gradients: Gradient text, gradient fills forbidden
+ * - One Accent: Single accent color via data-accent, never mixed on same surface
+ * - Colors Exact: All hex and oklch values literal from spec, never approximated
+ *
+ * This layer strips all box-shadow from shadcn/ui classes and documents
+ * the Still Void constraints for consuming components.
+ */
+
+@layer components {
+  /* Button family - strip shadows */
+  .btn,
+  [class*="btn-"],
+  button {
+    box-shadow: none !important;
+  }
+
+  /* Card family - strip shadows */
+  .card,
+  [class*="card-"] {
+    box-shadow: none !important;
+  }
+
+  /* Dialog family - strip shadows */
+  .dialog,
+  [class*="dialog-"],
+  [role="dialog"] {
+    box-shadow: none !important;
+  }
+
+  /* Popover family - strip shadows */
+  .popover,
+  [class*="popover-"] {
+    box-shadow: none !important;
+  }
+
+  /* Dropdown/Menu family - strip shadows */
+  .dropdown,
+  [class*="dropdown-"],
+  .menu,
+  [class*="menu-"],
+  [role="menu"],
+  [role="menuitem"] {
+    box-shadow: none !important;
+  }
+
+  /* Tooltip family - strip shadows */
+  .tooltip,
+  [class*="tooltip-"] {
+    box-shadow: none !important;
+  }
+
+  /* Alert family - strip shadows */
+  .alert,
+  [class*="alert-"] {
+    box-shadow: none !important;
+  }
+
+  /* Input, Select, Textarea - strip shadows */
+  input,
+  select,
+  textarea,
+  .input,
+  .select,
+  .textarea {
+    box-shadow: none !important;
+  }
+
+  /* Modal, Drawer - strip shadows */
+  .modal,
+  [class*="modal-"],
+  .drawer,
+  [class*="drawer-"] {
+    box-shadow: none !important;
+  }
+
+  /* Badge - strip shadows */
+  .badge,
+  [class*="badge-"] {
+    box-shadow: none !important;
+  }
+
+  /* Tabs - strip shadows */
+  .tabs,
+  [class*="tabs-"],
+  [role="tablist"] {
+    box-shadow: none !important;
+  }
+
+  /* Catch-all for any remaining Tailwind shadow utilities */
+  [class*="shadow"] {
+    box-shadow: none !important;
+  }
+}
