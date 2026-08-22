@@ -1,5 +1,16 @@
 # @still-void/ui
 
+## 2.0.0
+
+### Major Changes
+
+- **Breaking:** removes the framework-agnostic core entry point (`import ... from '@still-void/ui'`). The package is now React/Next.js-only. Tokens and recipes moved to `@still-void/ui/react`; DOM behaviors (`createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard`) moved to `@still-void/ui/react/client`. `react`/`react-dom` (>=18) are now required peer dependencies instead of optional. No token/design values changed. See `docs/migration-v1-to-v2.md` for the full import map; non-React consumers have no migration path and should stay on `^1`.
+
+### Minor Changes
+
+- Add shadcn/ui components with Still Void theming. Exports ~40 components from `@still-void/ui/react` (server-safe) and `@still-void/ui/react/client` (client-only). Tailwind config extends Still Void tokens; CSS override layer removes shadows per design spec.
+- Add Tailwind config extending Still Void tokens and shadcn/ui theme integration infrastructure. Includes `tailwind.config.ts` mapping Still Void colors, typography, spacing, and border radii as Tailwind utilities for use with shadcn/ui components.
+
 ## 1.1.1
 
 ### Patch Changes
