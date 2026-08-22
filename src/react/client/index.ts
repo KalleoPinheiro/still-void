@@ -9,3 +9,6 @@ export * from './CopyButton';
 export * from './TableOfContents';
 export * from './ReadingProgress';
 export * from './hooks';
+
+// Client-only shadcn/ui components (require state, browser APIs, Radix UI interactivity)
+export * from './shadcn';
