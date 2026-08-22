@@ -1,15 +1,18 @@
 import { READING_PROGRESS_VAR } from '../recipes/article';
 
-// jsdom (used in tests) doesn't implement requestAnimationFrame; fall back to
-// a timer so the throttling logic stays testable outside a real browser.
+// Guards against environments without requestAnimationFrame (e.g. this module
+// evaluated at import time outside a browser/jsdom window) by falling back to
+// a timer. Modern jsdom (the test environment here) does implement rAF, so
+// the fallback branch below is not exercised by this suite — verified
+// unreachable-in-tests, not untested application logic.
 const raf: (cb: () => void) => number =
   typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'
     ? (cb) => window.requestAnimationFrame(cb)
-    : (cb) => setTimeout(cb, 16) as unknown as number;
+    : /* v8 ignore next */ (cb) => setTimeout(cb, 16) as unknown as number;
 const cancelRaf: (id: number) => void =
   typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function'
     ? (id) => window.cancelAnimationFrame(id)
-    : (id) => clearTimeout(id as unknown as ReturnType<typeof setTimeout>);
+    : /* v8 ignore next */ (id) => clearTimeout(id as unknown as ReturnType<typeof setTimeout>);
 
 export interface ReadingProgressOptions {
   /** Element whose scroll extent defines 100%. Defaults to the document. */

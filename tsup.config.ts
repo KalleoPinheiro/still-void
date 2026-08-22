@@ -12,7 +12,6 @@ export default defineConfig([
   {
     ...shared,
     entry: {
-      index: 'src/index.ts',
       'react/index': 'src/react/index.ts',
     },
     clean: true,

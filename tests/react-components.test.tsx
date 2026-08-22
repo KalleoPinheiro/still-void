@@ -40,6 +40,16 @@ describe('CategoryPill', () => {
     const pill = container.querySelector('.sv-pill') as HTMLElement;
     expect(pill.style.getPropertyValue('--sv-pill-color')).toBe(accents.violet);
   });
+
+  test('renders a real button with aria-pressed when interactive', () => {
+    render(<CategoryPill label="IA" interactive active />);
+    expect(screen.getByRole('button', { name: 'IA' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('interactive without active defaults aria-pressed to false', () => {
+    render(<CategoryPill label="IA" interactive />);
+    expect(screen.getByRole('button', { name: 'IA' })).toHaveAttribute('aria-pressed', 'false');
+  });
 });
 
 describe('Callout', () => {
@@ -71,6 +81,11 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'About' })).not.toHaveAttribute('aria-current');
   });
+
+  test('renders the actions slot when provided', () => {
+    render(<Header actions={<button>Toggle</button>} />);
+    expect(screen.getByRole('button', { name: 'Toggle' })).toBeInTheDocument();
+  });
 });
 
 describe('Hero', () => {
@@ -96,8 +111,55 @@ describe('CodeBlock + CopyButton', () => {
     expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument();
   });
 
+  test('stays in the un-copied state when the clipboard write fails', async () => {
+    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } });
+    render(<CopyButton code="x" />);
+    const button = screen.getByRole('button', { name: 'Copy' });
+    button.click();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
+  });
+
+  test('a second copy click resets the pending "copied" timeout instead of stacking it', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<CopyButton code="x" />);
+    const button = screen.getByRole('button', { name: 'Copy' });
+    button.click();
+    expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument();
+    screen.getByRole('button', { name: 'Copied' }).click();
+    expect(writeText).toHaveBeenCalledTimes(2);
+  });
+
+  test('reverts to "Copy" after the feedback window elapses', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<CopyButton code="x" />);
+    screen.getByRole('button', { name: 'Copy' }).click();
+    await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument());
+    vi.advanceTimersByTime(2000);
+    await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument());
+    vi.useRealTimers();
+  });
+
+  test('unmounting while the "copied" timeout is pending does not throw', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    const { unmount } = render(<CopyButton code="x" />);
+    screen.getByRole('button', { name: 'Copy' }).click();
+    await screen.findByRole('button', { name: 'Copied' });
+    expect(() => unmount()).not.toThrow();
+  });
+
   test('renders filename in header when provided', () => {
     render(<CodeBlock code="x" filename="index.ts" />);
     expect(screen.getByText('index.ts')).toBeInTheDocument();
+  });
+
+  test('falls back to "code" in the header when neither filename nor language is provided', () => {
+    render(<CodeBlock code="x" />);
+    expect(screen.getByText('code')).toBeInTheDocument();
   });
 });

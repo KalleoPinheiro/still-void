@@ -66,4 +66,29 @@ describe('createReadingProgress', () => {
     progress = createReadingProgress({ varTarget: target });
     expect(target.style.getPropertyValue('--sv-reading-progress')).toBe('1');
   });
+
+  test('varTarget: null skips writing the CSS var anywhere', () => {
+    setScrollExtent(2000, 800, 1200);
+    document.documentElement.style.removeProperty('--sv-reading-progress');
+    progress = createReadingProgress({ varTarget: null });
+    expect(document.documentElement.style.getPropertyValue('--sv-reading-progress')).toBe('');
+  });
+
+  test('reports 100% when the document has no scrollable overflow (total <= 0)', () => {
+    setScrollExtent(800, 800, 0);
+    const onChange = vi.fn();
+    progress = createReadingProgress({ onChange });
+    expect(progress.getPercent()).toBe(1);
+    expect(onChange).toHaveBeenCalledWith(1);
+  });
+
+  test('reports 100% for a target element with no scrollable overflow (total <= 0)', () => {
+    const target = document.createElement('div');
+    target.getBoundingClientRect = () => ({ top: 0, height: 800 }) as DOMRect;
+    Object.defineProperty(window, 'innerHeight', { value: 800, configurable: true });
+    const onChange = vi.fn();
+    progress = createReadingProgress({ target, onChange });
+    expect(progress.getPercent()).toBe(1);
+    expect(onChange).toHaveBeenCalledWith(1);
+  });
 });

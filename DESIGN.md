@@ -1,6 +1,6 @@
 ---
 name: Still Void
-description: Framework-agnostic design system — calm dark-first surfaces, one sharp accent, zero decoration.
+description: React/Next.js design system — calm dark-first surfaces, one sharp accent, zero decoration.
 colors:
   bg-dark: "#0A0A0C"
   bg-elev-dark: "#111114"
@@ -217,9 +217,34 @@ Every component is precise and unornamented — a component earns color or motio
 - **Style:** Raised Void background, 1px Hairline border, 12px radius, JetBrains Mono throughout, uppercase Label-styled header bar showing filename or language.
 - **Copy affordance:** ghost button, Ink Muted → Ink on hover, switches to accent-colored border + text on copy success for 2 seconds — the only component with a timed color state.
 
-## 6. Do's and Don'ts
+## 6. shadcn/ui Components
 
-Every Don't below is a named anti-reference from PRODUCT.md, repeated here so the visual spec enforces the same line as the product strategy.
+A curated set of shadcn/ui components has been adapted to Still Void via Tailwind configuration and CSS overrides, preserving the design system's core principles:
+
+### Theming Strategy
+- **Tailwind Config:** Extended to map Still Void tokens (colors, typography, spacing, radii) — ensures shadcn components inherit the system palette without duplication.
+- **CSS Overrides:** `shadcn-overrides.css` layer removes all box-shadows, applies correct font families (Sora/Manrope/JetBrains Mono), and ensures spacing/radii match the spec exactly.
+- **No Gradients:** Gradient text and background gradients removed entirely; the system uses only flat surfaces and the `.sv-gradient-border` accent accent (and only on FeaturedPostCard).
+
+### Component Guarantees
+Every imported shadcn component *must* adhere to:
+1. **No box-shadow** — the Flat-By-Default Rule applies to shadcn as much as native Still Void components.
+2. **Correct fonts** — Sora/Manrope headings (not arbitrary default), JetBrains Mono for code, Manrope for body/labels.
+3. **One accent at a time** — shadcn Button variants, Select focus states, Dialog overlays all respect `data-accent`, never mix hues.
+4. **Spacing/radii literal** — every component border-radius and padding is set to a value from `src/tokens/`, never approximated.
+
+### Adding New shadcn Components
+When integrating a new shadcn component:
+1. Run `npx shadcn-ui@latest add [component]` to install.
+2. Override styles in `shadcn-overrides.css` — remove shadows, fix fonts, lock to Still Void tokens.
+3. Add Storybook story in `src/react/stories/` showing dark/light modes and accent variants.
+4. Verify no `box-shadow` appears (use browser DevTools Inspector).
+5. Verify fonts render correctly (Sora on headings, Manrope on body, JetBrains on code).
+6. Commit with message: "feat: add [ComponentName] component with Still Void theming".
+
+## 7. Do's and Don'ts
+
+Every Don't below is a named anti-reference from PRODUCT.md, repeated here so the visual spec enforces the same line as the product strategy — and additional rules for shadcn component additions.
 
 ### Do:
 - **Do** keep exactly one accent active per page via `data-accent`; never render two accent hues on the same view (see The One-Accent Rule).
