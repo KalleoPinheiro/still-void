@@ -133,6 +133,9 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ## Task Breakdown
 
+> **Decisão do orquestrador (2026-08-23, após a Fase 2):** `@testing-library/user-event` estava só como dependência transitiva e foi declarado como devDependency em `a324d73`. Motivo: a justificativa da spec para o `NativeSelect` é literalmente que `userEvent.selectOptions` continua funcionando nele — provar isso com `fireEvent.change` afirma menos do que a AC exige. **T10, T11 e T14 devem usar `userEvent`** (`click`, `selectOptions`) nas interações, não `fireEvent`.
+
+
 ### T1: Escrever a seção "Forms" de `style.css` ✅ `775bc85`
 
 **What**: Adicionar as regras `.sv-field` (+ modificadores `--textarea`/`--select`/`--file`), `.sv-check`, `.sv-radio`, `.sv-choice`, `.sv-radio-group` (+ `--horizontal`), `.sv-radio-group__legend` e `.sv-sr-only`, exatamente como no contrato de CSS do `design.md`.
