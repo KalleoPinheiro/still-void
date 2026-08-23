@@ -16,18 +16,36 @@ picking server or client is mandatory.
 | `@still-void/ui/react` | No — renders in Server Components | Design tokens, recipes, data-contract types, and every component that doesn't need hooks/state/browser APIs |
 | `@still-void/ui/react/client` | Yes — the whole bundle is one Client Component boundary | DOM/localStorage behaviors, hooks, and every component that needs interactivity |
 
-Plus two CSS entries, framework-neutral, imported once at the app root:
+Plus CSS entries, framework-neutral, imported once at the app root:
 
 | Entry | What it is |
 | --- | --- |
 | `@still-void/ui/theme.css` | CSS custom properties (`--sv-*`): color tokens, dark/light via `[data-theme]`, accents via `[data-accent]` |
-| `@still-void/ui/style.css` | All component classes (`sv-*`) |
+| `@still-void/ui/style.css` | All component classes (`sv-*`) — this is all a consumer needs for every server-safe component, Tailwind or not |
+| `@still-void/ui/shadcn-overrides.css` | **Opt-in.** Applies `box-shadow: none !important` to bare element selectors (`button`, `input`, `select`, `textarea`, …). Never imported by `style.css` — importing it automatically would reach into a consumer's own components, not just the package's |
+
+Plus one Tailwind entry, for consumers who compose their own markup with Tailwind
+utilities on top of Still Void's tokens:
+
+| Entry | What it is |
+| --- | --- |
+| `@still-void/ui/tailwind-preset` | A Tailwind preset mapping `sv-*` color/spacing/radius keys to `var(--sv-*)`. Optional — the components themselves style through real `sv-*` CSS and need no Tailwind at all (see "Tailwind is optional" below) |
 
 **Rule of thumb:** import from `@still-void/ui/react` by default. Reach for
 `@still-void/ui/react/client` only for the specific pieces that need it (theme
 toggling, copy-to-clipboard, scroll spy, reading progress, or a Radix-backed shadcn
 component with internal state) — and compose them into your Server Components via
 slots/`children`, never by making a whole page a Client Component.
+
+### Tailwind is optional
+
+Every server-safe component — including the shadcn-derived `Button`, `Card`, `Alert`,
+`Badge` and the form/table primitives below — styles itself through real `sv-*` classes
+in `style.css`, driven by `var(--sv-*)`. None of them need Tailwind, a Tailwind config,
+or any build-time CSS processing beyond loading `theme.css` + `style.css`. `tailwindcss`
+is declared as an **optional peer dependency**: install it and load
+`@still-void/ui/tailwind-preset` only if you're composing your own markup with Tailwind
+utilities against Still Void's tokens — the package's own components don't need it.
 
 ## Design tokens
 
@@ -58,6 +76,12 @@ component:
   `layout()`, `sidebar()`, `hero()`, `skeletonLine()`, `cardSkeleton()` + `*Classes` maps
 - `recipes/article` — `codeBlock()`, `callout()`, `tableOfContents()`, `tocLink()`,
   `readingProgress()`, `articleHeader()`, `prose()` + `*Classes` maps
+- `recipes/field` — `field(options?: { variant?: 'input' | 'textarea' | 'select' | 'file' })` +
+  `fieldClasses` (`choice`, `srOnly`). The single source of truth for the form-field frame
+  shared by `Input`, `Textarea`, `NativeSelect` and `FileInput` — use it when composing your
+  own field markup instead of mirroring `.sv-field`'s CSS by hand
+- `recipes/table` — `table()` + `tableClasses` (`container`, `head`, `body`, `foot`, `row`,
+  `th`, `td`, `caption`) — the class map behind the `Table` family, for a raw `<table>`
 - `recipes/cx` — `cx(...)`, the internal class-join helper (exported for consumer use too)
 
 ## Component catalog
@@ -70,6 +94,33 @@ component:
 | `Content` primitives — `CategoryPill`, `PostCard`, `FeaturedPostCard`, `PostGrid`, `Layout`, `Sidebar`, `SidebarSection`, `Hero`, `Skeleton`, `CardSkeleton` | Blog/content layout |
 | `Article`, `ThemeScript` | Article shell; `ThemeScript` inlines the pre-hydration theme script to avoid FOUC |
 | `Button`, `Card` (+ `CardHeader`/`CardFooter`/`CardTitle`/`CardDescription`/`CardContent`), `Alert` (+ `AlertTitle`/`AlertDescription`), `Badge`, `Input` | shadcn/ui components with no internal state |
+| `Textarea` | `<textarea>`, styled via `field({ variant: 'textarea' })`. Accepts `rows` — the attribute `Input` never took |
+| `NativeSelect` | Real `<select>` — form field, serializes into `FormData`, driveable by `userEvent.selectOptions`. **Coexists on purpose with `Select`** (client-only Radix combobox) — see "NativeSelect vs. Select" below |
+| `FileInput` | `<input type="file">` with a styled `::file-selector-button`. `type` is fixed to `"file"` even if a caller passes another `type` |
+| `Checkbox` | `<input type="checkbox">`, no wrapper — pair with your own `<label>` or the `sv-choice` class (`fieldClasses.choice`) for a label+control row |
+| `RadioGroup`, `RadioGroupItem` | `<fieldset>`/`<legend>` group of native radios. See "RadioGroup: name propagation" below for the direct-children limitation |
+| `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption` | Presentational data table — a `<table>` inside a horizontally-scrolling container. No sorting/pagination/selection; that's a separate `DataTable` feature, not this family |
+
+### `NativeSelect` vs. `Select`
+
+Both ship from the package and **neither is deprecated in favor of the other** — they solve
+different problems:
+
+| | `NativeSelect` (`@still-void/ui/react`) | `Select` (`@still-void/ui/react/client`) |
+| --- | --- | --- |
+| Element | Real `<select>` | Radix combobox with a portaled listbox |
+| Server-safe | Yes — no `'use client'`, no hooks | No — client boundary, internal state |
+| Form integration | Serializes into `FormData` out of the box | Needs a hidden input or controlled state to submit natively |
+| Interaction in tests | `userEvent.selectOptions` | Radix's own trigger/listbox interaction |
+| Use it when | You want a plain form field that works in a Server Component and needs zero JS to submit | You want custom-styled options, search, or rich option content, and are already in a Client Component |
+
+### `RadioGroup`: `name` propagation is direct-children only
+
+`RadioGroup` has no `useId`/`createContext` (those are hooks — using them would break
+server-safety), so it injects its `name` prop into `RadioGroupItem` children via
+`React.Children.map`. This only reaches **direct children**: a `RadioGroupItem` wrapped in
+another element (e.g. a styling `<div>`) does not receive the group's `name` and must
+declare its own. A `RadioGroupItem`'s own `name` always wins over the group's.
 
 ### Client-only (`@still-void/ui/react/client`)
 

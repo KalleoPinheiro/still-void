@@ -191,7 +191,23 @@ None. If a `box-shadow` appears anywhere in a consuming project's use of this sy
 
 Every component is precise and unornamented — a component earns color or motion only when it's carrying state (active nav link, hover lift, copy-success feedback), never as baseline decoration.
 
-*No `Button` or text `Input` primitive ships in v1.* The system currently covers content-display and navigation components only (see below); a Button/Input pass is open work, not an oversight to paper over here.
+*Button and Input primitives are specified.* The form-field frame below closes the Button/Input pass that earlier revisions of this document listed as open work.
+
+### Form fields — Input / Textarea / NativeSelect / FileInput
+
+All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so border, radius, surface, typography and focus ring come from a single source rather than four hand-copied approximations:
+
+- **Height:** 40px (`--sv-space-10`); `Textarea` grows instead (`min-height: 80px`, resizable vertically).
+- **Corner radius:** 6px (`--sv-radius-sm`).
+- **Padding:** 12px horizontal / 8px vertical (`--sv-space-3` / `--sv-space-2`).
+- **Surface:** `var(--sv-surface)` background on a 1px `var(--sv-border)` border, `var(--sv-text)` foreground, `var(--sv-text-2)` placeholder.
+- **Type scale:** `var(--sv-text-base)` (15px) — the one visual value in this pass that isn't a literal carry-over from the previous shadcn defaults (those were Tailwind's unspecified `text-sm`, 14px, not a Still Void token; see the `patch` changeset for the reancoring).
+- **Disabled:** `cursor: not-allowed`, `opacity: 0.5`.
+- **`FileInput`** additionally styles its native `::file-selector-button` (`-webkit-file-upload-button` fallback) with the same border/radius/surface tokens; `NativeSelect` keeps the browser's native affordance (no `appearance: none`) so `color-scheme` carries the dropdown chrome and native `multiple` list boxes into the right theme for free.
+
+### Focus state (all interactive controls)
+
+`outline: 2px solid var(--sv-accent-ink)` with `outline-offset: 2px` on `:focus-visible` — never `box-shadow`, never Tailwind's `ring-*` utilities. `--sv-accent-ink` is the token already validated at ≥4.5:1 contrast in both themes. This replaces a prior state where the shadcn layer's `focus-visible:ring-accent` referenced a Tailwind color (`accent`) that did not exist in the package's config, so no field had a visible focus ring at all (a WCAG 2.4.7 failure, not a style choice).
 
 ### Chips — CategoryPill
 - **Shape:** fully rounded (`rounded.full`, 9999px), `padding: 4px 12px`.
@@ -219,12 +235,13 @@ Every component is precise and unornamented — a component earns color or motio
 
 ## 6. shadcn/ui Components
 
-A curated set of shadcn/ui components has been adapted to Still Void via Tailwind configuration and CSS overrides, preserving the design system's core principles:
+A curated set of shadcn/ui components has been adapted to Still Void, preserving the design system's core principles. The server-safe family (`Button`, `Card`, `Alert`, `Badge`, and the form/table primitives above) styles itself with real `sv-*` CSS in `style.css`, not Tailwind utilities — the client-only Radix family (`Dialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) still ships as Tailwind utility classes, migrated in a later feature.
 
 ### Theming Strategy
-- **Tailwind Config:** Extended to map Still Void tokens (colors, typography, spacing, radii) — ensures shadcn components inherit the system palette without duplication.
-- **CSS Overrides:** `shadcn-overrides.css` layer removes all box-shadows, applies correct font families (Sora/Manrope/JetBrains Mono), and ensures spacing/radii match the spec exactly.
-- **No Gradients:** Gradient text and background gradients removed entirely; the system uses only flat surfaces and the `.sv-gradient-border` accent accent (and only on FeaturedPostCard).
+- **CSS variables, not Tailwind, drive theming.** `sv-*` classes read `var(--sv-*)`, so `[data-theme]`/`[data-accent]` propagate to every server-safe component with zero consumer configuration and zero Tailwind dependency.
+- **Tailwind Preset (optional):** `@still-void/ui/tailwind-preset` maps the same `sv-*` keys to `var(--sv-*)` for consumers composing their own markup with Tailwind utilities on top of the system's tokens. It is not required by any component the package ships, and `tailwindcss` is declared as an optional peer dependency accordingly.
+- **`shadcn-overrides.css` (opt-in subpath):** ships as `@still-void/ui/shadcn-overrides.css`. It applies `box-shadow: none !important` to bare element selectors (`button`, `input`, `select`, `textarea`, a `[class*="shadow"]` catch-all), which is aggressive enough to reach into a consumer's *own* unrelated components — so it is never imported by `style.css` or loaded automatically. Opt in only if you're adding more unstyled shadcn components of your own and want the same shadow reset.
+- **No Gradients:** Gradient text and background gradients removed entirely; the system uses only flat surfaces and the `.sv-gradient-border` accent (and only on FeaturedPostCard).
 
 ### Component Guarantees
 Every imported shadcn component *must* adhere to:

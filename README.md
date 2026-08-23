@@ -156,6 +156,14 @@ A selection of **shadcn/ui** components has been ported to Still Void with the d
 - `Input` — text input with placeholder, disabled, and focus states
 - `Alert` — with optional title and description
 - `Badge` — with variants (default, secondary, destructive, outline)
+- `Textarea` — multi-line text field sharing `Input`'s frame, plus `rows`
+- `NativeSelect` — a real `<select>`, serializable via `FormData`; coexists with the client-only `Select` combobox (see [docs/design-system.md](docs/design-system.md))
+- `FileInput` — `<input type="file">` with a styled file-selector button
+- `Checkbox` — `<input type="checkbox">`, no wrapper
+- `RadioGroup` / `RadioGroupItem` — `<fieldset>`/`<legend>` group of native radios
+- `Table` family — `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`, a presentational data table with a scrolling container
+
+All of the above style themselves through real `sv-*` CSS classes — no Tailwind required (see the note below).
 
 **Client-only components** (import from `@still-void/ui/react/client`):
 - `Dialog` — modal with trigger, content, header, footer, title, description
@@ -203,7 +211,15 @@ export function SettingsDialog() {
 }
 ```
 
-**Note:** Tailwind CSS is now a peer dependency when using shadcn/ui components. Configure your `tailwind.config.ts` to extend Still Void's tokens (see [DESIGN.md](DESIGN.md) for the full config).
+**Note:** Tailwind is **not required**. Every server-safe component — shadcn-derived (`Button`,
+`Card`, `Alert`, `Badge`) and the form/table primitives above — styles itself through real
+`sv-*` classes in `@still-void/ui/style.css`, driven by `var(--sv-*)`, so it follows
+`[data-theme]`/`[data-accent]` with zero Tailwind config. `tailwindcss` is declared as an
+**optional** peer dependency: install it and import `@still-void/ui/tailwind-preset` only
+if you're composing your own markup with Tailwind utilities against Still Void's tokens.
+There's also an opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element
+`box-shadow: none !important` resets) for consumers who install additional unstyled shadcn
+components of their own — it's never imported automatically.
 
 ## Fidelity rules (do not regress)
 
