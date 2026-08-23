@@ -18,7 +18,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | Fase | Tasks | Status | Testes acumulados |
 | --- | --- | --- | --- |
 | 1 — Fundação | T1 `775bc85`, T2 `714493c`, T3 `8df34e6`, T4 `319030e`, T5 `aa2ef50` | ✅ completa | 475 (base 320, +155) — cobertura 100% |
-| 2 — Campos | T6–T9 | ⏳ pendente | — |
+| 2 — Campos | T6 `054d294`, T7 `b37405c`, T8 `ad89a23`, T9 `6271147` | ✅ completa | 502 (base 475, +27) — cobertura 100% |
 | 3 — Escolhas e tabela | T10–T12 | ⏳ pendente | — |
 | 4 — Barril e integração | T13–T14 | ⏳ pendente | — |
 | 5 — Distribuição | T15–T16 | ⏳ pendente | — |
@@ -250,7 +250,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T6: Migrar `Input` para `field()` [P]
+### T6: Migrar `Input` para `field()` [P] ✅ `054d294`
 
 **What**: Trocar a string de utilitárias Tailwind por `cn(field(), className)`, sem alterar props, tipos, `forwardRef` ou `displayName`.
 **Where**: `src/components/ui/input.tsx`, `tests/ui-input.test.tsx` (estender)
@@ -273,7 +273,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T7: Criar `Textarea` [P]
+### T7: Criar `Textarea` [P] ✅ `b37405c`
 
 **What**: Componente `Textarea` server-safe conforme o contrato do design.
 **Where**: `src/components/ui/textarea.tsx` (novo), `tests/ui-textarea.test.tsx` (novo)
@@ -300,7 +300,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T8: Criar `NativeSelect` [P]
+### T8: Criar `NativeSelect` [P] ✅ `ad89a23`
 
 **What**: Componente `NativeSelect` server-safe, `<select>` real.
 **Where**: `src/components/ui/native-select.tsx` (novo), `tests/ui-native-select.test.tsx` (novo)
@@ -327,7 +327,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T9: Criar `FileInput` [P]
+### T9: Criar `FileInput` [P] ✅ `6271147`
 
 **What**: Componente `FileInput` com `type` blindado.
 **Where**: `src/components/ui/file-input.tsx` (novo), `tests/ui-file-input.test.tsx` (novo)
