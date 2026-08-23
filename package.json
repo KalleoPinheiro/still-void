@@ -54,6 +54,16 @@
         "default": "./dist/react/client/index.cjs"
       }
     },
+    "./tailwind-preset": {
+      "import": {
+        "types": "./dist/tailwind-preset.d.ts",
+        "default": "./dist/tailwind-preset.js"
+      },
+      "require": {
+        "types": "./dist/tailwind-preset.d.cts",
+        "default": "./dist/tailwind-preset.cjs"
+      }
+    },
     "./theme.css": "./dist/theme.css",
     "./style.css": "./dist/style.css",
     "./shadcn-overrides.css": "./dist/shadcn-overrides.css",
@@ -66,6 +76,9 @@
       ],
       "react/client": [
         "./dist/react/client/index.d.ts"
+      ],
+      "tailwind-preset": [
+        "./dist/tailwind-preset.d.ts"
       ]
     }
   },
@@ -90,7 +103,13 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "tailwindcss": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

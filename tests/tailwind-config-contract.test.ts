@@ -12,9 +12,14 @@ import { describe, expect, test } from 'vitest';
  * The config is read as text rather than imported: it is a v3-style config in
  * a repo that declares tailwindcss v4, and importing it would drag that
  * (separately scoped) type mismatch into this feature's typecheck gate.
+ *
+ * T16 moved the config object out of the root `tailwind.config.ts` (now a
+ * one-line re-export) into `src/tailwind-preset.ts`, the published
+ * `./tailwind-preset` entry — that file is the source of truth this test
+ * reads now.
  */
 
-const configPath = resolve(process.cwd(), 'tailwind.config.ts');
+const configPath = resolve(process.cwd(), 'src/tailwind-preset.ts');
 const source = readFileSync(configPath, 'utf-8');
 const themeCss = readFileSync(resolve(process.cwd(), 'src/css/theme.css'), 'utf-8');
 
