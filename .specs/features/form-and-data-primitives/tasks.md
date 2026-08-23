@@ -21,7 +21,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | 2 — Campos | T6 `054d294`, T7 `b37405c`, T8 `ad89a23`, T9 `6271147` | ✅ completa | 502 (base 475, +27) — cobertura 100% |
 | 3 — Escolhas e tabela | T10 `bbaa8a8`, T11 `c8941f5`, T12 `21e0874` | ✅ completa | 550 (+48) — cobertura 100% |
 | 4 — Barril e integração | T13 `9fb6552`, T14 `e63f8ef` | ✅ completa | 676 (+126) — cobertura 100%, gate build verde (publint + attw) |
-| 5 — Distribuição | T15–T16 | ⏳ pendente | — |
+| 5 — Distribuição | T15 `cacf0b5`, T16 `06d082e` | ✅ completa | 691 (+15) — cobertura 100%, gate build verde (publint + attw) |
 | 6 — Migração P2 | T17–T20 | ⏳ pendente | — |
 | 7 — Catálogo e release | T21–T24 | ⏳ pendente | — |
 
