@@ -780,3 +780,101 @@ body.sv-body {
   color: var(--sv-text-2);
   font-size: var(--sv-text-sm);
 }
+
+/* ---------- Button ---------- */
+/* Default variant/size need no modifier class — .sv-btn alone is a complete,
+   Tailwind-independent button, the same pattern .sv-field uses for its
+   default 'input' variant. Modifiers only override what a variant/size
+   changes. */
+.sv-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sv-space-2);
+  height: var(--sv-space-10);
+  padding: 0 var(--sv-space-4);
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-sm);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  font: inherit;
+  font-family: var(--sv-font-body);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover),
+    border-color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-btn:hover {
+  background: var(--sv-surface-2);
+}
+.sv-btn:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sv-btn--destructive {
+  background: var(--sv-danger);
+  color: var(--sv-bg);
+}
+.sv-btn--destructive:hover {
+  background: color-mix(in srgb, var(--sv-danger) 90%, transparent);
+}
+
+.sv-btn--outline {
+  border-color: var(--sv-border);
+  background: var(--sv-bg);
+  color: var(--sv-text);
+}
+.sv-btn--outline:hover {
+  background: var(--sv-surface);
+  color: var(--sv-accent-ink);
+}
+
+.sv-btn--secondary {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-btn--secondary:hover {
+  background: var(--sv-surface);
+}
+
+.sv-btn--ghost {
+  background: transparent;
+  color: var(--sv-text);
+}
+.sv-btn--ghost:hover {
+  background: var(--sv-surface);
+}
+
+.sv-btn--link {
+  background: transparent;
+  color: var(--sv-accent-ink);
+  text-underline-offset: 4px;
+}
+.sv-btn--link:hover {
+  text-decoration: underline;
+}
+
+.sv-btn--sm {
+  height: calc(var(--sv-space-8) + var(--sv-space-1));
+  padding: 0 var(--sv-space-3);
+  font-size: var(--sv-text-sm);
+}
+.sv-btn--lg {
+  height: calc(var(--sv-space-10) + var(--sv-space-1));
+  padding: 0 var(--sv-space-8);
+}
+.sv-btn--icon {
+  width: var(--sv-space-10);
+  padding: 0;
+}

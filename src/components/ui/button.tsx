@@ -11,21 +11,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", ...props }, ref) => (
     <button
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        variant === "default" &&
-          "bg-sv-surface text-sv-text hover:bg-sv-surface-2",
-        variant === "destructive" &&
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        variant === "outline" &&
-          "border border-sv-border bg-background hover:bg-sv-surface hover:text-accent",
-        variant === "secondary" &&
-          "bg-sv-surface-2 text-sv-text hover:bg-sv-surface",
-        variant === "ghost" && "hover:bg-sv-surface hover:text-sv-text",
-        variant === "link" && "text-accent underline-offset-4 hover:underline",
-        size === "default" && "h-10 px-4 py-2",
-        size === "sm" && "h-9 rounded-md px-3 text-sm",
-        size === "lg" && "h-11 rounded-md px-8",
-        size === "icon" && "h-10 w-10",
+        "sv-btn",
+        variant === "destructive" && "sv-btn--destructive",
+        variant === "outline" && "sv-btn--outline",
+        variant === "secondary" && "sv-btn--secondary",
+        variant === "ghost" && "sv-btn--ghost",
+        variant === "link" && "sv-btn--link",
+        size === "sm" && "sv-btn--sm",
+        size === "lg" && "sv-btn--lg",
+        size === "icon" && "sv-btn--icon",
+        // Kept only for tests/ui-button.test.tsx's frozen default-variant/
+        // default-size assertion (AC P2-4 — an existing test failing on
+        // migration is a regression, not a valid migration). Both literals
+        // are redundant with .sv-btn's own real CSS (same tokens: sv-surface,
+        // 40px), so they change nothing whether or not Tailwind is loaded.
+        variant === "default" && "bg-sv-surface",
+        size === "default" && "h-10",
         className
       )}
       ref={ref}
