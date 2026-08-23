@@ -726,3 +726,57 @@ body.sv-body {
   white-space: nowrap;
   border: 0;
 }
+
+/* ---------- Table ---------- */
+/* Presentational only — sorting, paging and selection are a data-table
+   concern with a different API surface. The header decoration here is the
+   one consumers were repeating by hand on every table screen. */
+.sv-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+.sv-table {
+  width: 100%;
+  border-collapse: collapse;
+  caption-side: bottom;
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text);
+}
+.sv-table__head {
+  background: var(--sv-bg);
+}
+.sv-table__th {
+  height: var(--sv-space-10);
+  padding: 0 var(--sv-space-3);
+  text-align: start;
+  font-size: var(--sv-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sv-text-3);
+  font-weight: 600;
+  border-bottom: 1px solid var(--sv-border);
+}
+.sv-table__td {
+  padding: var(--sv-space-3);
+  vertical-align: middle;
+}
+.sv-table__row {
+  border-bottom: 1px solid var(--sv-border);
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-table__body .sv-table__row:last-child {
+  border-bottom: 0;
+}
+.sv-table__row:hover {
+  background: var(--sv-surface-2);
+}
+.sv-table__foot {
+  border-top: 1px solid var(--sv-border);
+  background: var(--sv-surface);
+  font-weight: 600;
+}
+.sv-table__caption {
+  margin-top: var(--sv-space-4);
+  color: var(--sv-text-2);
+  font-size: var(--sv-text-sm);
+}
