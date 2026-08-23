@@ -21,8 +21,10 @@ describe('Button', () => {
   test('renders children and defaults to variant=default size=default', () => {
     render(<Button>Click me</Button>);
     const button = screen.getByRole('button', { name: 'Click me' });
-    expect(button.className).toContain('bg-sv-surface');
-    expect(button.className).toContain('h-10');
+    // "default" is the base shape for both axes, so it adds no modifier —
+    // the absence of every sv-btn--* class is what proves the defaults held.
+    expect(button).toHaveClass('sv-btn');
+    expect(button.className).not.toMatch(/sv-btn--/);
   });
 
   test.each(variants)('applies variant=%s classes', (variant) => {

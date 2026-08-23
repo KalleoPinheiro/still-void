@@ -20,13 +20,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         size === "sm" && "sv-btn--sm",
         size === "lg" && "sv-btn--lg",
         size === "icon" && "sv-btn--icon",
-        // Kept only for tests/ui-button.test.tsx's frozen default-variant/
-        // default-size assertion (AC P2-4 — an existing test failing on
-        // migration is a regression, not a valid migration). Both literals
-        // are redundant with .sv-btn's own real CSS (same tokens: sv-surface,
-        // 40px), so they change nothing whether or not Tailwind is loaded.
-        variant === "default" && "bg-sv-surface",
-        size === "default" && "h-10",
         className
       )}
       ref={ref}

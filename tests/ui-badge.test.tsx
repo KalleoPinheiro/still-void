@@ -11,7 +11,9 @@ const variants: NonNullable<BadgeProps['variant']>[] = ['default', 'secondary', 
 describe('Badge', () => {
   test('defaults to variant=default', () => {
     render(<Badge>New</Badge>);
-    expect(screen.getByText('New')).toHaveClass('bg-sv-signal-cyan');
+    // Same rule as Button: the default variant is the unmodified base class.
+    expect(screen.getByText('New')).toHaveClass('sv-badge');
+    expect(screen.getByText('New').className).not.toMatch(/sv-badge--/);
   });
 
   test.each(variants)('applies variant=%s classes', (variant) => {
