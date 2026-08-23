@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createRef } from 'react';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, test } from 'vitest';
 import { NativeSelect } from '../src/components/ui/native-select';
 
@@ -19,7 +20,11 @@ describe('NativeSelect', () => {
     expect(select).toBeInstanceOf(HTMLSelectElement);
   });
 
-  test('changes value when a different option is selected', () => {
+  // AC P1-Campos #3 names userEvent.selectOptions specifically: it is the
+  // interaction the Radix Select cannot serve, and the reason this component
+  // exists. Asserting it through fireEvent.change would prove a weaker claim
+  // than the spec makes.
+  test('userEvent.selectOptions changes the value', async () => {
     render(
       <NativeSelect aria-label="Fruit" defaultValue="apple">
         <option value="apple">Apple</option>
@@ -27,7 +32,7 @@ describe('NativeSelect', () => {
       </NativeSelect>
     );
     const select = screen.getByRole('combobox') as HTMLSelectElement;
-    fireEvent.change(select, { target: { value: 'banana' } });
+    await userEvent.selectOptions(select, 'banana');
     expect(select).toHaveValue('banana');
   });
 
