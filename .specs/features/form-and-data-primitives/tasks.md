@@ -19,7 +19,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | --- | --- | --- | --- |
 | 1 — Fundação | T1 `775bc85`, T2 `714493c`, T3 `8df34e6`, T4 `319030e`, T5 `aa2ef50` | ✅ completa | 475 (base 320, +155) — cobertura 100% |
 | 2 — Campos | T6 `054d294`, T7 `b37405c`, T8 `ad89a23`, T9 `6271147` | ✅ completa | 502 (base 475, +27) — cobertura 100% |
-| 3 — Escolhas e tabela | T10–T12 | ⏳ pendente | — |
+| 3 — Escolhas e tabela | T10 `bbaa8a8`, T11 `c8941f5`, T12 `21e0874` | ✅ completa | 550 (+48) — cobertura 100% |
 | 4 — Barril e integração | T13–T14 | ⏳ pendente | — |
 | 5 — Distribuição | T15–T16 | ⏳ pendente | — |
 | 6 — Migração P2 | T17–T20 | ⏳ pendente | — |
