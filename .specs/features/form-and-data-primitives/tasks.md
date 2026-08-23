@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/form-and-data-primitives/design.md`
-**Status**: In Progress
+**Status**: Tasks complete — awaiting Verifier
 
 ---
 
@@ -23,7 +23,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | 4 — Barril e integração | T13 `9fb6552`, T14 `e63f8ef` | ✅ completa | 676 (+126) — cobertura 100%, gate build verde (publint + attw) |
 | 5 — Distribuição | T15 `cacf0b5`, T16 `06d082e` | ✅ completa | 691 (+15) — cobertura 100%, gate build verde (publint + attw) |
 | 6 — Migração P2 | T17 `c4b1769`, T18 `b37d68f`, T19 `a429446`, T20 `63ff7b7`, T20b `08993f1` | ✅ completa | 757 — cobertura 100%, gate build verde |
-| 7 — Catálogo e release | T21–T24 | ⏳ pendente | — |
+| 7 — Catálogo e release | T21 `f9fa911`, T22 `710b3d9`, T23 `4e82a07`, T24 `dd7b8a0` | ✅ completa | 757 — gate build + build-storybook verdes |
 
 ---
 
