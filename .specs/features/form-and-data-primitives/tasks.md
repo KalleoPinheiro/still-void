@@ -538,6 +538,21 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
+
+> **Auditoria do orquestrador antes da Fase 6 (2026-08-23).** `Button` e `Badge` carregam classes Tailwind que referenciam cores **inexistentes** no config do pacote — mesma família do defeito D5. A migração deve resolvê-las contra os tokens do sistema (`patch`, por AD-004), nunca portar o bug para o CSS novo:
+>
+> | Classe hoje | Existe no config? | Resolver para |
+> | --- | --- | --- |
+> | `bg-destructive`, `text-destructive-foreground` (Button) | ❌ não | `var(--sv-danger)` / `var(--sv-danger-ink)` |
+> | `bg-background` (Button outline) | ❌ não | `var(--sv-bg)` |
+> | `text-accent`, `hover:text-accent` (Button link/outline) | ❌ não | `var(--sv-accent-ink)` |
+> | `focus-visible:ring-ring`, `ring-offset-background` (Button) | ❌ não | `outline` + `var(--sv-accent-ink)` (AD-005) |
+> | `focus:ring-ring` (Badge) | ❌ não | idem AD-005 |
+> | `bg-red-500`, `hover:bg-red-600` (Badge destructive) | paleta crua do Tailwind, não é token Still Void | `var(--sv-danger)` |
+> | `bg-sv-signal-cyan` (Badge default) | ✔ existe, mas fixa o acento em ciano | `var(--sv-accent)`, para seguir `data-accent` (One-Accent Rule) |
+>
+> **Diferido, fora do escopo desta feature:** `Badge` é uma função simples, sem `forwardRef`, divergindo de todos os outros componentes de `components/ui/`. Adicionar `forwardRef` é `minor` e não está em nenhuma AC — registrar como item de backlog, não fazer aqui.
+
 ### T17: Migrar `Button` para CSS `sv-*` [P]
 
 **What**: Trocar utilitárias Tailwind por classe(s) `sv-btn*` com CSS real, preservando toda variante e prop.
