@@ -56,6 +56,7 @@
     },
     "./theme.css": "./dist/theme.css",
     "./style.css": "./dist/style.css",
+    "./shadcn-overrides.css": "./dist/shadcn-overrides.css",
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -80,7 +81,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint:package": "publint --strict && attw --pack . --exclude-entrypoints theme.css style.css",
+    "lint:package": "publint --strict && attw --pack . --exclude-entrypoints theme.css style.css shadcn-overrides.css",
     "changeset": "changeset",
     "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
     "release": "npm run build && changeset publish",
