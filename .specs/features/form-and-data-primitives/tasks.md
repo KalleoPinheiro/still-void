@@ -22,7 +22,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | 3 — Escolhas e tabela | T10 `bbaa8a8`, T11 `c8941f5`, T12 `21e0874` | ✅ completa | 550 (+48) — cobertura 100% |
 | 4 — Barril e integração | T13 `9fb6552`, T14 `e63f8ef` | ✅ completa | 676 (+126) — cobertura 100%, gate build verde (publint + attw) |
 | 5 — Distribuição | T15 `cacf0b5`, T16 `06d082e` | ✅ completa | 691 (+15) — cobertura 100%, gate build verde (publint + attw) |
-| 6 — Migração P2 | T17–T20 | ⏳ pendente | — |
+| 6 — Migração P2 | T17 `c4b1769`, T18 `b37d68f`, T19 `a429446`, T20 `63ff7b7`, T20b `08993f1` | ✅ completa | 757 — cobertura 100%, gate build verde |
 | 7 — Catálogo e release | T21–T24 | ⏳ pendente | — |
 
 ---
@@ -643,6 +643,26 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
+### T20b: Remover as classes Tailwind mortas que as asserções congeladas prendiam ✅ `08993f1`
+
+**What**: Tirar `bg-sv-surface`/`h-10` do `Button` e `bg-sv-signal-cyan` do `Badge`, e reescrever as 3 asserções que as prendiam para afirmarem o mesmo comportamento contra o mecanismo atual.
+**Where**: `src/components/ui/button.tsx`, `src/components/ui/badge.tsx`, `tests/ui-button.test.tsx`, `tests/ui-badge.test.tsx`
+**Depends on**: T20
+**Requirement**: FDP-12 (fecha o que T17/T20 deixaram pela metade)
+
+**Por que existe**: AC P2-4 ("teste existente passa sem edição") colidiu com AD-001. As 3 asserções verificavam *"defaults to variant=default"* através do literal da classe Tailwind — mecanismo, não comportamento — e AD-001 aposentou esse mecanismo por decisão de projeto. As classes não eram inertes: com o preset publicado em T16, `bg-sv-signal-cyan` resolve para `var(--sv-accent-cyan)` e fixa o badge em ciano, que é exatamente a violação da One-Accent Rule que a T20 existia para corrigir.
+
+**Decisão**: aprovada pelo usuário em 2026-08-23. A AC P2-4 fica emendada: protege *comportamento* de regressão, não o literal da classe utilitária.
+
+**Done when**:
+- [x] Nenhuma classe utilitária Tailwind resta em nenhum componente server-safe de `src/components/ui/` (verificado por grep)
+- [x] As 3 asserções afirmam classe base presente + ausência de modificador — claim mais forte que a anterior, não mais fraca
+- [x] Gate Full passa: 757 testes, cobertura 100%
+
+**Tests**: unit · **Gate**: full
+
+---
+
 ### T21: Stories dos campos
 
 **What**: `Textarea.stories.tsx`, `NativeSelect.stories.tsx`, `FileInput.stories.tsx`, cada uma mostrando dark/light e um accent.
@@ -861,6 +881,9 @@ Nenhuma task marcada `[P]` depende de outra `[P]` da mesma fase. ✅
 Nenhuma violação. Nenhuma task produz código sem verificação na própria task.
 
 ---
+
+
+> **Backlog levantado durante a Fase 6 (fora do escopo desta spec).** A família **client** (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) segue em classes utilitárias Tailwind e carrega os mesmos defeitos que a família server-safe acabou de perder: classes de cor inexistentes (`bg-background`, `ring-ring`, `ring-accent`, `ring-offset-background`) e — pior — `shadow-lg`/`shadow-md`/`shadow-sm`, que violam a Flat-By-Default Rule direto no código-fonte. A spec já declara essa migração fora de escopo; isto fica registrado como a próxima feature natural. Some-se a ela `Badge` sem `forwardRef`.
 
 ## Requirement Traceability (fechamento)
 
