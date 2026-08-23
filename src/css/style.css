@@ -878,3 +878,39 @@ body.sv-body {
   width: var(--sv-space-10);
   padding: 0;
 }
+
+/* ---------- Card ---------- */
+.sv-card {
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-2);
+  padding: var(--sv-space-6);
+}
+.sv-card__title {
+  margin: 0;
+  font-size: var(--sv-text-2xl);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+.sv-card__description {
+  margin: 0;
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text-2);
+}
+.sv-card__content {
+  padding: var(--sv-space-6);
+  padding-top: 0;
+}
+.sv-card__footer {
+  display: flex;
+  align-items: center;
+  padding: var(--sv-space-6);
+  padding-top: 0;
+}
