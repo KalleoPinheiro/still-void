@@ -947,3 +947,54 @@ body.sv-body {
 .sv-alert__description p {
   line-height: 1.625;
 }
+
+/* ---------- Badge ---------- */
+/* Default variant uses var(--sv-accent) rather than a fixed hue, so the
+   badge follows [data-accent] instead of locking to cyan (One-Accent Rule —
+   orchestrator audit, tasks.md pre-T17). The destructive text color is
+   var(--sv-bg) rather than var(--sv-danger-ink): --sv-danger-ink equals
+   --sv-danger in dark mode, which would render invisible text on the
+   danger fill — var(--sv-bg) mirrors the contrast approach the default
+   variant already used (text-sv-bg on a colored fill) and stays legible in
+   both themes. */
+.sv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sv-space-1) var(--sv-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-full);
+  background: var(--sv-accent);
+  color: var(--sv-bg);
+  font-size: var(--sv-text-xs);
+  font-weight: 600;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover),
+    border-color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-badge:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+.sv-badge--secondary {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-badge--secondary:hover {
+  background: var(--sv-surface);
+}
+
+.sv-badge--destructive {
+  background: var(--sv-danger);
+  color: var(--sv-bg);
+}
+.sv-badge--destructive:hover {
+  background: color-mix(in srgb, var(--sv-danger) 90%, transparent);
+}
+
+.sv-badge--outline {
+  background: transparent;
+  border-color: var(--sv-border);
+  color: var(--sv-text);
+}
