@@ -914,3 +914,36 @@ body.sv-body {
   padding: var(--sv-space-6);
   padding-top: 0;
 }
+
+/* ---------- Alert ---------- */
+.sv-alert {
+  position: relative;
+  width: 100%;
+  padding: var(--sv-space-4);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-alert > svg {
+  position: absolute;
+  top: var(--sv-space-4);
+  left: var(--sv-space-4);
+  color: var(--sv-text);
+}
+.sv-alert > svg ~ * {
+  padding-left: calc(var(--sv-space-6) + var(--sv-space-1));
+}
+.sv-alert__title {
+  margin: 0 0 var(--sv-space-1);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+.sv-alert__description {
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text-2);
+}
+.sv-alert__description p {
+  line-height: 1.625;
+}
