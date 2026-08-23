@@ -9,7 +9,21 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/form-and-data-primitives/design.md`
-**Status**: Draft
+**Status**: In Progress
+
+---
+
+## Progresso
+
+| Fase | Tasks | Status | Testes acumulados |
+| --- | --- | --- | --- |
+| 1 — Fundação | T1 `775bc85`, T2 `714493c`, T3 `8df34e6`, T4 `319030e`, T5 `aa2ef50` | ✅ completa | 475 (base 320, +155) — cobertura 100% |
+| 2 — Campos | T6–T9 | ⏳ pendente | — |
+| 3 — Escolhas e tabela | T10–T12 | ⏳ pendente | — |
+| 4 — Barril e integração | T13–T14 | ⏳ pendente | — |
+| 5 — Distribuição | T15–T16 | ⏳ pendente | — |
+| 6 — Migração P2 | T17–T20 | ⏳ pendente | — |
+| 7 — Catálogo e release | T21–T24 | ⏳ pendente | — |
 
 ---
 
@@ -119,7 +133,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ## Task Breakdown
 
-### T1: Escrever a seção "Forms" de `style.css`
+### T1: Escrever a seção "Forms" de `style.css` ✅ `775bc85`
 
 **What**: Adicionar as regras `.sv-field` (+ modificadores `--textarea`/`--select`/`--file`), `.sv-check`, `.sv-radio`, `.sv-choice`, `.sv-radio-group` (+ `--horizontal`), `.sv-radio-group__legend` e `.sv-sr-only`, exatamente como no contrato de CSS do `design.md`.
 **Where**: `src/css/style.css` (append), `tests/field-css-contract.test.ts` (novo)
@@ -142,7 +156,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T2: Escrever a seção "Table" de `style.css`
+### T2: Escrever a seção "Table" de `style.css` ✅ `714493c`
 
 **What**: Adicionar `.sv-table-container`, `.sv-table`, `.sv-table__head|body|foot|row|th|td|caption` conforme o contrato de CSS.
 **Where**: `src/css/style.css` (append), `tests/table-css-contract.test.ts` (novo)
@@ -165,7 +179,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T3: Criar a receita `field()`
+### T3: Criar a receita `field()` ✅ `8df34e6`
 
 **What**: `src/recipes/field.ts` com `field()`, `FieldVariant`, `FieldOptions` e `fieldClasses`, na forma de `categoryPill()`.
 **Where**: `src/recipes/field.ts` (novo), `tests/recipes-field.test.ts` (novo)
@@ -189,7 +203,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T4: Criar a receita `table()`
+### T4: Criar a receita `table()` ✅ `319030e`
 
 **What**: `src/recipes/table.ts` com `table()` e `tableClasses`.
 **Where**: `src/recipes/table.ts` (novo), `tests/recipes-table.test.ts` (novo)
@@ -212,7 +226,7 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 ---
 
-### T5: Ligar `tailwind.config.ts` às variáveis de tema (D1)
+### T5: Ligar `tailwind.config.ts` às variáveis de tema (D1) ✅ `aa2ef50`
 
 **What**: Trocar cada cor literal do config por `var(--sv-*)` e remover os 9 aliases `*-light`, que ficam inertes.
 **Where**: `tailwind.config.ts`, `tests/tailwind-config-contract.test.ts` (novo)
@@ -503,7 +517,12 @@ T21 (stories campos) → T22 (stories escolhas/tabela) → T23 (docs) → T24 (c
 
 **Tools**: MCP: NONE · Skill: NONE
 
+> **Achado da Fase 1 que afeta esta task:** `tailwind.config.ts` importa `Config` de `tailwindcss`, mas `corePlugins` não existe no tipo `Config` da v4 (o repo tem `tailwindcss ^4` em devDeps com config em formato v3). Hoje isso passa despercebido porque `tsconfig.json` só inclui `src`, `tests` e `.storybook` — o config da raiz nunca é typechecked. Ao buildar o preset como entry publicada, o tipo passa a ser verificado e quebra.
+> **Resolução prescrita (dentro do escopo):** mover o objeto para `src/tailwind-preset.ts`, tipado **estruturalmente** (sem importar `Config` da tailwindcss), e reduzir `tailwind.config.ts` a `export { default } from './src/tailwind-preset'`. Fonte única de verdade, publicável, sem assumir a migração v4 — que segue declarada fora de escopo na spec.
+
 **Done when**:
+- [ ] `src/tailwind-preset.ts` é a fonte única; `tailwind.config.ts` só reexporta
+- [ ] O preset **não** importa tipo de `tailwindcss` (evita o mismatch v3/v4)
 - [ ] `exports['./tailwind-preset']` com `types`/`default` para ESM **e** CJS, no mesmo formato dos entries existentes
 - [ ] `peerDependencies.tailwindcss` presente **e** `peerDependenciesMeta.tailwindcss.optional === true` (teste afirma os dois — obrigatório seria `major`)
 - [ ] `npm pack --dry-run` lista o preset (teste de contrato lê o campo `files` e o resultado do build)
