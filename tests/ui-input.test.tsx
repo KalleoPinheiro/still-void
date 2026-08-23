@@ -31,4 +31,25 @@ describe('Input', () => {
     render(<Input className="custom" placeholder="Cls" />);
     expect(screen.getByPlaceholderText('Cls')).toHaveClass('custom');
   });
+
+  test('renders the sv-field base class', () => {
+    render(<Input placeholder="Base" />);
+    expect(screen.getByPlaceholderText('Base')).toHaveClass('sv-field');
+  });
+
+  test('composes className with sv-field instead of replacing it', () => {
+    render(<Input className="custom" placeholder="Compose" />);
+    const input = screen.getByPlaceholderText('Compose');
+    expect(input).toHaveClass('sv-field');
+    expect(input).toHaveClass('custom');
+  });
+
+  test('renders no leftover Tailwind color utilities in the class list', () => {
+    render(<Input placeholder="NoUtils" />);
+    const classList = Array.from(screen.getByPlaceholderText('NoUtils').classList);
+    const leftoverColorUtility = classList.find(
+      (cls) => cls.startsWith('bg-sv-') || cls.startsWith('border-sv-') || cls.startsWith('text-sv-') || cls.startsWith('ring-')
+    );
+    expect(leftoverColorUtility).toBeUndefined();
+  });
 });
