@@ -8,33 +8,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark mode (default)
-        'sv-bg': '#0A0A0C',
-        'sv-bg-elev': '#111114',
-        'sv-surface': '#16161B',
-        'sv-surface-2': '#1C1C22',
-        'sv-border': 'rgba(255, 255, 255, 0.08)',
-        'sv-border-strong': 'rgba(255, 255, 255, 0.14)',
-        'sv-text': '#EDEDF0',
-        'sv-text-2': '#8B8B96',
-        'sv-text-3': '#83838F',
+        // Every entry points at the custom property declared in theme.css
+        // rather than repeating its value. Literals here froze the whole
+        // Tailwind layer on the dark palette: a component using bg-sv-surface
+        // stayed near-black under [data-theme='light']. Binding to the
+        // variable makes the theme (and the accent) switch propagate for free.
+        'sv-bg': 'var(--sv-bg)',
+        'sv-bg-elev': 'var(--sv-bg-elev)',
+        'sv-surface': 'var(--sv-surface)',
+        'sv-surface-2': 'var(--sv-surface-2)',
+        'sv-border': 'var(--sv-border)',
+        'sv-border-strong': 'var(--sv-border-strong)',
+        'sv-text': 'var(--sv-text)',
+        'sv-text-2': 'var(--sv-text-2)',
+        'sv-text-3': 'var(--sv-text-3)',
 
-        // Light mode (via data-theme="light" or prefers-color-scheme)
-        'sv-bg-light': '#F7F7F5',
-        'sv-bg-elev-light': '#FFFFFF',
-        'sv-surface-light': '#FFFFFF',
-        'sv-surface-2-light': '#F2F2EF',
-        'sv-border-light': 'rgba(0, 0, 0, 0.08)',
-        'sv-border-strong-light': 'rgba(0, 0, 0, 0.14)',
-        'sv-text-light': '#16161B',
-        'sv-text-2-light': '#5A5A66',
-        'sv-text-3-light': '#6F6F78',
+        // The nine *-light aliases that used to live here are gone: the
+        // variable above already resolves to the light value under
+        // [data-theme='light'], so a second set of keys was inert.
 
         // Accents (via data-accent)
-        'sv-signal-cyan': 'oklch(0.78 0.12 210)',
-        'sv-twilight-violet': 'oklch(0.72 0.14 295)',
-        'sv-quiet-mint': 'oklch(0.78 0.10 160)',
-        'sv-warm-amber': 'oklch(0.78 0.12 75)',
+        'sv-signal-cyan': 'var(--sv-accent-cyan)',
+        'sv-twilight-violet': 'var(--sv-accent-violet)',
+        'sv-quiet-mint': 'var(--sv-accent-mint)',
+        'sv-warm-amber': 'var(--sv-accent-amber)',
       },
       fontFamily: {
         'sv-display': 'Sora, ui-sans-serif, system-ui, sans-serif',
