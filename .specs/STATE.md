@@ -44,11 +44,16 @@
 
 ## Handoff
 
-- **Feature**: form-and-data-primitives (`.specs/features/form-and-data-primitives/`)
-- **Phase / Task**: Execute completo — 24 tasks + T20b commitadas; primeira rodada do Verifier concluída (FAIL), gaps 1–5 corrigidos, re-verificação pendente
-- **Completed**: Specify, Design, Tasks, Fases 1–7, Verifier rodada 1, correções dos gaps (`2974b8a` + emendas de spec)
-- **In-progress** (file:line): nenhum — árvore limpa
-- **Next step**: re-despachar o Verifier sobre `4422b64..HEAD` para confirmar que os 5 mutantes sobreviventes agora morrem e que os gaps de precisão da spec estão fechados
-- **Blockers**: nenhum. Duas lacunas conhecidas registradas de propósito: checagem de cor pintada exige browser real (fora do harness jsdom), e a família client (`dialog`/`dropdown-menu`/`select`/`tabs`/`tooltip`) segue em Tailwind com `box-shadow` no fonte — backlog no tasks.md
+- **Feature**: form-and-data-primitives — ✅ **concluída e verificada**
+- **Phase / Task**: nenhuma em aberto. Verifier rodada 2 PASS.
+- **Completed**: Specify, Design, Tasks, Fases 1–7 (24 tasks + T20b), Verifier rodadas 1 e 2
+- **In-progress** (file:line): nenhum
+- **Next step**: abrir PR de `claude/tlc-spec-still-void-gaps-ee7589` para `main`. A release sai `minor` + `patch` via Changesets — nada de `major`, nenhum export foi removido ou renomeado.
+- **Blockers**: nenhum
+- **Backlog herdado** (registrado no `tasks.md`, fora do escopo desta feature):
+  1. Família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) ainda em utilitárias Tailwind, com `shadow-lg`/`shadow-md`/`shadow-sm` no fonte violando a Flat-By-Default Rule, e classes de cor inexistentes (`bg-background`, `ring-ring`, `ring-accent`)
+  2. Checagem de cor pintada sob `[data-theme]` exige browser real — candidata a teste de Storybook/Playwright
+  3. `Badge` sem `forwardRef`, divergindo do resto de `components/ui/`
+  4. `tailwind.config.ts` em formato v3 com `tailwindcss ^4` em devDeps — normalização v4 CSS-first
 - **Uncommitted files**: nenhum
 - **Branch**: `claude/tlc-spec-still-void-gaps-ee7589`

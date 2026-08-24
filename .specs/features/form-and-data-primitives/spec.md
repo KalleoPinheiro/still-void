@@ -216,30 +216,30 @@ Esta spec é também, deliberadamente, o *"Button/Input pass"* que a própria `D
 
 | ID | Story | Fase | Status |
 | --- | --- | --- | --- |
-| FDP-01 | P1: Campos nativos — `Textarea` | Design | Pending |
-| FDP-02 | P1: Campos nativos — `NativeSelect` | Design | Pending |
-| FDP-03 | P1: Campos nativos — `FileInput` | Design | Pending |
-| FDP-04 | P1: Campos nativos — receita `field()` + `.sv-field`, fonte única | Design | Pending |
-| FDP-05 | P1: Campos nativos — `Input` migra para `.sv-field` com paridade visual | Design | Pending |
-| FDP-06 | P1: Escolhas — `Checkbox` nativo | Design | Pending |
-| FDP-07 | P1: Escolhas — `RadioGroup` (`fieldset`/`legend`/orientation) | Design | Pending |
-| FDP-08 | P1: Escolhas — `RadioGroupItem` + propagação de `name` | Design | Pending |
-| FDP-09 | P1: Tabela — família de 8 componentes | Design | Pending |
-| FDP-10 | P1: Tabela — container de rolagem + `containerClassName` | Design | Pending |
-| FDP-11 | P1: Tabela — CSS `.sv-table*` theme-aware | Design | Pending |
-| SVD-01 | P1: D1 — Tailwind config passa a referenciar `var(--sv-*)` | Design | Pending |
-| SVD-02 | P1: D1 — remoção dos aliases `*-light` obsoletos | Design | Pending |
-| SVD-06 | P1: D5 — anel de foco visível (`ring-accent` inexistente hoje) | Design | Pending |
-| SVD-03 | P2: D2 — preset Tailwind publicado (`files` + `exports`) | Design | Pending |
-| SVD-04 | P2: D3 — `tailwindcss` como peer dep opcional | Design | Pending |
-| SVD-05 | P2: D4 — `shadcn-overrides.css` copiado para `dist` + subpath | Design | Pending |
-| FDP-12 | P2: `Button`/`Card`/`Alert`/`Badge` migram para CSS `sv-*` | Design | Pending |
-| FDP-13 | P1/P2: barrel `@still-void/ui/react` exporta tudo que é novo | Design | Pending |
-| FDP-14 | P3: stories para cada componente novo | Design | Pending |
-| FDP-15 | P3: docs (`design-system.md`, `README.md`, `DESIGN.md` §6) | Design | Pending |
-| FDP-16 | P3: changesets separados (`minor` features / `patch` fixes) | Design | Pending |
+| FDP-01 | P1: Campos nativos — `Textarea` | Verified | ✅ |
+| FDP-02 | P1: Campos nativos — `NativeSelect` | Verified | ✅ |
+| FDP-03 | P1: Campos nativos — `FileInput` | Verified | ✅ |
+| FDP-04 | P1: Campos nativos — receita `field()` + `.sv-field`, fonte única | Verified | ✅ |
+| FDP-05 | P1: Campos nativos — `Input` migra para `.sv-field` com paridade visual | Verified | ✅ |
+| FDP-06 | P1: Escolhas — `Checkbox` nativo | Verified | ✅ |
+| FDP-07 | P1: Escolhas — `RadioGroup` (`fieldset`/`legend`/orientation) | Verified | ✅ |
+| FDP-08 | P1: Escolhas — `RadioGroupItem` + propagação de `name` | Verified | ✅ |
+| FDP-09 | P1: Tabela — família de 8 componentes | Verified | ✅ |
+| FDP-10 | P1: Tabela — container de rolagem + `containerClassName` | Verified | ✅ |
+| FDP-11 | P1: Tabela — CSS `.sv-table*` theme-aware | Verified | ✅ |
+| SVD-01 | P1: D1 — Tailwind config passa a referenciar `var(--sv-*)` | Verified | ✅ |
+| SVD-02 | P1: D1 — remoção dos aliases `*-light` obsoletos | Verified | ✅ |
+| SVD-06 | P1: D5 — anel de foco visível (`ring-accent` inexistente hoje) | Verified | ✅ |
+| SVD-03 | P2: D2 — preset Tailwind publicado (`files` + `exports`) | Verified | ✅ |
+| SVD-04 | P2: D3 — `tailwindcss` como peer dep opcional | Verified | ✅ |
+| SVD-05 | P2: D4 — `shadcn-overrides.css` copiado para `dist` + subpath | Verified | ✅ |
+| FDP-12 | P2: `Button`/`Card`/`Alert`/`Badge` migram para CSS `sv-*` | Verified | ✅ |
+| FDP-13 | P1/P2: barrel `@still-void/ui/react` exporta tudo que é novo | Verified | ✅ |
+| FDP-14 | P3: stories para cada componente novo | Verified | ✅ |
+| FDP-15 | P3: docs (`design-system.md`, `README.md`, `DESIGN.md` §6) | Verified | ✅ |
+| FDP-16 | P3: changesets separados (`minor` features / `patch` fixes) | Verified | ✅ |
 
-**Coverage:** 22 requisitos, 0 mapeados a tasks ainda.
+**Coverage:** 22 requisitos, 22 mapeados a tasks, 22 verificados pelo Verifier (rodada 2, PASS).
 
 ---
 

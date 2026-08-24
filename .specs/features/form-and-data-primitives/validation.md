@@ -282,3 +282,92 @@ Every component name, subpath, prop and class asserted by `README.md`, `docs/des
 **Issues found**: 3 actionable — (1) SVD-01 AC#2 has no test and is unsatisfiable under jsdom as written; (2) server-safety is unenforced for `FileInput` and the `Table` family, proven by two mutants surviving the full suite; (3) the Button/Card/Alert CSS contracts use substring rule-existence checks that a child selector already satisfies, so three whole base rules can be deleted with the suite green.
 
 **Next steps**: fix Gaps 2 and 3 (both are small, mechanical, and reuse patterns already present in this repo); restate or relocate SVD-01 AC#2; refresh the STATE.md Handoff. Re-verify after.
+
+---
+
+# Round 2 (re-verification)
+
+**Date**: 2026-08-24
+**Diff range**: `50c1f2d..HEAD` (2 new commits: `2974b8a` test fixes, `e02d760` spec amendments), scoped against the full feature range `4422b64..HEAD`
+**Verifier**: fresh independent sub-agent (different session from round 1; author ≠ verifier)
+**Verdict**: ✅ **PASS**
+
+Round 1 established 45/48 AC clauses matched their spec outcome with cited evidence; that sweep was not redone. This round is scoped to the deltas: the two fix commits and the two spec amendments.
+
+## Round-1 survivors re-tested (all in scratch state on the real files, `git checkout --` after each, `git status` verified clean after every round)
+
+| # | File | Mutation | Tests run | Result |
+| --- | --- | --- | --- | --- |
+| 7b | `src/css/style.css` | deleted `.sv-card { … }` base rule | `ui-card` + `component-css-contract` | ✅ **Now killed** — `component-css-contract.test.ts:135` (`toContain('.sv-card')` over the exact-key set) and `:144` (`decl()` throws "Rule not found") both fail |
+| 8 | `src/css/style.css` | deleted `.sv-alert { … }` base rule | `ui-alert` + `component-css-contract` | ✅ **Now killed** — same two assertions fail for `.sv-alert` |
+| 9 | `src/css/style.css` | deleted `.sv-btn { … }` base rule | `ui-button` + `component-css-contract` | ✅ **Now killed** — same two assertions fail for `.sv-btn` |
+| 12 | `src/components/ui/file-input.tsx` | prepended `"use client"` | `server-safety.test.ts` | ✅ **Now killed** — `server-safety.test.ts:97` (`%s carries no "use client" directive`, instantiated for `file-input.tsx` since the graph walk now reaches it) fails |
+| 13 | `src/components/ui/table.tsx` | prepended `"use client"` | `server-safety.test.ts` | ✅ **Now killed** — same assertion fails for `table.tsx` |
+
+**Result: 5/5 round-1 survivors now killed.**
+
+## Fresh mutations against the two new test files (probing for narrow, mutant-specific coverage)
+
+| # | File | Mutation | Tests run | Result |
+| --- | --- | --- | --- | --- |
+| F1 | `src/components/ui/checkbox.tsx` | added `import { Root } from '@radix-ui/react-checkbox'` | `server-safety.test.ts` | ✅ **Killed** — `:101` "imports no @radix-ui package" fails for `checkbox.tsx` |
+| F2 | `src/components/ui/checkbox.tsx` | added `const [state, setState] = React.useState(false)` | `server-safety.test.ts` | ✅ **Killed** — `:107` "uses no React hook" fails for `checkbox.tsx` |
+| F3 | `src/css/style.css` | hollowed `.sv-card { }` (empty body, rule kept, not deleted) | `component-css-contract.test.ts` | ✅ **Killed** — `decl()` returns `undefined` for every required property, `:144` fails with `expected undefined to be '1px solid var(--sv-border)'` |
+| F4 | `src/css/style.css` | `.sv-btn { border-radius: var(--sv-radius-sm) }` → `var(--sv-radius-md)` (line 799 specifically, not the first file-wide match) | `component-css-contract.test.ts` | ✅ **Killed** — `:144` fails, `expected 'var(--sv-radius-md)' to be 'var(--sv-radius-sm)'` |
+| F5 | `tests/server-safety.test.ts` | `resolveModule()` body replaced with `return undefined;` — collapses the graph walk to the entry file alone | `server-safety.test.ts` | ✅ **Killed** — the guard test at `:81` ("the walked graph actually reached the new primitives") fails first: `expected [ 'src/react/index.ts' ] to include 'src/components/ui/file-input.tsx'`. Confirms the guard is load-bearing — without it, the per-file `test.each` blocks would have silently degraded to asserting over one file and stayed green |
+| F6 | `src/css/style.css` | added `box-shadow: 0 1px 2px var(--sv-border);` to `.sv-card` (token-only value, to isolate from the literal-color check) | `component-css-contract.test.ts` | ✅ **Killed** — `:154` "has no box-shadow (Flat-By-Default)" fails |
+
+**Result: 6/6 fresh mutations killed, 0 survived.** No blind spots found in either new test file.
+
+**Combined sensor total for this round: 11 mutations injected, 11 killed, 0 survived.** `git status` confirmed clean after every mutation/revert cycle.
+
+## Gap fixes verified as real, not cosmetic
+
+**Gap 2 (server-safety unenforced for `FileInput`/`Table`)** — genuinely fixed. `tests/server-safety.test.ts` walks the real import graph from `src/react/index.ts` via a relative-specifier resolver (`resolveModule`/`collectGraph`), collecting every first-party module transitively reachable. The graph currently collects the entry plus (at minimum, confirmed by the guard test) `file-input.tsx`, `table.tsx`, `textarea.tsx`, `native-select.tsx`, `checkbox.tsx`, `radio-group.tsx`, `input.tsx`, `recipes/field.ts`, `recipes/table.ts` — 94 `test.each`-instantiated assertions run against this round's full run (3 properties × ~31 modules). The guard test at the top (`the walked graph actually reached the new primitives`) is load-bearing and was itself proven load-bearing by mutation F5 above: breaking the walker fails the guard before the per-file checks can silently go vacuous. `@radix-ui` imports and hook usage are checked as raw source text (comment-stripped), not via module resolution, so they also catch non-relative imports the walker doesn't traverse into.
+
+**Gap 3 (Button/Card/Alert CSS contracts didn't discriminate)** — genuinely fixed. `tests/component-css-contract.test.ts` parses each CSS section (`Button`, `Card`, `Alert`, `Badge`) into a `Map<selector, body>` via `parseRules()`, then asserts `[...sections[name].keys()].toContain(selector)` — an exact-key lookup, not a substring match. Verified directly: mutation 7b/8/9 (whole-rule deletion) and F3 (hollowed rule) both fail this exact-key/declaration check, whereas under the round-1 `toContain('.sv-card')`-style substring test, `.sv-card__header` would have kept it green. A second layer (`decl()` + the `required` maps) pins the identity declarations (`height`, `border-radius`, `background`, `color` per family) to exact token values, catching both deletion and content drift (F4).
+
+## Spec amendments — judged genuine, not bar-lowering
+
+Read `git diff 50c1f2d e02d760 -- .specs/features/form-and-data-primitives/spec.md` directly (not the orchestrator's characterization).
+
+- **SVD-01 AC#2** (was: render under `[data-theme]`, assert `getComputedStyle` resolved background). The amendment restates it as: config color keys must reference variables that exist in `theme.css` (cross-file check) and new `sv-*` rules must declare colors only via `var(--sv-*)`. This is not a retreat to "whatever passes" — it is the strongest proposition actually observable in jsdom, and the underlying claim is independently true: jsdom does not load stylesheets or resolve `var()`, so a `getComputedStyle` assertion against `.sv-field`'s background would silently pass by never engaging the CSS at all (jsdom returns computed style off inline/UA styles only). The replacement test, `tests/tailwind-config-contract.test.ts`, was read directly: `declaredVars` is built from a regex over the real `theme.css` (`--sv-[\w-]+(?=\s*:)`) and each config value is checked to exist in that set (`:56`) — a genuine cross-file check that would fail on a typo'd variable name, which is the actual regression class D1 represents. The amendment also explicitly leaves the browser-level resolved-color check as a **named, open gap** ("candidata a um teste de Storybook/Playwright em feature própria") rather than silently dropping it. **Verdict: genuine restatement.**
+- **Edge case — "`style.css` without `theme.css` degrades to existing fallbacks"**. The amendment replaces an unverifiable claim ("fallbacks já usados") with a factual one: `var(--sv-*)` with nothing to resolve falls through to each property's CSS initial value, which is standard behavior with no special-cased fallback rule. This claim was independently checked against the real file: `grep -c 'var(--sv-[a-z0-9-]*,' src/css/style.css` finds exactly 4 fallback-syntax usages in the entire sheet (`--sv-pill-color`, `--sv-callout-color` ×2, `--sv-reading-progress`), all pre-existing, all in unrelated sections (CategoryPill, Callout, ReadingProgress), and none of them a fallback for "theme.css absent" — they are same-sheet custom-property overrides with a Still-Void-token default, a different mechanism entirely. So the amendment's central claim — the Forms/Table/Button/Card/Alert/Badge sections added by this feature carry no theme.css-absence fallback contract because none has ever existed for `sv-*` rules of this kind — holds up under direct inspection, not just assertion. **Verdict: genuine correction, grounded in the actual file.**
+- **Edge case — "`Checkbox` inside `TableHead`/`TableCell`, upstream Radix `[role=checkbox]` handling"**. The amendment corrects a factually wrong premise: the original text assumed the shared Radix `button[role=checkbox]` treatment applied, but `src/components/ui/checkbox.tsx` (read directly) renders a plain `<input type="checkbox">`, not a Radix `Root`/`button`. The amendment narrows the claim to what's actually true and CSS-observable (`vertical-align: middle` on the cell), which round 1 already found tested at `table-css-contract:132`. **Verdict: genuine correction, not a convenience rewrite** — it fixes a false statement about the codebase, it doesn't weaken a testable requirement into an untestable one.
+- **STATE.md Handoff (Gap 5)** — read directly. It now reads "Execute completo — 24 tasks + T20b commitadas; primeira rodada do Verifier concluída (FAIL), gaps 1–5 corrigidos, re-verificação pendente" with "Next step: re-despachar o Verifier..." — accurate as of this round's start, no longer stale.
+
+None of the four amendments soften a testable requirement to match what was shipped; each either (a) replaces a jsdom-unsatisfiable assertion with the strongest still-meaningful one available in that harness while naming the residual gap, or (b) corrects a factual error about the codebase found on inspection. No amendment was found that quietly lowered a previously-achievable bar.
+
+## Gate re-run (fresh, this session, real working tree at HEAD)
+
+| Gate | Command | Exit | Result |
+| --- | --- | --- | --- |
+| Typecheck | `npm run typecheck` | **0** | clean |
+| Tests + coverage | `npm run test:coverage` | **0** | **42 files, 871 passed, 0 failed, 0 skipped** |
+| Build | `npm run build` | **0** | clean, all ESM/CJS/DTS targets built |
+| Package lint | `npm run lint:package` | **0** | `publint --strict` clean; `attw` 🟢 across all four entrypoints (`./react`, `./react/client`, `./tailwind-preset`, `./package.json`) |
+
+Coverage: **Statements 100% (442/442), Branches 100% (247/247), Functions 100% (154/154), Lines 100% (419/419)** — unchanged from round 1, still full.
+
+**Test integrity**: round-1 baseline was 40 files / 757 tests. Now **42 files / 871 tests** (+2 files, +114 tests) — matches the fix commit's claim exactly. No test deleted, none skipped, none weakened (both new files are additive; nothing in the round-1-verified suite was touched by `2974b8a` or `e02d760` per `git diff 50c1f2d..HEAD --stat`, which shows only `component-css-contract.test.ts` and `server-safety.test.ts` as new files plus the three doc/spec files).
+
+## No-regression check
+
+| Path | `git diff 4422b64 -- <path>` | Result |
+| --- | --- | --- |
+| `src/css/theme.css` | 0 lines | ✅ byte-identical |
+| `src/tokens/` | 0 lines | ✅ byte-identical |
+| `tests/tokenParity.test.ts` | 0 lines | ✅ byte-identical |
+| `tests/contrast.test.ts` | 0 lines | ✅ byte-identical |
+
+## Working tree integrity
+
+`git status --short` after all mutation rounds: clean. Only `.specs/features/form-and-data-primitives/validation.md` was modified by this verification pass (this report). No mutation was left in place.
+
+## Round 2 Summary
+
+**Overall**: ✅ **Ready**
+
+All 5 mutants that survived round 1 now die. Six additional fault-injection probes targeted at the two new test files' most likely blind spots (missed import types, hollowed instead of deleted rules, non-required-property drift, a broken graph walker, box-shadow via token) found nothing further — the guard test in `server-safety.test.ts` is itself provably load-bearing. Both round-1 code gaps (server-safety, CSS rule discrimination) are closed with mechanisms that generalize (a graph walk that covers new components automatically; an exact-key CSS parser reused from the existing `field-css-contract` pattern), not one-off patches tuned to the exact round-1 mutants. The three spec amendments were checked against the real files rather than taken on the orchestrator's word, and each is a defensible, evidence-grounded correction rather than a quiet weakening. All four gates are green, coverage remains 100% across all four metrics, the test count grew by 114 with nothing deleted or weakened, and the four no-regression files remain byte-identical to the pre-feature baseline.
+
+**Remaining known gap** (pre-existing, explicitly disclosed, not a regression): SVD-01's original "resolved painted color" check still has no automated coverage — it requires a real browser (Storybook/Playwright), which is out of scope for the jsdom-based suite this repo uses. This is now correctly reflected in the spec itself (see amendment above) rather than silently left as a failing AC.

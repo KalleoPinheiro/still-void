@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/form-and-data-primitives/design.md`
-**Status**: Tasks complete — Verifier rodada 1 FAIL, gaps corrigidos em `2974b8a`, re-verificação pendente
+**Status**: ✅ Done — Verifier rodada 2 PASS (871 testes, 100% cobertura, 11/11 mutantes mortos)
 
 ---
 
