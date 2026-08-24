@@ -116,8 +116,9 @@ different problems:
 
 ### `RadioGroup`: `name` propagation is direct-children only
 
-`RadioGroup` has no `useId`/`createContext` (those are hooks — using them would break
-server-safety), so it injects its `name` prop into `RadioGroupItem` children via
+`RadioGroup` uses neither `useId` (a Hook) nor `createContext` (a React API, not a Hook) —
+this package's policy is that nothing reachable from the server-safe entry may call either,
+so it injects its `name` prop into `RadioGroupItem` children via
 `React.Children.map`. This only reaches **direct children**: a `RadioGroupItem` wrapped in
 another element (e.g. a styling `<div>`) does not receive the group's `name` and must
 declare its own. A `RadioGroupItem`'s own `name` always wins over the group's.

@@ -70,9 +70,10 @@ describe('Card family renders sv-* classes (FDP-12)', () => {
   test('no leftover Tailwind color utility on Card', () => {
     render(<Card>Body</Card>);
     const classList = Array.from(screen.getByText('Body').classList);
-    const leftover = classList.find(
-      (cls) => cls.startsWith('bg-sv-') || cls.startsWith('border-sv-') || cls.startsWith('text-sv-'),
-    );
+    // (^|:) rather than startsWith, so a variant-prefixed leftover such as
+    // `hover:bg-sv-surface-2` is caught too — the hover states are exactly
+    // where a half-finished migration would leave one behind.
+    const leftover = classList.find((cls) => /(^|:)(bg-sv-|border-sv-|text-sv-)/.test(cls));
     expect(leftover).toBeUndefined();
   });
 });

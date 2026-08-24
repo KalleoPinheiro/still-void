@@ -89,6 +89,11 @@ const stillVoidPreset: StillVoidTailwindPreset = {
       },
     },
   },
+  // v3 only. Tailwind v4 ignores `corePlugins` entirely, so a v4 consumer
+  // loading this preset would get Preflight back and fight style.css. The
+  // `tailwindcss` peer range is pinned to `>=3 <4` for exactly that reason;
+  // the v4 path is a CSS entry (`@theme` + `@source`) that this package does
+  // not ship yet.
   corePlugins: {
     preflight: false, // Disable Tailwind's preflight to avoid conflicts with Still Void styles
   },

@@ -47,8 +47,10 @@ describe('Input', () => {
   test('renders no leftover Tailwind color utilities in the class list', () => {
     render(<Input placeholder="NoUtils" />);
     const classList = Array.from(screen.getByPlaceholderText('NoUtils').classList);
-    const leftoverColorUtility = classList.find(
-      (cls) => cls.startsWith('bg-sv-') || cls.startsWith('border-sv-') || cls.startsWith('text-sv-') || cls.startsWith('ring-')
+    // (^|:) rather than startsWith: `focus-visible:ring-2` was the original
+    // D5 defect on this very component, and startsWith would not have seen it.
+    const leftoverColorUtility = classList.find((cls) =>
+      /(^|:)(bg-sv-|border-sv-|text-sv-|ring-)/.test(cls),
     );
     expect(leftoverColorUtility).toBeUndefined();
   });

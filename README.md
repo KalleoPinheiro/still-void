@@ -218,9 +218,12 @@ follows `[data-theme]`/`[data-accent]` with **zero Tailwind config**.
 
 The **client-only** family (`Dialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) has not
 been migrated yet and still emits Tailwind utility classes. If you use those, your app needs
-Tailwind configured against Still Void's tokens — import `@still-void/ui/tailwind-preset`
-(Tailwind v3 config format), or map the tokens in your own `@theme` block on v4. Without it
-those five render unstyled, silently and with no build error.
+Tailwind configured against Still Void's tokens. On **v3**, import
+`@still-void/ui/tailwind-preset`. On **v4**, map the tokens in your own `@theme` block and add
+an `@source` pointing at `node_modules/@still-void/ui/dist` — the preset is a v3-format config
+and v4 ignores its `corePlugins.preflight`, so loading it there would re-enable Preflight and
+fight `style.css`. That is why the `tailwindcss` peer range is `>=3 <4`. Without one of the two
+paths those five components render unstyled, silently and with no build error.
 
 `tailwindcss` is therefore declared as an **optional** peer dependency. There is also an
 opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element `box-shadow: none

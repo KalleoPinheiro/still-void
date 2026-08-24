@@ -56,7 +56,11 @@ function collectGraph(entryFile: string): Map<string, string> {
     const source = readFileSync(file, 'utf-8');
     modules.set(file, source);
 
-    const specifierRe = /(?:from|import)\s*['"](\.[^'"]+)['"]/g;
+    // Covers static (`from './x'`), bare side-effect (`import './x'`),
+    // dynamic (`import('./x')`) and `require('./x')`. A dynamic import is
+    // still a reachable module, so missing it would leave a hole the same
+    // size as the one this file exists to close.
+    const specifierRe = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*['"](\.[^'"]+)['"]/g;
     let match: RegExpExecArray | null;
     while ((match = specifierRe.exec(source))) {
       const resolved = resolveModule(file, match[1] as string);
@@ -98,14 +102,36 @@ describe('server-safe entry (@still-void/ui/react)', () => {
   });
 
   test.each(graphEntries)('%s imports no @radix-ui package', (_file, source) => {
-    expect(stripComments(source)).not.toMatch(/from\s*['"]@radix-ui\//);
+    // Match the specifier itself rather than the `from` form: a bare
+    // `import '@radix-ui/x'`, a dynamic import and a `require` all pull the
+    // package in just as effectively.
+    expect(stripComments(source)).not.toMatch(/['"]@radix-ui\//);
   });
 
   test.each(graphEntries)('%s uses no React hook or context constructor', (_file, source) => {
-    // createContext and useId are the two that would silently work in the test
-    // environment and only fail in a real Server Component render.
+    // The list is the whole hook surface, not a sample: a hook left out is a
+    // hole, and these fail only in a real Server Component render — never in
+    // this test environment, where they all work fine.
+    //
+    // `useId` and `createContext` are here as explicit PROJECT POLICY, which is
+    // what AD-002 decided: RadioGroup could have generated ids or used context,
+    // and chose the label-wrapping and Children.map designs precisely so the
+    // server-safe entry stays free of both. `createContext` is a React API, not
+    // a hook — it is in this list for the same policy reason, not because it is
+    // one. `use` is deliberately absent: reading a Promise is allowed here.
     expect(stripComments(source)).not.toMatch(
-      /\b(?:useState|useEffect|useLayoutEffect|useRef|useId|useReducer|useContext|createContext)\b/,
+      new RegExp(
+        '\\b(?:' +
+          [
+            'useState', 'useEffect', 'useLayoutEffect', 'useInsertionEffect',
+            'useRef', 'useReducer', 'useContext', 'useMemo', 'useCallback',
+            'useImperativeHandle', 'useDebugValue', 'useTransition',
+            'useDeferredValue', 'useSyncExternalStore', 'useOptimistic',
+            'useActionState', 'useFormStatus',
+            'useId', 'createContext',
+          ].join('|') +
+          ')\\b',
+      ),
     );
   });
 });
