@@ -44,16 +44,11 @@
 
 ## Handoff
 
-- **Feature**: form-and-data-primitives — ✅ **concluída e verificada**
-- **Phase / Task**: nenhuma em aberto. Verifier rodada 2 PASS.
-- **Completed**: Specify, Design, Tasks, Fases 1–7 (24 tasks + T20b), Verifier rodadas 1 e 2
-- **In-progress** (file:line): nenhum
-- **Next step**: abrir PR de `claude/tlc-spec-still-void-gaps-ee7589` para `main`. A release sai `minor` + `patch` via Changesets — nada de `major`, nenhum export foi removido ou renomeado.
-- **Blockers**: nenhum
-- **Backlog herdado** (registrado no `tasks.md`, fora do escopo desta feature):
-  1. Família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) ainda em utilitárias Tailwind, com `shadow-lg`/`shadow-md`/`shadow-sm` no fonte violando a Flat-By-Default Rule, e classes de cor inexistentes (`bg-background`, `ring-ring`, `ring-accent`)
-  2. Checagem de cor pintada sob `[data-theme]` exige browser real — candidata a teste de Storybook/Playwright
-  3. `Badge` sem `forwardRef`, divergindo do resto de `components/ui/`
-  4. `tailwind.config.ts` em formato v3 com `tailwindcss ^4` em devDeps — normalização v4 CSS-first
-- **Uncommitted files**: nenhum
+- **Feature concluída**: `form-and-data-primitives` — ✅ Verifier rodada 2 PASS (871 testes, 100% cobertura, 11/11 mutantes mortos, gates verdes). Nada em aberto nela.
+- **Próximo trabalho**: `.specs/features/still-void-gaps-round-2/intake.md` — **leia esse arquivo primeiro**
+- **Contexto**: o documento de lacunas do VittaFlow chegou truncado na rodada 1 (cortava no meio de `file-input`). A versão completa chegou em 2026-08-23 e traz **7 itens de catálogo** e **uma seção inteira de defeitos** que a rodada 1 nunca viu. Cada item do intake foi conferido contra o código-fonte desta branch — não é reprodução da alegação.
+- **Next step**: resolver as 6 decisões pendentes listadas no fim do intake, depois entrar em Specify. A sequência recomendada está no intake; o item mais urgente é **GAP-02** (consumidor em Tailwind v4 renderiza a família client sem cor, silenciosamente), e a recomendação é atacá-lo via **GAP-06** (migrar a família client para CSS `sv-*`) em vez de publicar um `@theme` que só mascara.
+- **Achado que exige registro**: `@radix-ui/react-alert-dialog` está em `dependencies` com **zero** uso em `src/`, e `docs/design-system.md:134` anuncia a família `AlertDialog` como exportada. Peso morto no bundle de todo consumidor + promessa falsa na doc. A linha 134 foi reescrita pela T23 da rodada 1 e a alegação falsa passou — o cross-check de doc do Verifier não pegou. Falha de verificação da rodada 1, registrada como GAP-03.
+- **Estado do repo**: árvore limpa, 39 commits em `4422b64..HEAD`, PR ainda **não** aberto para `main`
+- **Blockers**: nenhum técnico; só as 6 decisões do intake
 - **Branch**: `claude/tlc-spec-still-void-gaps-ee7589`
