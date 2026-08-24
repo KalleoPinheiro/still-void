@@ -595,3 +595,406 @@ body.sv-body {
   color: var(--sv-text);
   font-style: italic;
 }
+
+/* ---------- Forms ---------- */
+/* Single source of truth for the field frame. Input, Textarea, NativeSelect
+   and FileInput all render .sv-field, so border, radius, surface, typography
+   and focus ring are defined once and follow [data-theme] with zero consumer
+   configuration. */
+.sv-field {
+  display: block;
+  width: 100%;
+  height: var(--sv-space-10);
+  padding: var(--sv-space-2) var(--sv-space-3);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  line-height: 1.5;
+}
+.sv-field::placeholder {
+  color: var(--sv-text-2);
+}
+/* Tailwind's ring-* is box-shadow based and its `accent` color is not declared
+   in this package's config, so fields had no visible focus at all. Outline is
+   the system's focus state — never box-shadow. */
+.sv-field:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-field:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.sv-field--textarea {
+  height: auto;
+  min-height: calc(var(--sv-space-10) * 2);
+  resize: vertical;
+}
+/* A multi-select list box has to grow past the single-row field height. */
+.sv-field--select[multiple] {
+  height: auto;
+}
+.sv-field--file {
+  height: auto;
+  padding: var(--sv-space-1) var(--sv-space-2);
+}
+/* Two rules, not one selector list: an unsupported pseudo-element in a group
+   invalidates the whole rule, so the standard and the -webkit- fallback are
+   declared separately. */
+.sv-field--file::file-selector-button {
+  margin-inline-end: var(--sv-space-3);
+  padding: var(--sv-space-1) var(--sv-space-3);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+  font: inherit;
+  cursor: pointer;
+}
+.sv-field--file::-webkit-file-upload-button {
+  margin-inline-end: var(--sv-space-3);
+  padding: var(--sv-space-1) var(--sv-space-3);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* No appearance:none — the native check/radio chrome follows color-scheme
+   from theme.css, and accent-color tints it with the system accent. */
+.sv-check,
+.sv-radio {
+  width: var(--sv-space-4);
+  height: var(--sv-space-4);
+  accent-color: var(--sv-accent-ink);
+  margin: 0;
+  cursor: pointer;
+}
+.sv-check:focus-visible,
+.sv-radio:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-check:disabled,
+.sv-radio:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.sv-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sv-space-2);
+  cursor: pointer;
+  color: var(--sv-text);
+}
+.sv-radio-group {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-2);
+}
+.sv-radio-group--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--sv-space-4);
+}
+.sv-radio-group__legend {
+  padding: 0;
+  margin-bottom: var(--sv-space-2);
+  color: var(--sv-text-2);
+  font-size: var(--sv-text-sm);
+}
+/* Visually hidden, still announced. Never display:none or visibility:hidden —
+   both remove the element from the accessibility tree. */
+.sv-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Table ---------- */
+/* Presentational only — sorting, paging and selection are a data-table
+   concern with a different API surface. The header decoration here is the
+   one consumers were repeating by hand on every table screen. */
+.sv-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+.sv-table {
+  width: 100%;
+  border-collapse: collapse;
+  caption-side: bottom;
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text);
+}
+.sv-table__head {
+  background: var(--sv-bg);
+}
+.sv-table__th {
+  height: var(--sv-space-10);
+  padding: 0 var(--sv-space-3);
+  text-align: start;
+  font-size: var(--sv-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sv-text-3);
+  font-weight: 600;
+  border-bottom: 1px solid var(--sv-border);
+}
+.sv-table__td {
+  padding: var(--sv-space-3);
+  vertical-align: middle;
+}
+.sv-table__row {
+  border-bottom: 1px solid var(--sv-border);
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-table__body .sv-table__row:last-child {
+  border-bottom: 0;
+}
+.sv-table__row:hover {
+  background: var(--sv-surface-2);
+}
+.sv-table__foot {
+  border-top: 1px solid var(--sv-border);
+  background: var(--sv-surface);
+  font-weight: 600;
+}
+.sv-table__caption {
+  margin-top: var(--sv-space-4);
+  color: var(--sv-text-2);
+  font-size: var(--sv-text-sm);
+}
+
+/* ---------- Button ---------- */
+/* Default variant/size need no modifier class — .sv-btn alone is a complete,
+   Tailwind-independent button, the same pattern .sv-field uses for its
+   default 'input' variant. Modifiers only override what a variant/size
+   changes. */
+.sv-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sv-space-2);
+  height: var(--sv-space-10);
+  padding: 0 var(--sv-space-4);
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-sm);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  font: inherit;
+  font-family: var(--sv-font-body);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover),
+    border-color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-btn:hover {
+  background: var(--sv-surface-2);
+}
+.sv-btn:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sv-btn--destructive {
+  background: var(--sv-danger);
+  color: var(--sv-bg);
+}
+.sv-btn--destructive:hover {
+  background: color-mix(in srgb, var(--sv-danger) 90%, transparent);
+}
+
+.sv-btn--outline {
+  border-color: var(--sv-border);
+  background: var(--sv-bg);
+  color: var(--sv-text);
+}
+.sv-btn--outline:hover {
+  background: var(--sv-surface);
+  color: var(--sv-accent-ink);
+}
+
+.sv-btn--secondary {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-btn--secondary:hover {
+  background: var(--sv-surface);
+}
+
+.sv-btn--ghost {
+  background: transparent;
+  color: var(--sv-text);
+}
+.sv-btn--ghost:hover {
+  background: var(--sv-surface);
+}
+
+.sv-btn--link {
+  background: transparent;
+  color: var(--sv-accent-ink);
+  text-underline-offset: 4px;
+}
+.sv-btn--link:hover {
+  text-decoration: underline;
+}
+
+.sv-btn--sm {
+  height: calc(var(--sv-space-8) + var(--sv-space-1));
+  padding: 0 var(--sv-space-3);
+  font-size: var(--sv-text-sm);
+}
+.sv-btn--lg {
+  height: calc(var(--sv-space-10) + var(--sv-space-1));
+  padding: 0 var(--sv-space-8);
+}
+.sv-btn--icon {
+  width: var(--sv-space-10);
+  padding: 0;
+}
+
+/* ---------- Card ---------- */
+.sv-card {
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-2);
+  padding: var(--sv-space-6);
+}
+.sv-card__title {
+  margin: 0;
+  font-size: var(--sv-text-2xl);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+.sv-card__description {
+  margin: 0;
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text-2);
+}
+.sv-card__content {
+  padding: var(--sv-space-6);
+  padding-top: 0;
+}
+.sv-card__footer {
+  display: flex;
+  align-items: center;
+  padding: var(--sv-space-6);
+  padding-top: 0;
+}
+
+/* ---------- Alert ---------- */
+.sv-alert {
+  position: relative;
+  width: 100%;
+  padding: var(--sv-space-4);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-alert > svg {
+  position: absolute;
+  top: var(--sv-space-4);
+  left: var(--sv-space-4);
+  color: var(--sv-text);
+}
+.sv-alert > svg ~ * {
+  padding-left: calc(var(--sv-space-6) + var(--sv-space-1));
+}
+.sv-alert__title {
+  margin: 0 0 var(--sv-space-1);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+.sv-alert__description {
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text-2);
+}
+.sv-alert__description p {
+  line-height: 1.625;
+}
+
+/* ---------- Badge ---------- */
+/* Default variant uses var(--sv-accent) rather than a fixed hue, so the
+   badge follows [data-accent] instead of locking to cyan (One-Accent Rule —
+   orchestrator audit, tasks.md pre-T17). The destructive text color is
+   var(--sv-bg) rather than var(--sv-danger-ink): --sv-danger-ink equals
+   --sv-danger in dark mode, which would render invisible text on the
+   danger fill — var(--sv-bg) mirrors the contrast approach the default
+   variant already used (text-sv-bg on a colored fill) and stays legible in
+   both themes. */
+.sv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sv-space-1) var(--sv-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-full);
+  background: var(--sv-accent);
+  color: var(--sv-bg);
+  font-size: var(--sv-text-xs);
+  font-weight: 600;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover),
+    border-color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-badge:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+.sv-badge--secondary {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-badge--secondary:hover {
+  background: var(--sv-surface);
+}
+
+.sv-badge--destructive {
+  background: var(--sv-danger);
+  color: var(--sv-bg);
+}
+.sv-badge--destructive:hover {
+  background: color-mix(in srgb, var(--sv-danger) 90%, transparent);
+}
+
+.sv-badge--outline {
+  background: transparent;
+  border-color: var(--sv-border);
+  color: var(--sv-text);
+}

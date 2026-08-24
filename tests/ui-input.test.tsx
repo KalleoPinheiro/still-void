@@ -31,4 +31,27 @@ describe('Input', () => {
     render(<Input className="custom" placeholder="Cls" />);
     expect(screen.getByPlaceholderText('Cls')).toHaveClass('custom');
   });
+
+  test('renders the sv-field base class', () => {
+    render(<Input placeholder="Base" />);
+    expect(screen.getByPlaceholderText('Base')).toHaveClass('sv-field');
+  });
+
+  test('composes className with sv-field instead of replacing it', () => {
+    render(<Input className="custom" placeholder="Compose" />);
+    const input = screen.getByPlaceholderText('Compose');
+    expect(input).toHaveClass('sv-field');
+    expect(input).toHaveClass('custom');
+  });
+
+  test('renders no leftover Tailwind color utilities in the class list', () => {
+    render(<Input placeholder="NoUtils" />);
+    const classList = Array.from(screen.getByPlaceholderText('NoUtils').classList);
+    // (^|:) rather than startsWith: `focus-visible:ring-2` was the original
+    // D5 defect on this very component, and startsWith would not have seen it.
+    const leftoverColorUtility = classList.find((cls) =>
+      /(^|:)(bg-sv-|border-sv-|text-sv-|ring-)/.test(cls),
+    );
+    expect(leftoverColorUtility).toBeUndefined();
+  });
 });

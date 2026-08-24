@@ -156,6 +156,14 @@ A selection of **shadcn/ui** components has been ported to Still Void with the d
 - `Input` — text input with placeholder, disabled, and focus states
 - `Alert` — with optional title and description
 - `Badge` — with variants (default, secondary, destructive, outline)
+- `Textarea` — multi-line text field sharing `Input`'s frame, plus `rows`
+- `NativeSelect` — a real `<select>`, serializable via `FormData`; coexists with the client-only `Select` combobox (see [docs/design-system.md](docs/design-system.md))
+- `FileInput` — `<input type="file">` with a styled file-selector button
+- `Checkbox` — `<input type="checkbox">`, no wrapper
+- `RadioGroup` / `RadioGroupItem` — `<fieldset>`/`<legend>` group of native radios
+- `Table` family — `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`, a presentational data table with a scrolling container
+
+All of the above style themselves through real `sv-*` CSS classes — no Tailwind required (see the note below).
 
 **Client-only components** (import from `@still-void/ui/react/client`):
 - `Dialog` — modal with trigger, content, header, footer, title, description
@@ -203,7 +211,24 @@ export function SettingsDialog() {
 }
 ```
 
-**Note:** shadcn/ui components use Tailwind utility classes, so your app needs Tailwind CSS installed and configured to extend Still Void's tokens (see [DESIGN.md](DESIGN.md) for the full config).
+**Note on Tailwind:** every **server-safe** component — the shadcn-derived ones (`Button`,
+`Card`, `Alert`, `Badge`, `Input`) and the form/table primitives above — styles itself
+through real `sv-*` classes in `@still-void/ui/style.css`, driven by `var(--sv-*)`, so it
+follows `[data-theme]`/`[data-accent]` with **zero Tailwind config**.
+
+The **client-only** family (`Dialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) has not
+been migrated yet and still emits Tailwind utility classes. If you use those, your app needs
+Tailwind configured against Still Void's tokens. On **v3**, import
+`@still-void/ui/tailwind-preset`. On **v4**, map the tokens in your own `@theme` block and add
+an `@source` pointing at `node_modules/@still-void/ui/dist` — the preset is a v3-format config
+and v4 ignores its `corePlugins.preflight`, so loading it there would re-enable Preflight and
+fight `style.css`. That is why the `tailwindcss` peer range is `>=3 <4`. Without one of the two
+paths those five components render unstyled, silently and with no build error.
+
+`tailwindcss` is therefore declared as an **optional** peer dependency. There is also an
+opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element `box-shadow: none
+!important` resets) for consumers who install additional unstyled shadcn components of their
+own — it is never imported automatically.
 
 ## Fidelity rules (do not regress)
 
