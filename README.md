@@ -211,15 +211,21 @@ export function SettingsDialog() {
 }
 ```
 
-**Note:** Tailwind is **not required**. Every server-safe component — shadcn-derived (`Button`,
-`Card`, `Alert`, `Badge`) and the form/table primitives above — styles itself through real
-`sv-*` classes in `@still-void/ui/style.css`, driven by `var(--sv-*)`, so it follows
-`[data-theme]`/`[data-accent]` with zero Tailwind config. `tailwindcss` is declared as an
-**optional** peer dependency: install it and import `@still-void/ui/tailwind-preset` only
-if you're composing your own markup with Tailwind utilities against Still Void's tokens.
-There's also an opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element
-`box-shadow: none !important` resets) for consumers who install additional unstyled shadcn
-components of their own — it's never imported automatically.
+**Note on Tailwind:** every **server-safe** component — the shadcn-derived ones (`Button`,
+`Card`, `Alert`, `Badge`, `Input`) and the form/table primitives above — styles itself
+through real `sv-*` classes in `@still-void/ui/style.css`, driven by `var(--sv-*)`, so it
+follows `[data-theme]`/`[data-accent]` with **zero Tailwind config**.
+
+The **client-only** family (`Dialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) has not
+been migrated yet and still emits Tailwind utility classes. If you use those, your app needs
+Tailwind configured against Still Void's tokens — import `@still-void/ui/tailwind-preset`
+(Tailwind v3 config format), or map the tokens in your own `@theme` block on v4. Without it
+those five render unstyled, silently and with no build error.
+
+`tailwindcss` is therefore declared as an **optional** peer dependency. There is also an
+opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element `box-shadow: none
+!important` resets) for consumers who install additional unstyled shadcn components of their
+own — it is never imported automatically.
 
 ## Fidelity rules (do not regress)
 
@@ -241,10 +247,9 @@ components of their own — it's never imported automatically.
 
 ```sh
 npm run build             # tsup (ESM + CJS + .d.ts) + CSS to dist/
-npm test                  # vitest (31 tests)
+npm test                  # vitest (320 tests)
 npm run typecheck         # tsc --noEmit (strict)
 npm run lint:package      # publint + are-the-types-wrong on the packed tarball
-npm run playground        # serve the framework-free catalog
 npm run storybook         # component catalog at localhost:6006
 npm run build-storybook   # static Storybook build → storybook-static/
 npm run changeset         # record a change for the next release
