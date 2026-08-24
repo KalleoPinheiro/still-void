@@ -42,13 +42,43 @@
 - **Date**: 2026-08-22
 - **Status**: active
 
+### AD-006
+- **Decision**: Um componente server-safe pode expor **`as`** (union fechada de tags) **e** **`asChild`** (via `@radix-ui/react-slot`), e `@radix-ui/react-slot` passa a ser dependência **direta**. `as` cobre a troca de tag; `asChild` cobre composição arbitrária (`next/link`, componente do consumidor). Quando ambos forem passados, `asChild` vence e `as` é ignorado.
+- **Reason**: Decisão do usuário em 2026-08-23, sobre a alternativa de escolher só um. Verificado antes de aceitar: `@radix-ui/react-slot@1.3.3` não tem diretiva `'use client'`, não usa nenhum hook e depende só de `@radix-ui/react-compose-refs` — logo é compatível com AD-002 e não força boundary client. Hoje o Slot já existe como transitiva (via `react-dialog`, `react-select`, `react-menu`, `react-primitive`); promovê-lo a direta remove a fragilidade de depender de uma transitiva que o Radix pode reorganizar.
+- **Trade-off**: `Card` passa a ser o primeiro componente server-safe com dependência de runtime, e a superfície de API dobra em um componente que hoje só tem `className`. Exige documentar quando usar cada um. Precedência `asChild` > `as` precisa ser testada, não só documentada.
+- **Scope**: Todo componente do catálogo que precise trocar o elemento renderizado.
+- **Date**: 2026-08-23
+- **Status**: active
+
+### AD-007
+- **Decision**: Divergência entre documentação e artefato publicado é resolvida **na direção que agrega**, quando a capacidade é genuinamente desejada. Caso concreto: `docs/design-system.md` anuncia a família `AlertDialog` e `@radix-ui/react-alert-dialog` está em `dependencies`, mas nenhum símbolo existe em `src/` — resolve-se **portando e exportando** o componente, não apagando a linha da doc.
+- **Reason**: Decisão do usuário em 2026-08-23. Confirmação destrutiva é lacuna real de um design system, e o consumidor (VittaFlow) hoje usa `window.confirm` para operações destrutivas em prontuário. A dependência já está instalada e paga.
+- **Trade-off**: Mais superfície de API para 0 call sites atuais. A alternativa (remover a dep) economizaria 108K de install por consumidor. Custo aceito porque a lacuna funcional é real.
+- **Scope**: Catálogo; e como precedente para futuras divergências doc↔artefato.
+- **Date**: 2026-08-23
+- **Status**: active
+
+### AD-008
+- **Decision**: `FileInput` **mantém** o comportamento atual (`<input type="file">` visível, botão nativo via `::file-selector-button`) como default, e **ganha uma variante** para o padrão `label` + input escondido com rótulo em `children`. Nenhum consumidor quebra.
+- **Reason**: Decisão do usuário em 2026-08-23. As duas abordagens são legítimas: a atual mantém o controle nativo acessível por padrão; a pedida no relatório dá controle visual total e alvo de clique maior, e é o workaround que o VittaFlow já usa.
+- **Trade-off**: Mais superfície de API e mais teste para 2 call sites. O modo de input escondido exige cuidado extra de a11y — foco visível no `label` e exposição do arquivo escolhido.
+- **Scope**: `FileInput`.
+- **Date**: 2026-08-23
+- **Status**: active — **agendada, não incluída na rodada 2** (ver nota de conflito de escopo no intake)
+
 ## Handoff
 
-- **Feature concluída**: `form-and-data-primitives` — ✅ Verifier rodada 2 PASS (871 testes, 100% cobertura, 11/11 mutantes mortos, gates verdes). Nada em aberto nela.
-- **Próximo trabalho**: `.specs/features/still-void-gaps-round-2/intake.md` — **leia esse arquivo primeiro**
-- **Contexto**: o documento de lacunas do VittaFlow chegou truncado na rodada 1 (cortava no meio de `file-input`). A versão completa chegou em 2026-08-23 e traz **7 itens de catálogo** e **uma seção inteira de defeitos** que a rodada 1 nunca viu. Cada item do intake foi conferido contra o código-fonte desta branch — não é reprodução da alegação.
-- **Next step**: resolver as 6 decisões pendentes listadas no fim do intake, depois entrar em Specify. A sequência recomendada está no intake; o item mais urgente é **GAP-02** (consumidor em Tailwind v4 renderiza a família client sem cor, silenciosamente), e a recomendação é atacá-lo via **GAP-06** (migrar a família client para CSS `sv-*`) em vez de publicar um `@theme` que só mascara.
-- **Achado que exige registro**: `@radix-ui/react-alert-dialog` está em `dependencies` com **zero** uso em `src/`, e `docs/design-system.md:134` anuncia a família `AlertDialog` como exportada. Peso morto no bundle de todo consumidor + promessa falsa na doc. A linha 134 foi reescrita pela T23 da rodada 1 e a alegação falsa passou — o cross-check de doc do Verifier não pegou. Falha de verificação da rodada 1, registrada como GAP-03.
-- **Estado do repo**: árvore limpa, 39 commits em `4422b64..HEAD`, PR ainda **não** aberto para `main`
-- **Blockers**: nenhum técnico; só as 6 decisões do intake
+- **Feature concluída**: `form-and-data-primitives` — ✅ Verifier rodada 2 PASS (871 testes, 100% cobertura, 11/11 mutantes mortos). Nada em aberto.
+- **Próximo trabalho**: rodada 2 — `.specs/features/still-void-gaps-round-2/intake.md`. **As 6 decisões estão tomadas** (AD-006, AD-007, AD-008 + tabela no intake). Não há bloqueio: entrar direto em **Specify**.
+- **Escopo travado (P0 + P1)**:
+  1. GAP-06/07/08 — migrar família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`: 5 arquivos, 498 linhas, 43 exports) para CSS `sv-*`; fecha `dialog-shadow`, as classes de cor inexistentes, `dialog-close-button` e `dialog-aria-modal`
+  2. GAP-02 — publicar `@still-void/ui/tailwind.css` (v4 CSS-first, `@source` + `@theme`); fazer **depois** de 1, quando o bloco `@theme` já estiver mínimo
+  3. GAP-03 — portar e exportar a família `AlertDialog` (AD-007)
+  4. GAP-04 — `Button variant="accent"`; trivial agora que `.sv-btn` existe com modificadores
+  5. GAP-05 — `Card` com `as` **e** `asChild` (AD-006); `@radix-ui/react-slot` vira dep direta
+- **Fora do escopo da rodada 2**: `Separator`, `Progress`, `Pagination`, `FileInput` (abordagem decidida em AD-008, execução adiada), `data-chart` (declarado fora)
+- **Rede de segurança**: já existem `tests/ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu` — mesma regra da rodada 1 vale: teste existente que precise de edição é regressão de API, para e reporta
+- **Armadilha conhecida da rodada 1, não repetir**: contrato de CSS por substring (`toContain('.sv-card')`) não discrimina, porque `.sv-card__header` já satisfaz. Usar o parser seletor→corpo de `tests/component-css-contract.test.ts` desde o começo. E `tests/server-safety.test.ts` já cobre o grafo de `/react` — a família client vive em `/react/client` e **não** é coberta por ele; se um componente client for movido para server-safe, o teste pega sozinho
+- **Estado do repo**: árvore limpa, 39 commits em `4422b64..HEAD`, PR da rodada 1 ainda **não** aberto para `main`
+- **Blockers**: nenhum
 - **Branch**: `claude/tlc-spec-still-void-gaps-ee7589`

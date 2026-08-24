@@ -1,6 +1,6 @@
 # Lacunas `@still-void/ui` — Rodada 2 (intake verificado)
 
-- **Status:** Pronto para Specify
+- **Status:** Decisões tomadas (2026-08-23) — pronto para Specify
 - **Data:** 2026-08-23
 - **Origem:** documento completo "Lacunas do `@still-void/ui`" (VittaFlow, 2026-08-22, verificado contra `@still-void/ui@2.0.1`)
 - **Antecedente:** `.specs/features/form-and-data-primitives/` — rodada 1, concluída e verificada (Verifier PASS, 871 testes)
@@ -146,7 +146,32 @@ Já registrado como backlog na rodada 1; o documento completo confirma e detalha
 7. **GAP-01** — só se o consumidor confirmar que precisa
 8. **GAP-12** — recomendo declarar fora de escopo
 
+## Decisões tomadas — 2026-08-23
+
+Todas resolvidas com o usuário. Nada bloqueia a Specify.
+
+| # | Decisão | Resultado | Registro |
+| --- | --- | --- | --- |
+| 1 | Escopo da rodada 2 | **P0 + P1**: GAP-06/07/08 (família client), GAP-02 (`tailwind.css` v4), GAP-03 (`AlertDialog`), GAP-04 (`variant="accent"`), GAP-05 (`Card` como elemento). **Fora:** Separator, Progress, Pagination, FileInput, data-chart | — |
+| 2 | `AlertDialog` | **Exportar a família.** Portar do shadcn com CSS `sv-*`, exportar de `/react/client`. Alinha doc e artefato pelo lado que agrega | **AD-007** |
+| 3 | `Card` trocar elemento | **Os dois** — prop `as` (union fechada) **e** `asChild` via `@radix-ui/react-slot`, promovido a dep direta. `asChild` vence quando ambos forem passados | **AD-006** |
+| 4 | `FileInput` | **Adicionar variante** ao existente, sem quebrar o default. Agendado, **não** entra na rodada 2 (ver conflito abaixo) | **AD-008** |
+| 5 | `data-chart` | **Fora de escopo**, confirmado pela escolha de escopo | — |
+| 6 | Uma spec ou duas | **Uma spec**, com fases separadas e changesets separados (`patch` para defeitos, `minor` para catálogo) — foi o que funcionou na rodada 1 | — |
+
+### Conflito de escopo registrado
+
+As respostas 1 e 4 se cruzam: o escopo P0+P1 lista `FileInput` explicitamente como **fora**, mas a decisão 4 escolheu como tratá-lo. Leitura adotada: **a abordagem está decidida (AD-008), a execução fica para a rodada 3.** É uma variante mais testes — puxar para esta rodada é barato se o usuário preferir; basta dizer.
+
+### Verificação feita antes de aceitar a decisão 3
+
+`asChild` exige `@radix-ui/react-slot` como dependência direta de um componente **server-safe**, o que AD-002 governa. Conferido em `node_modules/@radix-ui/react-slot@1.3.3` antes de registrar: **nenhuma** diretiva `'use client'` no `dist`, **nenhum** hook (`useState`/`useEffect`/`useId`/`useRef`/`useContext`/`useReducer`/`useLayoutEffect`), e uma única dependência (`@radix-ui/react-compose-refs`). Compatível com AD-002 — não força boundary client.
+
+---
+
 ## Decisões pendentes do usuário (bloqueiam a Specify)
+
+> **Resolvidas em 2026-08-23.** Mantidas abaixo como registro do que foi perguntado e do que eu havia recomendado — em dois pontos o usuário decidiu diferente de mim (`Card`: escolheu ambos os mecanismos em vez de só `as`; `AlertDialog`: escolheu exportar em vez de eu ficar sem opinião forte).
 
 | # | Decisão | Recomendação |
 | --- | --- | --- |
