@@ -45,10 +45,10 @@
 ## Handoff
 
 - **Feature**: form-and-data-primitives (`.specs/features/form-and-data-primitives/`)
-- **Phase / Task**: Design — spec.md escrito e confirmado; design.md em redação
-- **Completed**: Specify
-- **In-progress** (file:line): `.specs/features/form-and-data-primitives/design.md` — não iniciado
-- **Next step**: Escrever design.md (arquitetura, contratos de componente, CSS, plano de teste), depois tasks.md
-- **Blockers**: nenhum. Pendência não-bloqueante: a seção "defeitos no que a lib exporta" do relatório original chegou truncada
-- **Uncommitted files**: `.specs/STATE.md`, `.specs/features/form-and-data-primitives/spec.md`
+- **Phase / Task**: Execute completo — 24 tasks + T20b commitadas; primeira rodada do Verifier concluída (FAIL), gaps 1–5 corrigidos, re-verificação pendente
+- **Completed**: Specify, Design, Tasks, Fases 1–7, Verifier rodada 1, correções dos gaps (`2974b8a` + emendas de spec)
+- **In-progress** (file:line): nenhum — árvore limpa
+- **Next step**: re-despachar o Verifier sobre `4422b64..HEAD` para confirmar que os 5 mutantes sobreviventes agora morrem e que os gaps de precisão da spec estão fechados
+- **Blockers**: nenhum. Duas lacunas conhecidas registradas de propósito: checagem de cor pintada exige browser real (fora do harness jsdom), e a família client (`dialog`/`dropdown-menu`/`select`/`tabs`/`tooltip`) segue em Tailwind com `box-shadow` no fonte — backlog no tasks.md
+- **Uncommitted files**: nenhum
 - **Branch**: `claude/tlc-spec-still-void-gaps-ee7589`

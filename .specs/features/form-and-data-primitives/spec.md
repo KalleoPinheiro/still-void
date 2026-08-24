@@ -137,7 +137,8 @@ Esta spec é também, deliberadamente, o *"Button/Input pass"* que a própria `D
 **Acceptance Criteria**:
 
 1. WHEN `tailwind.config.ts` é inspecionado THEN nenhuma cor do sistema SHALL estar como literal hex/oklch: cada uma SHALL referenciar a variável CSS correspondente (`'sv-surface': 'var(--sv-surface)'`, …), de modo que a troca de tema em CSS se propague.
-2. WHEN um teste renderiza os componentes migrados sob `[data-theme='light']` THEN a cor de fundo resolvida SHALL ser a do token light, e sob `[data-theme='dark']` a do token dark.
+2. WHEN o contrato de ligação é verificado THEN cada chave de cor do config SHALL referenciar uma variável que **existe** em `theme.css` (checagem cruzada entre os dois arquivos), e cada regra `sv-*` nova SHALL declarar suas cores só por `var(--sv-*)` — o que é o que faz `[data-theme]` se propagar.
+   > **Emenda pós-verificação (2026-08-23).** A redação original exigia renderizar sob `[data-theme]` e afirmar a **cor resolvida** via `getComputedStyle`. Isso é inverificável no harness escolhido: jsdom nunca carrega `style.css` e não resolve `var()`, então a asserção seria teatro. A AC foi reescrita para a proposição que o harness observa de verdade — ligação e ausência de literal — que é o que efetivamente previne a regressão do D1. A checagem de **cor pintada** exige browser real e fica registrada como lacuna conhecida, candidata a um teste de Storybook/Playwright em feature própria. Falha de precisão da spec, encontrada pelo Verifier.
 3. WHEN os valores das variáveis de tema são comparados antes e depois THEN `theme.css` SHALL permanecer inalterado — o fix é de *ligação*, não de valor (`port, don't redesign`).
 4. WHEN os tokens TS (`src/tokens/colors.ts`) são comparados com `theme.css` THEN `tests/tokenParity.test.ts` SHALL continuar passando sem alteração no teste.
 5. WHEN os aliases de cor `*-light` do Tailwind config (`sv-surface-light`, `sv-text-light`, …) deixam de ter função — porque a variável já troca sozinha — THEN SHALL ser removidos, e a remoção SHALL ser declarada como quebra no changeset se algum consumidor puder tê-los usado como utilitária.
@@ -206,8 +207,8 @@ Esta spec é também, deliberadamente, o *"Button/Input pass"* que a própria `D
 - WHEN `Table` recebe `children` diretamente sem `TableHeader`/`TableBody` THEN SHALL renderizar mesmo assim — os subcomponentes são composição, não obrigação.
 - WHEN um componente novo recebe `id`, `aria-*` ou `data-*` THEN SHALL repassar para o elemento nativo sem filtrar.
 - WHEN `FileInput` recebe `value` THEN SHALL repassar; o navegador rejeitar valor programático em `type=file` é comportamento nativo, não da lib.
-- WHEN o consumidor carrega `style.css` mas **não** `theme.css` THEN as regras `sv-*` novas SHALL degradar para os fallbacks já usados pelo restante de `style.css`, sem quebrar layout (mesmo contrato das classes existentes).
-- WHEN `Checkbox` é usado dentro de `TableHead`/`TableCell` THEN o alinhamento vertical SHALL continuar correto (o port upstream do `Table` já trata `[role=checkbox]`).
+- WHEN o consumidor carrega `style.css` mas **não** `theme.css` THEN as regras `sv-*` novas SHALL se comportar exatamente como as regras `sv-*` já existentes na mesma situação: `var(--sv-*)` sem valor resolve para o *initial value* da propriedade, sem regra de fallback própria. Não há contrato adicional a cumprir nem teste a escrever — é herança do contrato existente, e `theme.css` é documentado como obrigatório. *(Marcado como não-testável após verificação: a redação anterior prometia "fallbacks" que a folha nunca teve.)*
+- WHEN `Checkbox` é usado dentro de `TableHead`/`TableCell` THEN a célula SHALL declarar `vertical-align: middle`, que é a única garantia observável no nível de CSS. *(A premissa original — "o port upstream já trata `[role=checkbox]`" — não se aplica: aquele tratamento existe para o `Checkbox` do Radix, que renderiza `button[role=checkbox]`; o nosso é `<input>` nativo, que não precisa do ajuste. Corrigido após verificação.)*
 
 ---
 
