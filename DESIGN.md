@@ -19,7 +19,7 @@ colors:
   border-strong-light: "rgba(0,0,0,0.14)"
   text-light: "#16161B"
   text-2-light: "#5A5A66"
-  text-3-light: "#6F6F78"
+  text-3-light: "#6D6D76"
   signal-cyan: "oklch(0.78 0.12 210)"
   twilight-violet: "oklch(0.72 0.14 295)"
   quiet-mint: "oklch(0.78 0.10 160)"
@@ -177,7 +177,7 @@ A near-monochrome dark stack (four tonal steps of near-black) carries the whole 
 
 ## 4. Elevation
 
-Still Void is flat by doctrine — there is no `box-shadow` anywhere in the system, on any component, in any state. Depth is conveyed two other ways: **tonal layering** (Panel sits one step lighter than Void, Panel Deep one step lighter again — depth reads as a lightness gradient, not a drop shadow) and a **1px translateY lift** on hover (`.sv-card-hover`) paired with a border-color shift from Hairline to Hairline Strong. The one deliberate exception to "no ornament" is `.sv-gradient-border` — a 1px conic gradient ring (accent → transparent → Hairline Strong) used as the system's single signature flourish, reserved for `FeaturedPostCard`.
+Still Void is flat by doctrine — there is no `box-shadow` anywhere in the system, on any component, in any state. Depth is conveyed two other ways: **tonal layering** (Panel sits one step lighter than Void, Panel Deep one step lighter again — depth reads as a lightness gradient, not a drop shadow) and a **2px translateY lift** on hover (`.sv-card-hover`) paired with a border-color shift from Hairline to Hairline Strong. The one deliberate exception to "no ornament" is `.sv-gradient-border` — a 1px conic gradient ring (accent → transparent → Hairline Strong) used as the system's single signature flourish, reserved for `FeaturedPostCard`.
 
 ### Shadow Vocabulary
 None. If a `box-shadow` appears anywhere in a consuming project's use of this system, it is not using Still Void correctly.
