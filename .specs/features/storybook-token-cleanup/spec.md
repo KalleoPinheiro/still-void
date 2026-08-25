@@ -6,9 +6,9 @@ O critique de `/impeccable critique` em `.impeccable/critique/2026-08-25T17-23-1
 
 ## Goals
 
-- [ ] `node detect.mjs --json src/react/stories` retorna array vazio, exit code 0.
-- [ ] O falso positivo (`CategoryPill.stories.tsx` `RawColor`) fica documentado como exceção no próprio arquivo, não "corrigido" — a feature que ele demonstra (passthrough de cor arbitrária) continua existindo e sendo demonstrada.
-- [ ] Os 4 valores literais fora da escala (`Icon.stories.tsx`, `Select.stories.tsx`, `Tooltip.stories.tsx` ×2) passam a referenciar tokens reais de DESIGN.md.
+- [x] `node detect.mjs --json src/react/stories` retorna array vazio, exit code 0.
+- [x] O falso positivo (`CategoryPill.stories.tsx` `RawColor`) fica documentado como exceção no próprio arquivo, não "corrigido" — a feature que ele demonstra (passthrough de cor arbitrária) continua existindo e sendo demonstrada.
+- [x] Os 4 valores literais fora da escala (`Icon.stories.tsx`, `Select.stories.tsx`, `Tooltip.stories.tsx` ×2) passam a referenciar tokens reais de DESIGN.md.
 
 ## Out of Scope
 
