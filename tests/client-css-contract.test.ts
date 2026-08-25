@@ -394,7 +394,7 @@ describe('client CSS contract — the menu item primitive', () => {
     expect(decl(menu, '.sv-menu-item__dot', 'width')).toBe('var(--sv-space-2)');
     expect(decl(menu, '.sv-menu-item__dot', 'height')).toBe('var(--sv-space-2)');
     expect(decl(menu, '.sv-menu-item__dot', 'border-radius')).toBe('var(--sv-radius-full)');
-    expect(decl(menu, '.sv-menu-item__dot', 'background')).toBe('currentColor');
+    expect(decl(menu, '.sv-menu-item__dot', 'background')).toBe('currentcolor');
   });
 
   test('the label, separator and shortcut read from tokens', () => {

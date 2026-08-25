@@ -100,11 +100,15 @@ export const Slot = React.forwardRef<HTMLElement, SlotProps>(
 
     // A valid React element's `.props` is always an object (React itself
     // guarantees this, `{}` for a childless element) — no fallback needed.
-    const child = children as React.ReactElement<Record<string, unknown>> & {
-      ref?: React.Ref<unknown>
-    }
+    const child = children as React.ReactElement<
+      Record<string, unknown> & { ref?: React.Ref<unknown> }
+    >
+    // React 19 moved `ref` onto `props`; reading `element.ref` directly still
+    // works but is deprecated and logs a dev warning ("ref is now a regular
+    // prop"). `child.props.ref` is the same value without the warning.
+    const childRef = child.props.ref ?? null
     const mergedProps = mergeProps(slotProps, child.props)
-    mergedProps.ref = forwardedRef ? composeRefs(forwardedRef, child.ref ?? null) : child.ref
+    mergedProps.ref = forwardedRef ? composeRefs(forwardedRef, childRef) : childRef
     return React.cloneElement(child, mergedProps)
   },
 )

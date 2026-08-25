@@ -32,6 +32,7 @@ const Icon = React.forwardRef<SVGSVGElement, IconProps>(
 
     return (
       <Glyph
+        {...props}
         ref={ref}
         className={cn(
           'sv-icon',
@@ -39,12 +40,16 @@ const Icon = React.forwardRef<SVGSVGElement, IconProps>(
           size === 'lg' && 'sv-icon--lg',
           className,
         )}
-        // Heroicons spreads incoming props over its own defaults, so passing
-        // aria-hidden={undefined} is what removes the default aria-hidden.
+        // Spread before, not after: whether the icon is announced is
+        // controlled by `label`, not by a stray aria-hidden/role/aria-label
+        // the caller passed through `...props` — those must not be able to
+        // override the mode `label` selected. (Heroicons itself still
+        // spreads ITS own default aria-hidden under what we pass here, so
+        // aria-hidden={undefined} below is still what removes it when a
+        // label is present.)
         aria-hidden={label === undefined ? 'true' : undefined}
         role={label === undefined ? undefined : 'img'}
         aria-label={label}
-        {...props}
       />
     );
   },

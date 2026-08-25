@@ -27,10 +27,10 @@ function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
-/** The body of every `@media (prefers-reduced-motion: reduce)` block, with its offset. */
-function reduceBlocks(source: string): { body: string; start: number }[] {
+/** The body of every `@media (prefers-reduced-motion: reduce)` block, with its offsets. */
+function reduceBlocks(source: string): { body: string; start: number; end: number }[] {
   const clean = stripComments(source);
-  const blocks: { body: string; start: number }[] = [];
+  const blocks: { body: string; start: number; end: number }[] = [];
   const opener = /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/g;
   let match: RegExpExecArray | null;
   while ((match = opener.exec(clean))) {
@@ -44,7 +44,12 @@ function reduceBlocks(source: string): { body: string; start: number }[] {
       else if (char === '}') depth -= 1;
       index += 1;
     }
-    blocks.push({ body: clean.slice(bodyStart, index - 1), start: match.index });
+    // `end` is the block's real closing brace, not `start + body.length` —
+    // that undercounts by the length of the `@media (...) {` header itself,
+    // which sits between `start` and `bodyStart`. Undercounting shrinks the
+    // "inside reduce" range short of the block's actual end, so a selector
+    // near the close of a reduce block could be misread as a base rule.
+    blocks.push({ body: clean.slice(bodyStart, index - 1), start: match.index, end: index });
   }
   return blocks;
 }
@@ -63,10 +68,7 @@ function classesUnderReduce(sheet: SheetName): Set<string> {
 /** Offset of a class's first base declaration (a rule outside any media block). */
 function baseRuleOffset(sheet: SheetName, className: string): number {
   const clean = stripComments(files[sheet]);
-  const reduceRanges = reduceBlocks(files[sheet]).map(({ body, start }) => ({
-    start,
-    end: start + body.length,
-  }));
+  const reduceRanges = reduceBlocks(files[sheet]).map(({ start, end }) => ({ start, end }));
   const pattern = new RegExp(`(^|[\\s,>+~])\\.${className}(?![a-z0-9_-])`, 'gm');
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(clean))) {

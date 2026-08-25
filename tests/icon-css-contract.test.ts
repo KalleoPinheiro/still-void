@@ -94,9 +94,11 @@ describe('icon CSS contract — the size scale', () => {
   );
 
   test('.sv-icon inherits its color and refuses to be squeezed by flex', () => {
-    // currentColor is what makes an icon follow the text it sits next to, in
+    // currentcolor is what makes an icon follow the text it sits next to, in
     // both themes and under every [data-accent], with no consumer config.
-    expect(decl('.sv-icon', 'color')).toBe('currentColor');
+    // (Lowercase: CSS keywords are case-insensitive, and the file's own
+    // convention elsewhere is lowercase.)
+    expect(decl('.sv-icon', 'color')).toBe('currentcolor');
     expect(decl('.sv-icon', 'flex-shrink')).toBe('0');
   });
 

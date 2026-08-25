@@ -41,11 +41,14 @@ const DialogContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
-      // Radix renders role="dialog" but never aria-modal, so assistive tech was
-      // told nothing about the content behind the panel being inert (CLIENT-05).
-      aria-modal="true"
       className={cn("sv-dialog", className)}
       {...props}
+      // Spread after props, not before: aria-modal is a guarantee this
+      // component makes (CLIENT-05), not a default a caller can override by
+      // passing its own aria-modal. Radix renders role="dialog" but never
+      // aria-modal, so assistive tech was told nothing about the content
+      // behind the panel being inert.
+      aria-modal="true"
     >
       {children}
       {showCloseButton ? (

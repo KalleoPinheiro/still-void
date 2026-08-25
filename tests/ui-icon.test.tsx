@@ -86,6 +86,21 @@ describe('Icon — the accessible name (ICON-03)', () => {
     expect(svg.hasAttribute('aria-label')).toBe(false);
     expect(svg.getAttribute('aria-hidden')).toBe('true');
   });
+
+  test('a caller-supplied aria-hidden/role cannot override the mode label selects', () => {
+    // `label` is the only thing that should decide whether the icon is
+    // announced. A stray aria-hidden/role passed through `...props` (the
+    // rest of IconProps forwards straight to the <svg>) must not silence a
+    // labeled icon or announce an unlabeled one.
+    const labeled = renderIcon({ name: 'x', label: 'Fechar', 'aria-hidden': 'true' });
+    expect(labeled.getAttribute('aria-hidden')).not.toBe('true');
+    expect(labeled.getAttribute('role')).toBe('img');
+    expect(labeled.getAttribute('aria-label')).toBe('Fechar');
+
+    const unlabeled = renderIcon({ name: 'x', role: 'img' });
+    expect(unlabeled.getAttribute('aria-hidden')).toBe('true');
+    expect(unlabeled.hasAttribute('role')).toBe(false);
+  });
 });
 
 describe('Icon — invalid name at runtime (ICON-05)', () => {

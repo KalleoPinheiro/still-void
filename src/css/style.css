@@ -1015,7 +1015,7 @@ body.sv-body {
 .sv-icon {
   width: var(--sv-space-5);
   height: var(--sv-space-5);
-  color: currentColor;
+  color: currentcolor;
   flex-shrink: 0;
 }
 .sv-icon--sm {
@@ -1273,7 +1273,7 @@ body.sv-body {
   width: var(--sv-space-2);
   height: var(--sv-space-2);
   border-radius: var(--sv-radius-full);
-  background: currentColor;
+  background: currentcolor;
 }
 
 .sv-menu-label {

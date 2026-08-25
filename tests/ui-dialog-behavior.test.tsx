@@ -137,6 +137,22 @@ describe('Dialog — modality is announced (CLIENT-05)', () => {
     renderDialog();
     expect(await screen.findByRole('dialog')).toHaveAttribute('aria-modal', 'true');
   });
+
+  test('a caller-supplied aria-modal cannot override the guarantee', async () => {
+    // aria-modal is a contract this component makes, not a default a
+    // consumer's own props can quietly flip off through {...props} spread
+    // order. Passing aria-modal={false} explicitly must still lose.
+    render(
+      <Dialog>
+        <DialogTrigger>Open</DialogTrigger>
+        <DialogContent aria-modal={false}>
+          <DialogTitle>Title</DialogTitle>
+        </DialogContent>
+      </Dialog>,
+    );
+    act(screen.getByText('Open'));
+    expect(await screen.findByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+  });
 });
 
 describe('Dialog — the default close button (CLIENT-06)', () => {

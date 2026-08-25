@@ -24,10 +24,13 @@ this is a Tailwind-integration and a11y migration, not a redesign.
   break if the query becomes ambiguous now that `DialogContent` renders its own close
   button by default. See Step 3.
 
-## Step 1 — upgrade to Tailwind v4 (only if you use the client-only family with Tailwind)
+## Step 1 — upgrade to Tailwind v4 (only if you have `tailwindcss` installed at all)
 
-If your app used `@still-void/ui/tailwind-preset` against `Dialog`/`Select`/etc, or styled
-those components' generated classes yourself, upgrade Tailwind first:
+`tailwindcss` is a peer dependency at `>=4` now — `>=3 <4` is no longer satisfied by
+`npm install`, **regardless of whether you actually used `@still-void/ui/tailwind-preset`
+or the client-only family with it.** Any installed `tailwindcss@3` fails peer resolution
+unconditionally. There is no partial-upgrade path: a consumer on Tailwind `3.x` must either
+upgrade to `4.x` or stay on `@still-void/ui@2.x` (see "If you can't migrate yet" below).
 
 ```sh
 npm install tailwindcss@^4
@@ -37,7 +40,7 @@ Follow [Tailwind's own v3 → v4 upgrade guide](https://tailwindcss.com/docs/upg
 for your app's own utilities — that migration is unrelated to this package and out of
 scope here.
 
-If you don't use `tailwindcss` at all, skip this step. Every component in this package's
+If you don't have `tailwindcss` installed at all, skip this step. Every component in this package's
 catalog renders fully styled with zero Tailwind, in `3.0` as in `2.x`.
 
 ## Step 2 — drop the Tailwind preset import

@@ -58,8 +58,8 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 | Concorrência / ordenação | Análogo real é ordem de cascata CSS: nenhuma regra nova pode usar `!important` nem depender de vir antes/depois do Tailwind do consumidor (**CLIENT-08**) |
 | Ciclo de vida / expiração de dados | N/A — sem estado persistido |
 | Observabilidade | `displayName` preservado em todo componente migrado ou novo — é o que o React DevTools mostra (**CLIENT-07**, **ALERT-05**) |
-| Falha de dependência externa | `@radix-ui/react-slot` promovido a dep direta não pode introduzir boundary client no entry server-safe (**CARD-05**); `@heroicons/react` não pode quebrar tree-shaking nem o entry server-safe (**ICON-06**), e o próprio teste de server-safety passa a cobrir terceiros (**ICON-07**) |
-| Integridade de transição de estado | `data-state=open|closed` do Radix dirige o CSS; toda regra de estado cobre os dois estados e respeita `prefers-reduced-motion` (**CLIENT-03**) |
+| Falha de dependência externa | O mecanismo de `asChild` do `Card` não pode introduzir boundary client no entry server-safe (**CARD-05** — resolvido com `Slot` vendorizado, ver AD-015); `@heroicons/react` não pode quebrar tree-shaking nem o entry server-safe (**ICON-06**), e o próprio teste de server-safety passa a cobrir terceiros (**ICON-07**) |
+| Integridade de transição de estado | O atributo `data-state` do Radix (`open` ou `closed`) dirige o CSS; toda regra de estado cobre os dois valores e respeita `prefers-reduced-motion` (**CLIENT-03**) |
 
 ---
 
@@ -117,9 +117,10 @@ vem antes por dependência técnica.
 
 ### P1: Família client estilizada por CSS `sv-*` ⭐ MVP
 
-**User Story**: Como consumidor em Tailwind v3 ou v4, quero que `Dialog`, `DropdownMenu`, `Select`, `Tabs` e
+**User Story**: Como consumidor, quero que `Dialog`, `DropdownMenu`, `Select`, `Tabs` e
 `Tooltip` se estilizem sozinhos, para que não renderizem sem cor quando eu não configuro Tailwind contra os
-tokens do Still Void.
+tokens do Still Void — independentemente de eu ter Tailwind instalado ou não (AD-012 fecha o suporte a v3
+depois desta história; a migração em si não depende de versão de Tailwind nenhuma).
 
 **Why P1**: é o defeito que quebra o consumidor hoje, silenciosamente. Fecha GAP-06, GAP-07, GAP-08 e a causa do GAP-02.
 
@@ -344,7 +345,7 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 | TW-01 | P2: `tailwind.css` — utilitárias resolvem para `var(--sv-*)` | Design | Pending |
 | TW-02 | P2: `tailwind.css` — `@theme` sem `@source` e sem aliases mortos | Design | Pending |
 | TW-03 | P2: `tailwind.css` — export + cópia para `dist` | Design | Pending |
-| TW-04 | P2: `tailwind.css` — peer `tailwindcss` `>=3`, opcional | Design | Pending |
+| TW-04 | P2: `tailwind.css` — peer `tailwindcss` `>=4`, opcional (AD-012) | Design | Pending |
 | TW-05 | P2: `tailwind.css` — paridade de tokens com `theme.css` | Design | Pending |
 | TW-06 | P2: `tailwind.css` — README atualizado, v4+ declarado | Design | Pending |
 | TW-07 | P2: `tailwind.css` — preset v3, entry do tsup e `tailwind.config.ts` removidos | Design | Pending |

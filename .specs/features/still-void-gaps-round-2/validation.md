@@ -96,7 +96,7 @@ T1–T24 all show a commit hash in tasks.md and every commit listed is present i
 | TW-07 | v3 preset artifacts fully removed | `tests/package-contract.test.ts:87-115`; filesystem confirms `src/tailwind-preset.ts` and `tailwind.config.ts` both gone; `tsup.config.ts` has only 2 entries; repo grep for `tailwind-preset` (excluding node_modules/CHANGELOG/.specs/.changeset) returns only `tests/package-contract.test.ts` (assertions of absence) | ✅ PASS |
 | TW-08 | `docs/migration-v2-to-v3.md` documents the two breaking changes | `docs/migration-v2-to-v3.md:7-8,27-69` | ✅ PASS |
 
-**Status**: ✅ All 45 ACs covered and matched to spec-defined outcomes. One spec-precision note (CARD-05, see above) — outcome achieved, precondition text stale due to a documented mid-round pivot (AD-015).
+**Status**: ✅ All 45 ACs covered and matched to spec-defined outcomes. One spec-precision note (CARD-05, see above) — outcome achieved throughout; the precondition text's staleness (a documented mid-round pivot, AD-015) was corrected in `design.md` immediately after this pass.
 
 ---
 
@@ -134,7 +134,7 @@ No conjunction gaps found in the sampled ACs — all payload-bearing assertions 
 
 None of the 45 ACs are ambiguous about their expected outcome — all had a concrete, checkable value (a class string, an attribute value, a boolean, a file path, a token reference) and evidence targeting exactly that value.
 
-One **note** (not a gap): **CARD-05**'s literal precondition ("WHEN `@radix-ui/react-slot` vira dependência direta") is now counterfactual — AD-015 (2026-08-25) replaced that plan with a vendored `Slot` after discovering the real package's hook usage. `design.md`'s "Components" section for `Card` still describes the superseded plan (`@radix-ui/react-slot@1.3.3` promoted to a direct dependency) and was not updated alongside AD-015. The AC's *outcome* — server-safety preserved — is fully satisfied and, per AD-015's own reasoning, satisfied more robustly than the original plan would have been. This is a stale premise in prose, not a functional gap: no fix task warranted.
+One **note** (not a gap, and since fixed): **CARD-05**'s literal precondition ("WHEN `@radix-ui/react-slot` vira dependência direta") is counterfactual — AD-015 (2026-08-25) replaced that plan with a vendored `Slot` after discovering the real package's hook usage. At the time this report was first written, `design.md`'s "Components" section for `Card` still described the superseded plan; that staleness was corrected immediately after this Verifier pass (commit `bae3c34`), so `design.md` now matches AD-015. The AC's *outcome* — server-safety preserved — was fully satisfied throughout and, per AD-015's own reasoning, satisfied more robustly than the original plan would have been.
 
 ---
 
