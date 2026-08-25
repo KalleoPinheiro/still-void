@@ -58,7 +58,7 @@ export const AllIcons: Story = {
                 style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}
               >
                 <Icon name={name} size={size} />
-                <span style={{ fontSize: '0.6875rem', color: 'var(--sv-text-3)' }}>{name}</span>
+                <span style={{ fontSize: 'var(--sv-text-xs)', color: 'var(--sv-text-3)' }}>{name}</span>
               </div>
             ))}
           </div>

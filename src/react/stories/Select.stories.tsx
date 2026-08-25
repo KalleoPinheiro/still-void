@@ -129,7 +129,7 @@ export const Sizes: Story = {
       <div>
         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Small</label>
         <Select>
-          <SelectTrigger style={{ width: '150px', fontSize: '0.875rem' }}>
+          <SelectTrigger style={{ width: '150px', fontSize: 'var(--sv-text-sm)' }}>
             <SelectValue placeholder="Select" />
           </SelectTrigger>
           <SelectContent>
