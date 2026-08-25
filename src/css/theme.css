@@ -256,7 +256,8 @@
      appears. Zeroing the transition leaves the [data-state] opacities intact,
      so the closed panel stays invisible rather than snapping into view. */
   .sv-overlay,
-  .sv-dialog {
+  .sv-dialog,
+  .sv-pop {
     transition: none;
   }
 }

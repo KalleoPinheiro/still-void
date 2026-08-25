@@ -235,3 +235,81 @@ describe('client CSS contract — the overlay and dialog primitives', () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// T6 -- Popovers and Tooltip
+// ---------------------------------------------------------------------------
+
+const popovers = rulesOf('Popovers');
+const tooltip = rulesOf('Tooltip');
+
+describe('client CSS contract — the floating panel primitive', () => {
+  test.each([
+    ['.sv-pop', () => popovers],
+    ['.sv-pop__viewport', () => popovers],
+    ['.sv-pop__scroll', () => popovers],
+    ['.sv-tooltip', () => tooltip],
+  ])('%s exists as an exact selector, not a prefix match', (selector, get) => {
+    // `.sv-pop__viewport` contains the substring `.sv-pop`; only an exact-key
+    // lookup proves the base rule itself survived.
+    expect([...get().keys()]).toContain(selector);
+  });
+
+  test('.sv-pop is a token-built panel on the dropdown layer', () => {
+    expect(decl(popovers, '.sv-pop', 'z-index')).toBe('var(--sv-z-dropdown)');
+    expect(decl(popovers, '.sv-pop', 'min-width')).toBe('calc(var(--sv-space-16) * 2)');
+    expect(decl(popovers, '.sv-pop', 'border')).toBe('1px solid var(--sv-border)');
+    expect(decl(popovers, '.sv-pop', 'border-radius')).toBe('var(--sv-radius-md)');
+    expect(decl(popovers, '.sv-pop', 'background')).toBe('var(--sv-surface)');
+    expect(decl(popovers, '.sv-pop', 'color')).toBe('var(--sv-text)');
+  });
+
+  test('.sv-pop fades on [data-state] and nothing else moves', () => {
+    expectFadeContract(popovers, '.sv-pop');
+  });
+
+  test('.sv-pop__viewport caps its height from the spacing scale and scrolls', () => {
+    // Without the cap a long option list runs straight off the viewport, which
+    // is what max-h-96 was doing before the migration.
+    expect(decl(popovers, '.sv-pop__viewport', 'max-height')).toBe(
+      'calc(var(--sv-space-16) * 6)',
+    );
+    expect(decl(popovers, '.sv-pop__viewport', 'overflow-y')).toBe('auto');
+  });
+
+  test('.sv-pop__scroll is a token-sized, centred affordance', () => {
+    expect(decl(popovers, '.sv-pop__scroll', 'height')).toBe('var(--sv-space-5)');
+    expect(decl(popovers, '.sv-pop__scroll', 'align-items')).toBe('center');
+    expect(decl(popovers, '.sv-pop__scroll', 'justify-content')).toBe('center');
+  });
+
+  test('.sv-tooltip floats above every other layer', () => {
+    expect(decl(tooltip, '.sv-tooltip', 'z-index')).toBe('var(--sv-z-tooltip)');
+  });
+
+  test('.sv-tooltip declares only what differs from .sv-pop', () => {
+    // A tooltip that restated a .sv-pop value would let the two surfaces drift
+    // apart silently; one that added a property .sv-pop does not have would be
+    // a second panel design rather than a variant of the shared one.
+    const popProperties = properties(popovers, '.sv-pop');
+    for (const property of properties(tooltip, '.sv-tooltip')) {
+      expect(popProperties, property).toContain(property);
+      expect(decl(tooltip, '.sv-tooltip', property), property).not.toBe(
+        decl(popovers, '.sv-pop', property),
+      );
+    }
+  });
+
+  test.each([
+    ['Popovers', () => popovers],
+    ['Tooltip', () => tooltip],
+  ])('the %s section obeys the Still Void design rules', (_name, get) => {
+    // SelectContent's `shadow-md` dies here (CLIENT-04).
+    expectSystemRules(get());
+  });
+
+  test('prefers-reduced-motion zeroes the panel fade (CLIENT-03)', () => {
+    expect([...reducedMotion.keys()]).toContain('.sv-pop');
+    expect(decl(reducedMotion, '.sv-pop', 'transition')).toBe('none');
+  });
+});

@@ -1123,3 +1123,55 @@ body.sv-body {
   outline: 2px solid var(--sv-accent-ink);
   outline-offset: 2px;
 }
+
+/* ---------- Popovers ---------- */
+/* One floating surface for the SelectContent, the DropdownMenuContent and the
+   TooltipContent. They were three near-identical utility strings before, which
+   is how SelectContent kept a `shadow-md` that Flat-By-Default forbids while
+   the other two had already lost theirs. min-width is the old 8rem expressed on
+   the spacing scale, so the panel stays in step with the rest of the sheet. */
+.sv-pop {
+  z-index: var(--sv-z-dropdown);
+  min-width: calc(var(--sv-space-16) * 2);
+  overflow: hidden;
+  padding: var(--sv-space-1);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  transition: opacity var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-pop[data-state='open'] {
+  opacity: 1;
+}
+.sv-pop[data-state='closed'] {
+  opacity: 0;
+}
+
+/* The scrollable window inside a Select. The cap is the old max-h-96 (24rem)
+   on the spacing scale; without it a long option list runs off the viewport. */
+.sv-pop__viewport {
+  max-height: calc(var(--sv-space-16) * 6);
+  overflow-y: auto;
+}
+/* Select's scroll-up / scroll-down affordances. */
+.sv-pop__scroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--sv-space-5);
+  color: var(--sv-text-2);
+  cursor: default;
+}
+
+/* ---------- Tooltip ---------- */
+/* Declares only what differs from .sv-pop: a tooltip floats above every other
+   layer, holds one line of text rather than a list, and needs no min-width. */
+.sv-tooltip {
+  z-index: var(--sv-z-tooltip);
+  min-width: 0;
+  padding: var(--sv-space-1) var(--sv-space-3);
+  font-size: var(--sv-text-sm);
+}
