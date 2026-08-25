@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: Implementação concluída — T1–T24 (todas as 7 fases). Aguardando Verifier.
+**Status**: Implementação concluída e verificada — T1–T24 (todas as 7 fases + T24, achado real da Fase 2). Verifier: PASS (`.specs/features/still-void-gaps-round-2/validation.md`). T25 e T26 permanecem agendadas, fora do escopo desta rodada — ver notas nos mapas abaixo.
 
 ---
 
@@ -124,7 +124,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] Gate: `npm run test`
 - [ ] Test count: +6 testes
 
-**Tests**: unit (contrato) · **Gate**: quick
+**Tests**: unit (contrato) · **Gate**: full *(corrigido retroativamente em 2026-08-25 — a task criou `tests/icon-css-contract.test.ts`; a regra do gate full para task que cria teste só foi registrada depois, no T9)*
 **Commit**: `feat(css): add the sv-icon size scale`
 
 ---
@@ -221,7 +221,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] Gate: `npm run test`
 - [ ] Test count: +14 testes
 
-**Tests**: unit (contrato) · **Gate**: quick
+**Tests**: unit (contrato) · **Gate**: full *(corrigido retroativamente em 2026-08-25 — a task criou `tests/client-css-contract.test.ts`; regra do gate full ainda não registrada na Fase 2)*
 **Commit**: `feat(css): add the overlay and dialog primitives`
 
 ---
@@ -336,7 +336,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] Gate: `npm run test`
 - [ ] Test count: +6 testes
 
-**Tests**: unit · **Gate**: quick
+**Tests**: unit · **Gate**: full *(corrigido retroativamente em 2026-08-25 — a task criou `tests/ui-tabs-classes.test.tsx`)*
 **Commit**: `fix(tabs): style through sv-* classes`
 
 ---
@@ -358,7 +358,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] Gate: `npm run test`
 - [ ] Test count: +5 testes
 
-**Tests**: unit · **Gate**: quick
+**Tests**: unit · **Gate**: full *(corrigido retroativamente em 2026-08-25 — a task criou `tests/ui-tooltip-classes.test.tsx`)*
 **Commit**: `fix(tooltip): style through sv-* classes`
 
 ---
@@ -431,7 +431,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] Gate: `npm run test`
 - [ ] Test count: +8 testes
 
-**Tests**: unit · **Gate**: quick
+**Tests**: unit · **Gate**: full *(corrigido retroativamente em 2026-08-25 — a task criou `tests/client-class-contract.test.tsx`)*
 **Commit**: `test(client): pin the class purity of the migrated family`
 
 ---
@@ -549,7 +549,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] Gate: `npm run build && npm run lint:package && npm run test:coverage`
 - [ ] Test count: +12 testes
 
-**Tests**: unit (contrato) · **Gate**: build
+**Tests**: unit (contrato) · **Gate**: full + build *(a task criou `tests/tailwind-css-contract.test.ts`, então também exigia full — `npm run build` sozinho não roda `tsc` sobre `tests/`; os dois gates rodaram de fato na execução)*
 **Commit**: `feat(tailwind): publish a v4 CSS-first theme entry`
 
 ---
@@ -568,7 +568,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 - [ ] `exports["./tailwind-preset"]`, o `typesVersions` correspondente, a entry do `tsup` e os dois arquivos sumiram
 - [ ] `peerDependencies.tailwindcss` = `>=4`, seguindo opcional em `peerDependenciesMeta`
 - [ ] `tests/tailwind-config-contract.test.ts` removido e a remoção **declarada no corpo do commit** como AD-012
-- [ ] `grep -r "tailwind-preset"` fora de `node_modules`/`CHANGELOG` retorna zero
+- [ ] `grep -r "tailwind-preset"` fora de `node_modules`, `CHANGELOG.md`, `coverage/` (gitignored, gerado) e `.specs/` (registro histórico de decisão desta própria rodada) retorna zero — mesmo escopo do critério equivalente em `spec.md` (Success Criteria); a versão anterior desta linha não excluía `.specs/` e por isso nunca podia bater zero, já que este próprio arquivo cita o termo
 - [ ] Gate: `npm run build && npm run lint:package && npm run test:coverage`
 - [ ] Test count: −18 testes (remoção intencional), suíte no total ainda crescendo
 
@@ -662,6 +662,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 **Tests**: unit · **Gate**: full
 **Commit**: `fix(client): give every Radix-derived member a real displayName`
+**Changeset**: nenhum ainda — task pendente, nada publicado. Quando implementada, entra como `patch` (corrige um AC vacuoso, não muda comportamento visível).
 
 ---
 
@@ -685,6 +686,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 **Tests**: unit · **Gate**: full
 **Commit**: `fix(tabs): emit the sv-tabs container class`
+**Changeset**: nenhum ainda — task pendente, nada publicado. Quando implementada, entra como `patch` (`Tabs` passa a emitir `sv-tabs`, sem quebrar API).
 
 ---
 
@@ -706,7 +708,7 @@ para classe declarada em `style.css` perdia para a regra base. 8 classes afetada
 - [x] `.sv-btn`, `.sv-badge`, `.sv-table__row`, `.sv-menu-item`, `.sv-tabs__trigger` entram na lista
 - [x] Gate: `npm run test` — 971 passando, cobertura 100%
 
-**Tests**: unit (contrato) · **Gate**: quick
+**Tests**: unit (contrato) · **Gate**: full *(corrigido retroativamente em 2026-08-25 — a task criou `tests/reduced-motion-contract.test.ts`)*
 **Commit**: `fix(css): make the reduced-motion overrides win the cascade`
 
 ## Parallel Execution Map
@@ -740,6 +742,13 @@ Fase 6 (Paralelo):
 
 Fase 7 (Sequencial):
   T14,T16,T17,T18 → T19 → T20 → T21 → T22 → T23
+
+Fora do plano original, concluída fora de fase:
+  T5,T6,T7,T8 → T24 (achado real da Fase 2, corrigido antes da Fase 3 fechar)
+
+Fora de escopo desta rodada, agendadas (não executadas):
+  T14 → T25 [P]
+  T14 → T26 [P]
 ```
 
 ---
@@ -765,6 +774,9 @@ Fase 7 (Sequencial):
 | T21 | documentação | ✅ |
 | T22 | 2 stories | ⚠️ duas, mas mesma camada e sem teste — aceito |
 | T23 | 3 changesets | ✅ coeso — é um ato de release |
+| T24 | 1 correção de cascata + contrato | ✅ concluída fora do plano original (achado real) |
+| T25 | 1 correção (displayName) em 6 arquivos | ✅ coeso — mesmo padrão repetido, pendente |
+| T26 | 1 decisão + execução (`.sv-tabs`) | ✅ pendente |
 
 ---
 
@@ -795,8 +807,13 @@ Fase 7 (Sequencial):
 | T21 | T20 | T20 → T21 | ✅ |
 | T22 | T21 | T21 → T22 | ✅ |
 | T23 | T22 | T22 → T23 | ✅ |
+| T24 | T5–T8 | T5-T8 → T24 | ✅ (fora do plano original, ver nota abaixo) |
+| T25 | T14 | T14 → T25 | ✅ |
+| T26 | T14 | T14 → T26 | ✅ |
 
-T12 e T13 são `[P]` entre si e não dependem um do outro. T17 e T18 idem. T5–T8 idem.
+T12 e T13 são `[P]` entre si e não dependem um do outro. T17 e T18 idem. T5–T8 idem. T25 e T26 idem.
+
+**T24** não estava no plano de fases original — foi um achado real do worker da Fase 2 (cascata do `prefers-reduced-motion` quebrada), corrigido e commitado antes da Fase 3 fechar. Dependência real é T5–T8 (as seções de CSS onde o bug vivia), documentada aqui para manter o mapa fiel ao que rodou. **T25 e T26** são achados da Fase 3, agendados e **não executados** nesta rodada — dependem de T14 (o contrato de pureza de classe que os habilita a testar), mas não têm commit.
 
 ---
 
@@ -827,5 +844,8 @@ T12 e T13 são `[P]` entre si e não dependem um do outro. T17 e T18 idem. T5–
 | T21 | Documentação | unit (cross-check) | unit (cross-check, em T16) | ✅ |
 | T22 | Stories | none | none | ✅ |
 | T23 | Changesets | none | none | ✅ |
+| T24 | CSS do sistema + teste novo | unit (contrato) | unit (contrato) | ✅ |
+| T25 | Componente React (6 arquivos) | unit | unit | ✅ pendente — não bloqueia, task ainda não executada |
+| T26 | Componente + CSS do sistema | unit | unit | ✅ pendente — não bloqueia, task ainda não executada |
 
 Nenhuma ❌. Nenhum `Tests: none` justificado por "testado em outra task".
