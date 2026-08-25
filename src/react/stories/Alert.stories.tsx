@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Alert, AlertTitle, AlertDescription } from '../../components/ui/alert';
+import { Icon } from '../../components/ui/icon';
 
 const meta: Meta<typeof Alert> = {
   title: 'shadcn/Alert',
@@ -24,7 +25,7 @@ export const Default: Story = {
 export const WithIcon: Story = {
   render: () => (
     <Alert>
-      <span style={{ marginRight: '0.75rem', fontSize: '1.25rem' }}>ℹ️</span>
+      <Icon name="info" />
       <AlertTitle>Information</AlertTitle>
       <AlertDescription>
         This alert contains an icon to draw attention.
@@ -36,7 +37,7 @@ export const WithIcon: Story = {
 export const Success: Story = {
   render: () => (
     <Alert>
-      <span style={{ marginRight: '0.75rem', fontSize: '1.25rem' }}>✓</span>
+      <Icon name="check-circle" />
       <AlertTitle>Success</AlertTitle>
       <AlertDescription>
         Your operation completed successfully.
@@ -48,7 +49,7 @@ export const Success: Story = {
 export const Warning: Story = {
   render: () => (
     <Alert>
-      <span style={{ marginRight: '0.75rem', fontSize: '1.25rem' }}>⚠️</span>
+      <Icon name="alert-triangle" />
       <AlertTitle>Warning</AlertTitle>
       <AlertDescription>
         Please review this warning before proceeding.
@@ -60,7 +61,7 @@ export const Warning: Story = {
 export const Error: Story = {
   render: () => (
     <Alert>
-      <span style={{ marginRight: '0.75rem', fontSize: '1.25rem' }}>✕</span>
+      <Icon name="alert-circle" />
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         An error occurred. Please try again later.
