@@ -224,6 +224,35 @@
   }
 }
 
+/* Shared fade for every portal surface in style.css (.sv-overlay, .sv-dialog,
+   .sv-pop). Radix's Presence decides whether to keep a closing element
+   mounted long enough to animate out by reading the node's computed
+   `animation-name` — it listens for `animationstart`/`animationend`, never
+   `transitionend` (verified directly in @radix-ui/react-presence's source).
+   A `transition`-based fade never sets `animation-name`, so Presence sees
+   "none" and unmounts before a single frame renders; `animation` +
+   `@keyframes` is what it is actually built to detect. Declared here, not in
+   style.css's Overlays/Dialog/Popovers sections: those sections are parsed by
+   a flat, non-recursive selector-body regex in the CSS contract tests, which
+   cannot handle a rule with nested braces — the same reason
+   `sv-skeleton-shimmer` above lives here instead of next to `.sv-skeleton`. */
+@keyframes sv-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sv-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .sv-glass {
   background: color-mix(in srgb, var(--sv-bg-elev) 72%, transparent);
   backdrop-filter: blur(12px) saturate(1.4);

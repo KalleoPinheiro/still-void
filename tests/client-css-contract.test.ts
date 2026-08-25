@@ -124,13 +124,21 @@ function expectSystemRules(rules: Map<string, string>): void {
 /**
  * The fade is the only motion AD-009 allows: opacity, driven by the Radix
  * [data-state] attribute, at the system's fast duration and hover easing.
+ *
+ * `animation` + `@keyframes`, not `transition`: Radix's Presence (the thing
+ * that keeps a closing element mounted long enough to animate out) decides
+ * whether to wait by reading the node's computed `animation-name` — it never
+ * looks at `transition`. A `transition`-based fade compiles and looks correct
+ * in isolation, but on close Presence sees no animation and unmounts the
+ * element before the browser has a chance to render even one frame of it.
  */
 function expectFadeContract(rules: Map<string, string>, base: string): void {
-  expect(decl(rules, base, 'transition')).toBe(
-    'opacity var(--sv-duration-fast) var(--sv-ease-hover)',
+  expect(decl(rules, `${base}[data-state='open']`, 'animation')).toBe(
+    'sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover)',
   );
-  expect(decl(rules, `${base}[data-state='open']`, 'opacity')).toBe('1');
-  expect(decl(rules, `${base}[data-state='closed']`, 'opacity')).toBe('0');
+  expect(decl(rules, `${base}[data-state='closed']`, 'animation')).toBe(
+    'sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover)',
+  );
 }
 
 /**
@@ -237,7 +245,7 @@ describe('client CSS contract — the overlay and dialog primitives', () => {
   test('prefers-reduced-motion zeroes the overlay and dialog fade (CLIENT-03)', () => {
     for (const selector of ['.sv-overlay', '.sv-dialog']) {
       expect([...reducedMotion.keys()], selector).toContain(selector);
-      expect(decl(reducedMotion, selector, 'transition'), selector).toBe('none');
+      expect(decl(reducedMotion, selector, 'animation'), selector).toBe('none');
     }
   });
 });
@@ -316,7 +324,7 @@ describe('client CSS contract — the floating panel primitive', () => {
 
   test('prefers-reduced-motion zeroes the panel fade (CLIENT-03)', () => {
     expect([...reducedMotion.keys()]).toContain('.sv-pop');
-    expect(decl(reducedMotion, '.sv-pop', 'transition')).toBe('none');
+    expect(decl(reducedMotion, '.sv-pop', 'animation')).toBe('none');
   });
 });
 

@@ -1028,6 +1028,15 @@ body.sv-body {
 }
 
 /* ---------- Overlays ---------- */
+/* Shared fade for every portal surface (overlay, dialog panel, popover panel).
+   Driven by `animation`, not `transition` — Radix's Presence decides whether
+   to keep a closing element mounted long enough to animate out by reading the
+   node's computed `animation-name`, and a `transition` never sets it, so
+   Presence would unmount before a frame renders. The `sv-fade-in`/
+   `sv-fade-out` keyframes themselves live in theme.css, next to
+   `sv-skeleton-shimmer` — this section's own selector-body parser (in the CSS
+   contract tests) is flat and cannot handle a rule with nested braces. */
+
 /* The shared backdrop behind Dialog and AlertDialog. The class this replaces
    named `bg-background/80`, a color no config in this package ever declared, so
    the overlay rendered fully transparent and the page behind a modal stayed at
@@ -1041,16 +1050,15 @@ body.sv-body {
   background: color-mix(in srgb, var(--sv-bg) 80%, transparent);
   backdrop-filter: blur(var(--sv-space-1));
   -webkit-backdrop-filter: blur(var(--sv-space-1));
-  transition: opacity var(--sv-duration-fast) var(--sv-ease-hover);
 }
 /* AD-009: fade only -- no zoom, no slide. The selector is always anchored to
    the system class, because a bare [data-state='open'] would reach into the
    consumer's own markup. */
 .sv-overlay[data-state='open'] {
-  opacity: 1;
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-overlay[data-state='closed'] {
-  opacity: 0;
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
 }
 
 /* ---------- Dialog ---------- */
@@ -1073,13 +1081,12 @@ body.sv-body {
   border-radius: var(--sv-radius-lg);
   background: var(--sv-surface);
   color: var(--sv-text);
-  transition: opacity var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-dialog[data-state='open'] {
-  opacity: 1;
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-dialog[data-state='closed'] {
-  opacity: 0;
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
 }
 
 .sv-dialog__header {
@@ -1149,13 +1156,12 @@ body.sv-body {
   color: var(--sv-text);
   font-family: var(--sv-font-body);
   font-size: var(--sv-text-base);
-  transition: opacity var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-pop[data-state='open'] {
-  opacity: 1;
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-pop[data-state='closed'] {
-  opacity: 0;
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
 }
 
 /* The scrollable window inside a Select. The cap is the old max-h-96 (24rem)
@@ -1389,11 +1395,14 @@ body.sv-body {
   }
   /* AD-009 lets the portal family fade because open/closed carries state, but
      the fade is still an enhancement — under reduced motion the panel simply
-     appears. Zeroing the transition leaves the [data-state] opacities intact,
-     so a closed panel stays invisible rather than snapping into view. */
+     appears/disappears. `animation: none` (not `transition: none` — the fade
+     is driven by @keyframes so Presence's animationend-based unmount timing
+     detects it) means Presence sees no animation and unmounts on close the
+     same instant it would if the browser had no reduced-motion support at
+     all — the closed panel never has a chance to snap into view. */
   .sv-overlay,
   .sv-dialog,
   .sv-pop {
-    transition: none;
+    animation: none;
   }
 }
