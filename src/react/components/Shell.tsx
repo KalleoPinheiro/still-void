@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { Icon } from '../../components/ui/icon';
 import { cx } from '../../recipes/cx';
 import { footer, footerClasses, header, headerClasses, logo, logoClasses } from '../../recipes/shell';
 import type { NavItem } from '../../types';
@@ -38,18 +39,26 @@ export function Header({ logo: logoSlot, items = [], actions, glass, className, 
     <header className={cx(header({ glass }), className)} {...rest}>
       {logoSlot}
       {items.length > 0 && (
-        <nav className={headerClasses.nav}>
-          {items.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={item.active ? headerClasses.linkActive : headerClasses.link}
-              aria-current={item.active ? 'page' : undefined}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
+        // <details> makes the nav collapsible below 640px with zero
+        // JavaScript: CSS forces it open above that width (a no-op wrapper),
+        // native click-to-toggle handles it below (see DESIGN.md §5).
+        <details className={headerClasses.navToggle}>
+          <summary className={headerClasses.navSummary} aria-label="Menu">
+            <Icon name="menu" />
+          </summary>
+          <nav className={headerClasses.nav}>
+            {items.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className={item.active ? headerClasses.linkActive : headerClasses.link}
+                aria-current={item.active ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </details>
       )}
       {actions && <div className={headerClasses.actions}>{actions}</div>}
     </header>

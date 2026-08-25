@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { field, fieldClasses } from '../src/recipes/field';
+import { field, fieldClasses, fieldMessage } from '../src/recipes/field';
 
 describe('field()', () => {
   test('returns the bare frame class when called with no options', () => {
@@ -32,5 +32,19 @@ describe('fieldClasses', () => {
     const choice: 'sv-choice' = fieldClasses.choice;
     const srOnly: 'sv-sr-only' = fieldClasses.srOnly;
     expect([choice, srOnly]).toEqual(['sv-choice', 'sv-sr-only']);
+  });
+});
+
+describe('fieldMessage()', () => {
+  test('returns the bare message class when called with no options', () => {
+    expect(fieldMessage()).toBe('sv-field-message');
+  });
+
+  test("variant 'hint' adds no redundant modifier", () => {
+    expect(fieldMessage({ variant: 'hint' })).toBe('sv-field-message');
+  });
+
+  test("variant 'error' composes the base class with its modifier", () => {
+    expect(fieldMessage({ variant: 'error' })).toBe('sv-field-message sv-field-message--error');
   });
 });

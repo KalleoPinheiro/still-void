@@ -161,11 +161,11 @@ export const Keyboard: Story = {
         </TooltipTrigger>
         <TooltipContent>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <kbd style={{ padding: '0.25rem 0.5rem', border: '1px solid', borderRadius: '3px' }}>
+            <kbd style={{ padding: '0.25rem 0.5rem', border: '1px solid', borderRadius: 'var(--sv-radius-sm)' }}>
               Ctrl
             </kbd>
             <span>+</span>
-            <kbd style={{ padding: '0.25rem 0.5rem', border: '1px solid', borderRadius: '3px' }}>
+            <kbd style={{ padding: '0.25rem 0.5rem', border: '1px solid', borderRadius: 'var(--sv-radius-sm)' }}>
               K
             </kbd>
           </div>

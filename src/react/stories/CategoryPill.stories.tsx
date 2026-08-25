@@ -29,5 +29,9 @@ export const Active: Story = {
 };
 
 export const RawColor: Story = {
+  // `color` accepts "any CSS color" by design (see CategoryPillBaseProps in
+  // Content.tsx); DESIGN.md's One-Accent Rule exempts CategoryPill from the
+  // site accent constraint, so this is a documented passthrough, not drift.
+  // impeccable-disable-next-line design-system-color: intentional raw-color passthrough demo
   args: { label: 'Custom', color: '#ff5566' },
 };

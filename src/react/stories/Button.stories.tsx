@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from '../../components/ui/button';
+import { Icon as IconGlyph } from '../../components/ui/icon';
 
 const meta: Meta<typeof Button> = {
   title: 'shadcn/Button',
@@ -7,7 +8,7 @@ const meta: Meta<typeof Button> = {
   tags: ['autodocs'],
   argTypes: {
     variant: {
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'accent'],
       control: { type: 'select' },
     },
     size: {
@@ -63,6 +64,13 @@ export const Link: Story = {
   },
 };
 
+export const Accent: Story = {
+  args: {
+    variant: 'accent',
+    children: 'Accent',
+  },
+};
+
 export const Small: Story = {
   args: {
     size: 'sm',
@@ -80,7 +88,8 @@ export const Large: Story = {
 export const Icon: Story = {
   args: {
     size: 'icon',
-    children: '🎨',
+    'aria-label': 'Search',
+    children: <IconGlyph name="search" />,
   },
 };
 
@@ -93,6 +102,7 @@ export const AllVariants: Story = {
       <Button variant="secondary">Secondary</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
+      <Button variant="accent">Accent</Button>
     </div>
   ),
 };
@@ -103,7 +113,9 @@ export const AllSizes: Story = {
       <Button size="sm">Small</Button>
       <Button size="default">Default</Button>
       <Button size="lg">Large</Button>
-      <Button size="icon">🎨</Button>
+      <Button size="icon" aria-label="Search">
+        <IconGlyph name="search" />
+      </Button>
     </div>
   ),
 };

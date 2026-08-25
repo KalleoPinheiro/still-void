@@ -17,6 +17,10 @@ export function header(options: HeaderOptions = {}): string {
 
 export const headerClasses = {
   nav: 'sv-header__nav',
+  /** Wraps <nav> in a native <details> — collapsible below 640px, a no-op
+   * wrapper above it, with zero JavaScript (see DESIGN.md §5 Navigation). */
+  navToggle: 'sv-header__nav-toggle',
+  navSummary: 'sv-header__nav-summary',
   link: 'sv-header__link',
   linkActive: cx('sv-header__link', 'sv-header__link--active'),
   actions: 'sv-header__actions',

@@ -19,7 +19,7 @@ colors:
   border-strong-light: "rgba(0,0,0,0.14)"
   text-light: "#16161B"
   text-2-light: "#5A5A66"
-  text-3-light: "#6F6F78"
+  text-3-light: "#6D6D76"
   signal-cyan: "oklch(0.78 0.12 210)"
   twilight-violet: "oklch(0.72 0.14 295)"
   quiet-mint: "oklch(0.78 0.10 160)"
@@ -177,7 +177,7 @@ A near-monochrome dark stack (four tonal steps of near-black) carries the whole 
 
 ## 4. Elevation
 
-Still Void is flat by doctrine — there is no `box-shadow` anywhere in the system, on any component, in any state. Depth is conveyed two other ways: **tonal layering** (Panel sits one step lighter than Void, Panel Deep one step lighter again — depth reads as a lightness gradient, not a drop shadow) and a **1px translateY lift** on hover (`.sv-card-hover`) paired with a border-color shift from Hairline to Hairline Strong. The one deliberate exception to "no ornament" is `.sv-gradient-border` — a 1px conic gradient ring (accent → transparent → Hairline Strong) used as the system's single signature flourish, reserved for `FeaturedPostCard`.
+Still Void is flat by doctrine — there is no `box-shadow` anywhere in the system, on any component, in any state. Depth is conveyed two other ways: **tonal layering** (Panel sits one step lighter than Void, Panel Deep one step lighter again — depth reads as a lightness gradient, not a drop shadow) and a **2px translateY lift** on hover (`.sv-card-hover`) paired with a border-color shift from Hairline to Hairline Strong. The one deliberate exception to "no ornament" is `.sv-gradient-border` — a 1px conic gradient ring (accent → transparent → Hairline Strong) used as the system's single signature flourish, reserved for `FeaturedPostCard`.
 
 ### Shadow Vocabulary
 None. If a `box-shadow` appears anywhere in a consuming project's use of this system, it is not using Still Void correctly.
@@ -204,6 +204,7 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 - **Type scale:** `var(--sv-text-base)` (15px) — the one visual value in this pass that isn't a literal carry-over from the previous shadcn defaults (those were Tailwind's unspecified `text-sm`, 14px, not a Still Void token; see the `patch` changeset for the reancoring).
 - **Disabled:** `cursor: not-allowed`, `opacity: 0.5`.
 - **`FileInput`** additionally styles its native `::file-selector-button` (`-webkit-file-upload-button` fallback) with the same border/radius/surface tokens; `NativeSelect` keeps the browser's native affordance (no `appearance: none`) so `color-scheme` carries the dropdown chrome and native `multiple` list boxes into the right theme for free.
+- **Invalid state:** reads the native `aria-invalid="true"` attribute, not a boolean prop — `Input`/`Textarea`/`NativeSelect`/`FileInput` already spread `...props`, so `<Input aria-invalid="true" />` alone paints the border in `var(--sv-danger-ink)` (and swaps the focus outline to the same token) with zero component changes, matching the "composition over configuration" principle. Pair it with `aria-describedby` pointing at a `fieldMessage({ variant: 'error' })` element (recipe: `fieldMessage`) for the visible error text; the same recipe with no variant (or `variant: 'hint'`) styles ordinary helper text in `var(--sv-text-2)`.
 
 ### Focus state (all interactive controls)
 
@@ -217,7 +218,7 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 ### Cards — PostCard / FeaturedPostCard
 - **Corner Style:** 12px (`rounded.lg`).
 - **Background:** Panel, no shadow, 1px Hairline border.
-- **Shadow Strategy:** none — see Elevation. Hover applies `.sv-card-hover` (1px lift + border brighten); `FeaturedPostCard` additionally wears `.sv-gradient-border`.
+- **Shadow Strategy:** none — see Elevation. Hover applies `.sv-card-hover` (2px lift + border brighten); `FeaturedPostCard` additionally wears `.sv-gradient-border`.
 - **Internal Padding:** 24px comfortable (`spacing.6`) / 16px dense variant (`spacing.4`) for `PostCard`; 32px (`spacing.8`) for `FeaturedPostCard`.
 
 ### Callouts
@@ -227,7 +228,7 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 ### Navigation — Header / TableOfContents
 - **Style:** Header is sticky with a frosted-glass backdrop (`.sv-glass`, 72% opacity + 12px blur) by default; nav links are Ink Muted, transitioning to Ink on hover/active with no underline.
 - **TableOfContents:** Ink Faint links by default; the scroll-spy-active link turns the accent color — the only place in the system where the accent marks "current position" rather than "primary action."
-- **Mobile:** no distinct nav pattern is defined yet in this system; treat as an open gap, not an implicit "same as desktop."
+- **Mobile:** below 640px, `Header`'s nav lives inside a native `<details>`/`<summary>` disclosure — zero JavaScript, no client boundary. `<summary>` renders a 40px `menu` icon button (the tap target); the nav itself is hidden until opened, at which point it becomes a right-aligned dropdown panel (Panel background, 1px Hairline border, `--sv-radius-md`) with links stacked and a 44px touch target each (WCAG 2.5.8). Above 640px the same markup collapses to a no-op wrapper: CSS forces the nav to stay visible regardless of the native open/closed state, and the summary hides — there is exactly one Header markup for both widths, never a duplicated mobile/desktop nav.
 
 ### Code — CodeBlock
 - **Style:** Raised Void background, 1px Hairline border, 12px radius, JetBrains Mono throughout, uppercase Label-styled header bar showing filename or language.

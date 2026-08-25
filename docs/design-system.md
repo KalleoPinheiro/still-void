@@ -83,10 +83,21 @@ component:
 - `recipes/field` — `field(options?: { variant?: 'input' | 'textarea' | 'select' | 'file' })` +
   `fieldClasses` (`choice`, `srOnly`). The single source of truth for the form-field frame
   shared by `Input`, `Textarea`, `NativeSelect` and `FileInput` — use it when composing your
-  own field markup instead of mirroring `.sv-field`'s CSS by hand
+  own field markup instead of mirroring `.sv-field`'s CSS by hand. `fieldMessage(options?: {
+  variant?: 'hint' | 'error' })` styles the helper/error text paired with a field via
+  `aria-describedby`; invalid state itself is the native `aria-invalid="true"` attribute, not
+  a prop — every field component already spreads `...props`, so it needs no component change
 - `recipes/table` — `table()` + `tableClasses` (`container`, `head`, `body`, `foot`, `row`,
   `th`, `td`, `caption`) — the class map behind the `Table` family, for a raw `<table>`
-- `recipes/cx` — `cx(...)`, the internal class-join helper (exported for consumer use too)
+- `recipes/cx` — `cx(...)`, the internal class-join helper (exported for consumer use too). It only
+  concatenates and drops falsy values, on purpose: the `sv-*` classes it joins are never Tailwind
+  utilities, so there is never a utility conflict to resolve. This is deliberately *not* the same
+  helper as the shadcn-derived family's own `cn()` (`src/lib/utils.ts`, `clsx` + `tailwind-merge`):
+  those components can still be composed with a *consumer's own* Tailwind utility `className`
+  override (`@still-void/ui/tailwind.css` exists for exactly that), and `cn()`'s conflict
+  resolution is what makes that override actually win instead of colliding. `cx()` is for `sv-*`
+  class composition; `cn()` is for the shadcn layer's Tailwind interop. Neither should replace the
+  other.
 
 ## Component catalog
 

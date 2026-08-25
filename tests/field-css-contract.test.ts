@@ -63,11 +63,15 @@ const REQUIRED_SELECTORS = [
   '.sv-field::placeholder',
   '.sv-field:focus-visible',
   '.sv-field:disabled',
+  ".sv-field[aria-invalid='true']",
+  ".sv-field[aria-invalid='true']:focus-visible",
   '.sv-field--textarea',
   '.sv-field--select[multiple]',
   '.sv-field--file',
   '.sv-field--file::file-selector-button',
   '.sv-field--file::-webkit-file-upload-button',
+  '.sv-field-message',
+  '.sv-field-message--error',
   '.sv-check',
   '.sv-radio',
   '.sv-check:focus-visible',
@@ -114,6 +118,29 @@ describe('.sv-field reproduces the Input frame from tokens', () => {
   test('disabled fields are dimmed and show a not-allowed cursor', () => {
     expect(decl('.sv-field:disabled', 'cursor')).toBe('not-allowed');
     expect(decl('.sv-field:disabled', 'opacity')).toBe('0.5');
+  });
+});
+
+describe('invalid state reads aria-invalid, not a boolean prop', () => {
+  test("[aria-invalid='true'] paints the border with the danger-ink token", () => {
+    expect(decl(".sv-field[aria-invalid='true']", 'border-color')).toBe('var(--sv-danger-ink)');
+  });
+
+  test("[aria-invalid='true']:focus-visible swaps the outline to danger-ink", () => {
+    expect(decl(".sv-field[aria-invalid='true']:focus-visible", 'outline-color')).toBe(
+      'var(--sv-danger-ink)',
+    );
+  });
+});
+
+describe('.sv-field-message pairs helper/error text with a field', () => {
+  test('default is muted secondary text', () => {
+    expect(decl('.sv-field-message', 'color')).toBe('var(--sv-text-2)');
+    expect(decl('.sv-field-message', 'font-size')).toBe('var(--sv-text-sm)');
+  });
+
+  test('--error modifier switches to the danger-ink token', () => {
+    expect(decl('.sv-field-message--error', 'color')).toBe('var(--sv-danger-ink)');
   });
 });
 
