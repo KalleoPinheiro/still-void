@@ -42,7 +42,8 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 | Suporte a Tailwind v3 no consumidor | Decisão do usuário em 2026-08-24 (**AD-012**): a lib e os consumidores ficam em v4+. O preset v3 sai junto |
 | Compatibilidade retroativa da faixa de peer | Estreitar peer é **major** por definição; esta rodada assume o `v3.0.0` em vez de tentar servir as duas versões |
 | Trocar o motor de portal/foco do Radix | Radix continua sendo o comportamento; esta rodada troca só a camada visual |
-| Novos ícones desenhados à mão | O set curado vem do lucide-react; desenhar próprios é outra feature |
+| Novos ícones desenhados à mão | O set curado vem do `@heroicons/react`; desenhar próprios é outra feature |
+| Trocar de grade óptica por tamanho (20/solid, 16/solid) | O `Icon` usa `24/outline` como família única e escala por CSS; grade por tamanho é refinamento visual de outra rodada |
 
 ---
 
@@ -57,7 +58,7 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 | Concorrência / ordenação | Análogo real é ordem de cascata CSS: nenhuma regra nova pode usar `!important` nem depender de vir antes/depois do Tailwind do consumidor (**CLIENT-08**) |
 | Ciclo de vida / expiração de dados | N/A — sem estado persistido |
 | Observabilidade | `displayName` preservado em todo componente migrado ou novo — é o que o React DevTools mostra (**CLIENT-07**, **ALERT-05**) |
-| Falha de dependência externa | `@radix-ui/react-slot` promovido a dep direta não pode introduzir boundary client no entry server-safe (**CARD-05**); `lucide-react` não pode quebrar tree-shaking nem o entry server-safe (**ICON-06**) |
+| Falha de dependência externa | `@radix-ui/react-slot` promovido a dep direta não pode introduzir boundary client no entry server-safe (**CARD-05**); `@heroicons/react` não pode quebrar tree-shaking nem o entry server-safe (**ICON-06**), e o próprio teste de server-safety passa a cobrir terceiros (**ICON-07**) |
 | Integridade de transição de estado | `data-state=open|closed` do Radix dirige o CSS; toda regra de estado cobre os dois estados e respeita `prefers-reduced-motion` (**CLIENT-03**) |
 
 ---
@@ -67,7 +68,7 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 | Assunção / decisão | Default escolhido | Racional | Confirmado? |
 | --- | --- | --- | --- |
 | Animação de abrir/fechar da família client | Fade mínimo: `opacity` em `[data-state]`, `--sv-duration-fast` + `--sv-ease-hover`, desligado em `prefers-reduced-motion` | Decisão do usuário em 2026-08-24. Abrir/fechar carrega estado — DESIGN.md:192 permite motion nesse caso. Hoje nada anima (plugin ausente), então não há regressão | **y** |
-| `lucide-react` entra como **dependência direta** | Dep direta + `Icon` com set curado exportado | Decisão do usuário em 2026-08-24, ciente do custo de 31 MB desempacotado. Objetivo declarado: padronizar o uso de ícones também nas aplicações consumidoras | **y** |
+| Biblioteca de ícones | **`@heroicons/react`** como dependência direta (3,7 MB), com `Icon` expondo um set curado | Decisão do usuário em 2026-08-24, depois de o research reprovar o `lucide-react` (**AD-013** supersede o AD-010): a v1.34 marca `Icon.mjs`/`context.mjs` com `'use client'` e usa `useContext`, o que criaria boundary client no entry server-safe. Heroicons foi verificada por inspeção do tarball: zero `'use client'`, zero hook, `stroke="currentColor"`, `aria-hidden="true"` por padrão e **sem prop `size`** — tamanho obrigatoriamente por CSS, que é exatamente o ICON-02 | **y** |
 | Forma da API de ícones | Componente `Icon` (`name` + `size`) sobre classe `.sv-icon`, não re-export nomeado por ícone | Decisão do usuário em 2026-08-24. Mantém a superfície pública pequena e força o visual do sistema (currentColor, tamanho em token, stroke fixo) | **y** |
 | Formato do `tailwind.css` | Só `@theme` mapeando `--color-sv-*`/fonte/espaçamento/radius para `var(--sv-*)`. Sem `@source`, sem os aliases `--color-background`/`ring`/`destructive` | Decisão do usuário em 2026-08-24. Depois da migração o `dist` não tem classe Tailwind para o `@source` varrer, e os quatro aliases existiam só por causa das classes que esta rodada elimina | **y** |
 | `FileInput` fica fora da rodada | Rodada 3, abordagem já fixada em AD-008 | Decisão do usuário em 2026-08-24, resolvendo o conflito de escopo registrado no intake | **y** |
@@ -102,8 +103,11 @@ vem antes por dependência técnica.
    nenhum arquivo alcançável a partir dele contém `'use client'` ou hook do React
 5. WHEN um `name` fora do set curado é passado em runtime THEN o sistema SHALL renderizar o ícone default
    sem lançar exceção (a union de TS já barra em tempo de compilação)
-6. WHEN o bundle do consumidor é montado THEN cada ícone SHALL ser importado individualmente de
-   `lucide-react` (import nomeado, nunca `import * as`), preservando tree-shaking
+6. WHEN o bundle do consumidor é montado THEN cada ícone SHALL vir de import nomeado em
+   `@heroicons/react/24/outline` (nunca `import * as`, nunca o barrel raiz), preservando tree-shaking
+7. WHEN `tests/server-safety.test.ts` roda THEN ele SHALL cobrir também os **pacotes de terceiros**
+   alcançáveis a partir do entry server-safe — hoje o walker só segue especificadores relativos, então uma
+   dependência com `'use client'` passaria despercebida. É o buraco que quase deixou o `lucide-react` entrar
 
 **Independent Test**: renderizar `<Icon name="check" size="lg" label="ok" />` isolado e conferir tag, classes,
 `role`/`aria-label`; `tests/server-safety.test.ts` cobre o AC 4.
@@ -139,14 +143,19 @@ tokens do Still Void.
    `@layer` do Tailwind para vencer a cascata
 9. WHEN `SelectItem` está selecionado THEN o sistema SHALL renderizar um `<Icon name="check" />` no espaço
    que hoje é reservado por padding e fica vazio; o mesmo SHALL valer para `DropdownMenuCheckboxItem` (check)
-   e `DropdownMenuRadioItem` (ponto)
+   e `DropdownMenuCheckboxItem` (check). O indicador do `DropdownMenuRadioItem` é um **círculo em CSS**
+   (`.sv-menu__dot`), não um ícone — o set do heroicons não tem um ponto na grade certa
 10. WHEN `SelectTrigger` é renderizado THEN o sistema SHALL renderizar `<Icon name="chevron-down" />`, e os
     botões de scroll SHALL renderizar `chevron-up`/`chevron-down`
 11. WHEN qualquer elemento focável dos cinco recebe foco de teclado THEN o foco visível SHALL ser
     `outline: 2px solid var(--sv-accent-ink)` com `outline-offset: 2px` (AD-005) — nunca `ring-*`
 12. WHEN os testes existentes (`ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu`) rodam
     THEN eles SHALL passar **sem edição** — teste existente que precise mudar é regressão de API: parar e reportar
-13. WHEN o consumidor passa a prop `icon` em `SelectItem`, `SelectTrigger`, `DropdownMenuCheckboxItem`,
+13. WHEN `SelectItem` é renderizado THEN seus children SHALL ser envolvidos por `SelectPrimitive.ItemText`.
+    **Defeito verificado na fonte do Radix:** `ItemText` faz `createPortal(children, context.valueNode)` e
+    `SelectValue` sem `children` renderiza vazio quando há valor — hoje o trigger fica **em branco** depois
+    que o usuário escolhe uma opção
+14. WHEN o consumidor passa a prop `icon` em `SelectItem`, `SelectTrigger`, `DropdownMenuCheckboxItem`,
     `DropdownMenuRadioItem` ou `DropdownMenuSubTrigger` THEN o nó passado SHALL substituir o ícone default
     mantendo o mesmo slot de layout; WHEN `icon={null}` THEN nenhum indicador SHALL ser renderizado e o
     espaço reservado SHALL colapsar — o `pl-8` órfão não volta por outro caminho
@@ -287,7 +296,8 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 | ICON-03 | P1: Ícones — `label` troca para `role="img"` + `aria-label` | Design | Pending |
 | ICON-04 | P1: Ícones — server-safe em `@still-void/ui/react` | Design | Pending |
 | ICON-05 | P1: Ícones — `name` inválido cai no default sem lançar | Design | Pending |
-| ICON-06 | P1: Ícones — imports nomeados do lucide, tree-shaking preservado | Design | Pending |
+| ICON-06 | P1: Ícones — imports nomeados de `@heroicons/react/24/outline`, tree-shaking preservado | Design | Pending |
+| ICON-07 | P1: Ícones — `server-safety` passa a cobrir dependências de terceiros | Design | Pending |
 | CLIENT-01 | P1: Família client — só classes `sv-*` emitidas | Design | Pending |
 | CLIENT-02 | P1: Família client — todo valor por `var(--sv-*)` | Design | Pending |
 | CLIENT-03 | P1: Família client — `[data-state]` + fade + reduced-motion | Design | Pending |
@@ -300,7 +310,8 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 | CLIENT-10 | P1: Família client — chevrons de `Select` | Design | Pending |
 | CLIENT-11 | P1: Família client — foco por `outline` (AD-005) | Design | Pending |
 | CLIENT-12 | P1: Família client — testes existentes passam sem edição | Design | Pending |
-| CLIENT-13 | P1: Família client — prop `icon` substitui o indicador default | Design | Pending |
+| CLIENT-13 | P1: Família client — `SelectItem` envolve children em `ItemText` (trigger em branco) | Design | Pending |
+| CLIENT-14 | P1: Família client — prop `icon` substitui o indicador default | Design | Pending |
 | ALERT-01 | P2: `AlertDialog` — 11 exports no barrel client | Design | Pending |
 | ALERT-02 | P2: `AlertDialog` — `role="alertdialog"` + `aria-modal` | Design | Pending |
 | ALERT-03 | P2: `AlertDialog` — reutiliza CSS do `Dialog` | Design | Pending |
@@ -328,7 +339,7 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 
 **ID format:** `[CATEGORIA]-[NÚMERO]`
 **Status:** Pending → In Design → In Tasks → Implementing → Verified
-**Coverage:** 43 requisitos, 0 mapeados para tasks, 43 não mapeados ⚠️ (normal antes da fase Tasks)
+**Coverage:** 45 requisitos, 0 mapeados para tasks, 45 não mapeados ⚠️ (normal antes da fase Tasks)
 
 ---
 

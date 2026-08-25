@@ -80,7 +80,7 @@
 - **Trade-off**: 31 MB de install para quem usa só `Button` e `Card` — 300× o peso do `@radix-ui/react-alert-dialog` que o próprio intake tratou como problema. O bundle final continua ~1 KB por ícone graças ao tree-shaking, então o custo é de disco/instalação, não de runtime. `Icon` com set curado (em vez de re-export nomeado por ícone) mantém a API pública pequena: ampliar o set é `minor`, e nenhum ícone individual vira export que só sai em `major`.
 - **Scope**: Camada de ícones do pacote e todo componente que precise de indicador visual.
 - **Date**: 2026-08-24
-- **Status**: active
+- **Status**: superseded by AD-013 (a premissa de que o `lucide-react` era server-safe não se sustentou)
 
 ### AD-011
 - **Decision**: `@still-void/ui/tailwind.css` é publicado contendo **apenas** um bloco `@theme` que mapeia `--color-sv-*`, fonte, espaçamento e raio para `var(--sv-*)`. Sem `@source` e sem os aliases `--color-background`, `--color-ring`, `--color-destructive`, `--color-destructive-foreground`. O peer `tailwindcss` volta a `>=3`, seguindo opcional, e `@still-void/ui/tailwind-preset` (v3) continua exportado.
@@ -98,11 +98,19 @@
 - **Date**: 2026-08-24
 - **Status**: active
 
+### AD-013
+- **Decision**: A biblioteca de ícones do design system é **`@heroicons/react`** (dependência direta), não o `lucide-react`. O componente `Icon` e o set curado decididos no AD-010 permanecem exatamente como estão — muda só a origem da geometria. Cada ícone é importado nominalmente de `@heroicons/react/24/outline`; a grade `24/outline` é a família única e o tamanho vem sempre do CSS. O indicador de rádio do `DropdownMenu` é um círculo em CSS, porque o set não tem um ponto na grade certa.
+- **Reason**: Decisão do usuário em 2026-08-24, depois que o research reprovou o `lucide-react`. Verificado por inspeção do tarball publicado: `lucide-react@1.34.0` marca `dist/esm/Icon.mjs` e `dist/esm/context.mjs` com `'use client'` e todo ícone passa por `createLucideIcon → Icon → useLucideContext`, o que colocaria um boundary client dentro do entry server-safe e contrariaria o AD-002. A última 0.x sem esse problema (`0.577.0`) é de 2026-03-04 e a linha está parada. `@heroicons/react@2.2.0` foi varrida do mesmo jeito: zero `'use client'`, zero hook, `stroke="currentColor"`, `aria-hidden="true"` por padrão, `title`/`titleId` para nome acessível e **sem prop `size`** — o tamanho é obrigatoriamente CSS, que é o que a spec já exigia.
+- **Trade-off**: Sai do set default do shadcn, então exemplo de código copiado de fora vai citar ícone que o nosso set não tem — mitigado por `Icon` aceitar substituição via prop `icon` nos pontos de indicador. Em troca: 3,7 MB em vez de 31 MB, e server-safety garantida por inspeção, não por confiança.
+- **Scope**: Camada de ícones e qualquer componente que renderize indicador visual.
+- **Date**: 2026-08-24
+- **Status**: active
+
 ## Handoff
 
 - **Rodada 1 (`form-and-data-primitives`)**: concluída, Verifier PASS, **PR #10 mergeada em `main`**. PR #11 (`chore: version packages`) está aberta — mergear ela é o que publica no npm.
 - **Rodada 2 (`still-void-gaps-round-2`)**: fase **Specify** concluída em 2026-08-24 — `spec.md` escrita com 40 requisitos (ICON / CLIENT / ALERT / BTN / CARD / TW), aguardando confirmação do usuário antes do Design.
-- **Decisões novas desta sessão**: **AD-009** (motion: fade mínimo por `[data-state]`, sem zoom/slide), **AD-010** (`lucide-react` como dep direta + componente `Icon` com set curado), **AD-011** (`tailwind.css` só com `@theme`, sem `@source` nem aliases mortos), **AD-012** (superfície Tailwind **v4-only**: peer `>=4`, `tailwind-preset` removido — a rodada publica **`v3.0.0`**). `FileInput` (AD-008) confirmado **fora** desta rodada — vai para a rodada 3.
+- **Decisões novas desta sessão**: **AD-009** (motion: fade mínimo por `[data-state]`, sem zoom/slide), **AD-010** (componente `Icon` com set curado — a parte da fonte foi superseded por **AD-013**: `@heroicons/react` no lugar do `lucide-react`, que marca `Icon.mjs` com `'use client'`), **AD-011** (`tailwind.css` só com `@theme`, sem `@source` nem aliases mortos), **AD-012** (superfície Tailwind **v4-only**: peer `>=4`, `tailwind-preset` removido — a rodada publica **`v3.0.0`**). `FileInput` (AD-008) confirmado **fora** desta rodada — vai para a rodada 3.
 - **Escopo travado**, nesta ordem: (1) camada `Icon`; (2) migrar família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) para CSS `sv-*`, fechando GAP-06/07/08; (3) família `AlertDialog` (AD-007); (4) `Button variant="accent"`; (5) `Card` com `as` **e** `asChild` (AD-006, `@radix-ui/react-slot` vira dep direta); (6) `@still-void/ui/tailwind.css` (AD-011) por último, quando o pacote já não emitir nenhuma classe Tailwind.
 - **Fora do escopo da rodada 2**: `Separator`, `Progress`, `Pagination`, `FileInput`, `data-chart`; migrar `ThemeToggle`/`CopyButton` para `Icon`; remover o `tailwind-preset` v3.
 - **Perguntas em aberto**: nenhuma. As três pendências da spec foram resolvidas em 2026-08-24 — `showCloseButton` default `true`, peer `tailwindcss` `>=4` (AD-012) e indicador default renderizado **com prop `icon` para customizar** (`icon={null}` colapsa o slot).
