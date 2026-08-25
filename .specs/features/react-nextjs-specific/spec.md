@@ -131,20 +131,22 @@
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| RNS-01 | P1: Import único React-first | Design | Pending |
-| RNS-02 | P1: Import único React-first | Design | Pending |
-| RNS-03 | P1: Import único React-first | Design | Pending |
-| RNS-04 | P1: Import único React-first | Design | Pending |
-| RNS-05 | P1: Zero regressão visual | Design | Pending |
-| RNS-06 | P1: Zero regressão visual | Design | Pending |
-| RNS-07 | P2: Documentação do design system | Design | Pending |
-| RNS-08 | P2: Documentação do design system | Design | Pending |
-| RNS-09 | P2: Guia de migração | Design | Pending |
-| RNS-10 | P2: Guia de migração | Design | Pending |
-| RNS-11 | P2: Guia de migração | Design | Pending |
-| RNS-12 | P3: Changeset major | Design | Pending |
+| RNS-01 | P1: Import único React-first | Execute | ✅ Verified — `src/react/index.ts` re-exporta os 6 módulos de token + 4 de recipe + types |
+| RNS-02 | P1: Import único React-first | Execute | ✅ Verified — `src/react/client/index.ts` re-exporta themeManager/scrollSpy/readingProgress/clipboard |
+| RNS-03 | P1: Import único React-first | Execute | ✅ Verified — `src/index.ts` removido, `exports["."]`/`main`/`module`/`types` de topo removidos do `package.json` |
+| RNS-04 | P1: Import único React-first | Execute | ✅ Verified — `npm run lint:package` (`publint --strict` + `attw`) verde em `./react`, `./react/client`, css, `package.json` |
+| RNS-05 | P1: Zero regressão visual | Execute | ✅ Verified — tokens/recipes intocados, só paths de re-export; `npm test` 171/171 (inclui `tokenParity.test.ts`, `contrast.test.ts`) |
+| RNS-06 | P1: Zero regressão visual | Execute | ✅ Verified — `scripts/copy-css.mjs` inalterado, `theme.css`/`style.css` copiados verbatim |
+| RNS-07 | P2: Documentação do design system | Execute | ✅ Verified — `docs/design-system.md` escrito, com tabela server/client por componente |
+| RNS-08 | P2: Documentação do design system | Execute | ✅ Verified — idem RNS-07 (arquitetura + tokens + catálogo cobertos) |
+| RNS-09 | P2: Guia de migração | Execute | ✅ Verified — `docs/migration-v1-to-v2.md`, mapa completo antigo→novo |
+| RNS-10 | P2: Guia de migração | Execute | ✅ Verified — seção "What did not change" no guia de migração |
+| RNS-11 | P2: Guia de migração | Execute | ✅ Verified — seção "If you can't migrate yet" (path explícito pra quem não usa React) |
+| RNS-12 | P3: Changeset major | Execute | ✅ Verified — `.changeset/react-nextjs-only.md`, `"@still-void/ui": major`, publicado como `2.0.0` |
 
-**Coverage:** 12 total, 0 mapped to tasks yet, 12 unmapped ⚠️ (esperado antes da fase Design/Tasks)
+**Coverage:** 12 total, 12 mapeados e verificados, 0 unmapped.
+
+**Verificado**: Verifier PASS registrado em `.specs/features/react-nextjs-specific/validation.md` (evidência por AC, `npm run typecheck`/`build`/`lint:package`/`test` verdes) e numa revisão posterior de cobertura/segurança/perf (`5cbede0..HEAD`, sensor 5/5 mutantes mortos após fix em `b070ffd`, 320/320 testes, cobertura 100%). Mergeado em `main` via PR #7 (`4422b64`), publicado como `@still-void/ui@2.0.0`. Esta tabela ficou marcada `Pending` desde `2026-08-22` (merge da PR #7) apesar do PASS já registrado em `validation.md` — corrigido a pedido do usuário depois de achado durante o fechamento da PR #15.
 
 ---
 
