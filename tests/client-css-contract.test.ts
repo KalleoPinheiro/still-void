@@ -18,8 +18,6 @@ import { describe, expect, test } from 'vitest';
 
 const cssPath = resolve(process.cwd(), 'src/css/style.css');
 const css = readFileSync(cssPath, 'utf-8');
-const themeCssPath = resolve(process.cwd(), 'src/css/theme.css');
-const themeCss = readFileSync(themeCssPath, 'utf-8');
 
 function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -135,20 +133,28 @@ function expectFadeContract(rules: Map<string, string>, base: string): void {
   expect(decl(rules, `${base}[data-state='closed']`, 'opacity')).toBe('0');
 }
 
-/** The body of theme.css's `@media (prefers-reduced-motion: reduce)` block. */
+/**
+ * The body of style.css's `@media (prefers-reduced-motion: reduce)` block.
+ *
+ * It reads style.css and not theme.css on purpose: `@media` adds no
+ * specificity, and README documents the import order as theme.css then
+ * style.css, so a `transition: none` written in theme.css loses the cascade to
+ * the base rule declared here. The override only applies from this sheet —
+ * see tests/reduced-motion-contract.test.ts, which pins that property.
+ */
 function reducedMotionBlock(): string {
   const header = '@media (prefers-reduced-motion: reduce) {';
-  const start = themeCss.indexOf(header);
-  if (start === -1) throw new Error('No prefers-reduced-motion block in theme.css');
+  const start = css.indexOf(header);
+  if (start === -1) throw new Error('No prefers-reduced-motion block in style.css');
   let depth = 0;
-  for (let i = start + header.length - 1; i < themeCss.length; i += 1) {
-    if (themeCss[i] === '{') depth += 1;
-    if (themeCss[i] === '}') {
+  for (let i = start + header.length - 1; i < css.length; i += 1) {
+    if (css[i] === '{') depth += 1;
+    if (css[i] === '}') {
       depth -= 1;
-      if (depth === 0) return themeCss.slice(start + header.length, i);
+      if (depth === 0) return css.slice(start + header.length, i);
     }
   }
-  throw new Error('Unterminated prefers-reduced-motion block in theme.css');
+  throw new Error('Unterminated prefers-reduced-motion block in style.css');
 }
 
 const reducedMotion = parseRules(stripComments(reducedMotionBlock()));

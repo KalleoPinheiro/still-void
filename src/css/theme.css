@@ -240,24 +240,8 @@
   .sv-skeleton {
     animation: none;
   }
-  /* Hover/active color fades across nav, pills and the copy button are
-     non-essential motion too — instant is the reduced-motion default.
-     (The reading progress bar is intentionally excluded: its transition is
-     1:1 with the user's own scroll input, not decorative.) */
-  .sv-header__link,
-  .sv-footer__link,
-  .sv-pill--interactive,
-  .sv-code-block__copy,
-  .sv-toc__link {
-    transition: none;
-  }
-  /* AD-009 lets the portal family fade because open/closed carries state, but
-     the fade is still an enhancement — under reduced motion the panel simply
-     appears. Zeroing the transition leaves the [data-state] opacities intact,
-     so the closed panel stays invisible rather than snapping into view. */
-  .sv-overlay,
-  .sv-dialog,
-  .sv-pop {
-    transition: none;
-  }
+  /* Everything else this block used to name is declared in style.css, which
+     loads after this file. A media query adds no specificity, so the override
+     lost the cascade to the base rule every time — the reduce rules for those
+     classes now live at the end of style.css, where they can win. */
 }

@@ -1324,3 +1324,42 @@ body.sv-body {
   outline: 2px solid var(--sv-accent-ink);
   outline-offset: 2px;
 }
+
+/* ---------- Reduced motion ---------- */
+/* This block lives here, at the end of style.css, and not in theme.css, for a
+   cascade reason: `@media` adds no specificity, and README documents the
+   import order as theme.css then style.css. A `transition: none` written in
+   theme.css therefore loses to the base rule in this file — same specificity,
+   later document order — and the override silently never applies. Five classes
+   shipped in v2 exactly that way. tests/reduced-motion-contract.test.ts pins
+   the property: the reduce rule for a class must sit in the same sheet as its
+   base rule, and after it. */
+@media (prefers-reduced-motion: reduce) {
+  /* Hover and active colour fades across nav, pills, buttons, badges, table
+     rows and menu chrome are non-essential motion — instant is the
+     reduced-motion default. The reading progress bar is deliberately absent:
+     its transition tracks the user's own scroll input 1:1, so it is not
+     decoration. */
+  .sv-header__link,
+  .sv-footer__link,
+  .sv-pill--interactive,
+  .sv-code-block__copy,
+  .sv-toc__link,
+  .sv-table__row,
+  .sv-btn,
+  .sv-badge,
+  .sv-dialog__close,
+  .sv-menu-item,
+  .sv-tabs__trigger {
+    transition: none;
+  }
+  /* AD-009 lets the portal family fade because open/closed carries state, but
+     the fade is still an enhancement — under reduced motion the panel simply
+     appears. Zeroing the transition leaves the [data-state] opacities intact,
+     so a closed panel stays invisible rather than snapping into view. */
+  .sv-overlay,
+  .sv-dialog,
+  .sv-pop {
+    transition: none;
+  }
+}
