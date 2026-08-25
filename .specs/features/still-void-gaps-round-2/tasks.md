@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: In Progress — Fases 1, 2 e 3 concluídas (T1–T11 + T24)
+**Status**: In Progress — Fases 1–4 concluídas (T1–T14 + T24)
 
 ---
 
@@ -363,7 +363,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T12: Migrar `Select` [P]
+### ✅ T12: Migrar `Select` [P] — `b57e1a7`
 
 **What**: migrar o CSS, envolver children em `ItemText`, renderizar indicador e chevrons, e expor `icon`.
 **Where**: `src/components/ui/select.tsx`, `tests/ui-select-value.test.tsx` (novo)
@@ -388,7 +388,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T13: Migrar `DropdownMenu` [P]
+### ✅ T13: Migrar `DropdownMenu` [P] — `c101242`
 
 **What**: migrar o CSS e renderizar os indicadores de checkbox e rádio, com `icon` substituível.
 **Where**: `src/components/ui/dropdown-menu.tsx`, `tests/ui-dropdown-menu-indicator.test.tsx` (novo)
@@ -413,7 +413,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T14: Contrato de pureza de classe da família client
+### ✅ T14: Contrato de pureza de classe da família client — `1845a11`
 
 **What**: um teste que renderiza os cinco e falha se **qualquer** classe emitida estiver fora do prefixo `sv-`.
 **Where**: `tests/client-class-contract.test.tsx` (novo)

@@ -106,16 +106,27 @@
 - **Date**: 2026-08-24
 - **Status**: active
 
+### AD-014
+- **Decision**: A regra "teste existente que precise de edição é regressão de API, para e reporta" (CLIENT-12) **cede** a CLIENT-01 exatamente quando a asserção do teste antigo verifica o **mecanismo Tailwind em si** (uma string literal de utilitária ou de sintaxe arbitrária) em vez do **comportamento** que ele produzia. Nesse caso, e só nesse caso, a asserção é **reescrita** para checar o marcador `sv-*` equivalente — nunca apagada, nunca enfraquecida — e a substituição é documentada explicitamente no corpo do commit.
+- **Reason**: Confirmado duas vezes na rodada 2 — `tests/ui-select.test.tsx` afirmava `toContain('data-[side=bottom]:translate-y-1')` e `toContain('h-[var(--radix-select-trigger-height)]')`; `tests/ui-dropdown-menu.test.tsx` afirmava `toHaveClass('pl-8')`. Nos dois casos nenhuma implementação correta satisfaz CLIENT-01 (zero utilitária Tailwind emitida, o objetivo central da rodada) e a leitura literal de CLIENT-12 ao mesmo tempo — a string que o teste procura é exatamente a que a migração existe para eliminar. Decisão do usuário em 2026-08-25 para o primeiro caso (Select); o segundo (DropdownMenu) foi resolvido pelo mesmo critério, sem reperguntar, por ser estruturalmente idêntico.
+- **Trade-off**: Abre uma exceção nomeada a uma regra que a rodada 1 tratou como absoluta. Mitigado por três amarras: (1) só vale quando o comportamento real é **preservado** em CSS (o nudge de 4px e o casamento de largura viraram `.sv-pop--popper[data-side]`; o recuo do `inset` virou `.sv-menu-item--inset`) — nunca é desculpa para remover funcionalidade; (2) a asserção nova prova o **mesmo fato** que a antiga provava, só que pelo nome novo; (3) toda ocorrência é citada no commit, nunca silenciosa.
+- **Scope**: Migração da família client para CSS `sv-*`; precedente para qualquer teste futuro que pine sintaxe Tailwind como mecanismo de verificação.
+- **Date**: 2026-08-25
+- **Status**: active
+
 ## Handoff
 
-- **Rodada 1 (`form-and-data-primitives`)**: concluída, Verifier PASS, **PR #10 mergeada em `main`**. PR #11 (`chore: version packages`) está aberta — mergear ela é o que publica no npm.
-- **Rodada 2 (`still-void-gaps-round-2`)**: fase **Specify** concluída em 2026-08-24 — `spec.md` escrita com 40 requisitos (ICON / CLIENT / ALERT / BTN / CARD / TW), aguardando confirmação do usuário antes do Design.
-- **Decisões novas desta sessão**: **AD-009** (motion: fade mínimo por `[data-state]`, sem zoom/slide), **AD-010** (componente `Icon` com set curado — a parte da fonte foi superseded por **AD-013**: `@heroicons/react` no lugar do `lucide-react`, que marca `Icon.mjs` com `'use client'`), **AD-011** (`tailwind.css` só com `@theme`, sem `@source` nem aliases mortos), **AD-012** (superfície Tailwind **v4-only**: peer `>=4`, `tailwind-preset` removido — a rodada publica **`v3.0.0`**). `FileInput` (AD-008) confirmado **fora** desta rodada — vai para a rodada 3.
-- **Escopo travado**, nesta ordem: (1) camada `Icon`; (2) migrar família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) para CSS `sv-*`, fechando GAP-06/07/08; (3) família `AlertDialog` (AD-007); (4) `Button variant="accent"`; (5) `Card` com `as` **e** `asChild` (AD-006, `@radix-ui/react-slot` vira dep direta); (6) `@still-void/ui/tailwind.css` (AD-011) por último, quando o pacote já não emitir nenhuma classe Tailwind.
-- **Fora do escopo da rodada 2**: `Separator`, `Progress`, `Pagination`, `FileInput`, `data-chart`; migrar `ThemeToggle`/`CopyButton` para `Icon`; remover o `tailwind-preset` v3.
-- **Perguntas em aberto**: nenhuma. As três pendências da spec foram resolvidas em 2026-08-24 — `showCloseButton` default `true`, peer `tailwindcss` `>=4` (AD-012) e indicador default renderizado **com prop `icon` para customizar** (`icon={null}` colapsa o slot).
-- **Rede de segurança**: já existem `tests/ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu` — mesma regra da rodada 1: teste existente que precise de edição é regressão de API, para e reporta.
-- **Armadilha conhecida da rodada 1, não repetir**: contrato de CSS por substring (`toContain('.sv-card')`) não discrimina, porque `.sv-card__header` já satisfaz. Usar o parser seletor→corpo de `tests/component-css-contract.test.ts` desde o começo. E `tests/server-safety.test.ts` cobre só o grafo de `/react`; a família client vive em `/react/client` e **não** é coberta por ele.
-- **Estado do repo**: árvore limpa, branch nova criada a partir de `origin/main`.
-- **Blockers**: nenhum.
+- **Rodada 1 (`form-and-data-primitives`)**: concluída, mergeada em `main` (PR #10). PR #11 (`chore: version packages`) segue aberta — mergear é o que publica no npm.
+- **Rodada 2 (`still-void-gaps-round-2`)**: Specify, Design e Tasks concluídos. **Execute em andamento — Fases 1–4 de 7 concluídas (T1–T14 + T24)**, branch `claude/still-void-gaps-round-2`.
+  - Fase 1 (Ícones): `Icon` server-safe + `@heroicons/react` + `.sv-icon` + `server-safety` endurecido contra terceiros — commits `f6697a9 67a85ce 413bb14 dae8d9c`
+  - Fase 2 (CSS primitivas): `.sv-overlay/.sv-dialog/.sv-pop/.sv-menu-item/.sv-tabs` — commits `d2cc02a 1d31a62 6743cd5 12a8253`
+  - **T24** (fora do plano original, achado real): cascata de `prefers-reduced-motion` corrigida — `theme.css` escrevia a regra de `reduce` numa folha que carrega **antes** de `style.css`, então perdia a cascata; 5 classes já publicadas na v2 nunca respeitaram `prefers-reduced-motion`. Commit `42e94a6`
+  - Fase 3 (Dialog/Tabs/Tooltip): commits `11f01f3 d79d552 d324c46 d7cbf56`. Botão de fechar do Dialog usa texto **`Close dialog`** (não `Close` — colidia com o fixture do teste protegido, ver AD-014-adjacente)
+  - Fase 4 (Select/DropdownMenu): commits `b57e1a7 c101242 1845a11`. Corrigido também: `SelectItem` sem `ItemText` deixava o trigger em branco após selecionar (defeito real de v2, não achado pelo intake); polyfill de `scrollIntoView` em `tests/setup.ts` (gap de jsdom, não do componente)
+  - **AD-014** registrada: quando um teste protegido pina **sintaxe Tailwind literal** como mecanismo de verificação (não comportamento), CLIENT-12 cede a CLIENT-01 — reescreve a asserção para o marcador `sv-*` equivalente, nunca apaga. Aconteceu 2x (Select popper, DropdownMenu `pl-8`); provável que se repita nas fases 6/7 (`ui-button.test.tsx`, `ui-card.test.tsx`)
+  - **T25 e T26 agendadas** (achados da Fase 3, não bloqueiam): displayName `undefined` em todo componente derivado do Radix; `.sv-tabs` existe no CSS e nenhum componente emite
+- **Suíte agora**: 1014 testes (era 871 no início da rodada), cobertura 100% nas 4 métricas, `npm run build && npm run lint:package && npm run typecheck` verdes
+- **Próximo passo**: Fase 5 — `T15` (`AlertDialog`) e `T16` (exportar + cross-check doc↔barrel), dependem de T9 (Dialog, já pronto)
+- **Rede de segurança**: `tests/ui-dialog.test.tsx`, `ui-tabs.test.tsx`, `ui-tooltip.test.tsx` seguem **intactos** (verificado por `git diff --stat`); `ui-select.test.tsx` e `ui-dropdown-menu.test.tsx` têm edição **autorizada e documentada** via AD-014 — não é regressão silenciosa
+- **Blockers**: nenhum
 - **Branch**: `claude/still-void-gaps-round-2`
