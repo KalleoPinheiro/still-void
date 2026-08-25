@@ -228,7 +228,7 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 ### Navigation — Header / TableOfContents
 - **Style:** Header is sticky with a frosted-glass backdrop (`.sv-glass`, 72% opacity + 12px blur) by default; nav links are Ink Muted, transitioning to Ink on hover/active with no underline.
 - **TableOfContents:** Ink Faint links by default; the scroll-spy-active link turns the accent color — the only place in the system where the accent marks "current position" rather than "primary action."
-- **Mobile:** no distinct nav pattern is defined yet in this system; treat as an open gap, not an implicit "same as desktop."
+- **Mobile:** below 640px, `Header`'s nav lives inside a native `<details>`/`<summary>` disclosure — zero JavaScript, no client boundary. `<summary>` renders a 40px `menu` icon button (the tap target); the nav itself is hidden until opened, at which point it becomes a right-aligned dropdown panel (Panel background, 1px Hairline border, `--sv-radius-md`) with links stacked and a 44px touch target each (WCAG 2.5.8). Above 640px the same markup collapses to a no-op wrapper: CSS forces the nav to stay visible regardless of the native open/closed state, and the summary hides — there is exactly one Header markup for both widths, never a duplicated mobile/desktop nav.
 
 ### Code — CodeBlock
 - **Style:** Raised Void background, 1px Hairline border, 12px radius, JetBrains Mono throughout, uppercase Label-styled header bar showing filename or language.

@@ -86,6 +86,19 @@ describe('Header', () => {
     render(<Header actions={<button>Toggle</button>} />);
     expect(screen.getByRole('button', { name: 'Toggle' })).toBeInTheDocument();
   });
+
+  test('wraps the nav in a <details> disclosure with a labeled summary toggle', () => {
+    render(<Header items={[{ label: 'Home', href: '/' }]} />);
+    const nav = screen.getByRole('navigation');
+    const details = nav.closest('details');
+    expect(details).not.toBeNull();
+    expect(details?.querySelector('summary')).toHaveAccessibleName('Menu');
+  });
+
+  test('renders no nav wrapper at all when there are no items', () => {
+    render(<Header />);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
 });
 
 describe('Hero', () => {

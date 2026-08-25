@@ -40,35 +40,75 @@ body.sv-body {
   display: flex;
   align-items: center;
   gap: var(--sv-space-5);
-  /* Lets the row shrink below its content width so overflow-x can scroll
-     it instead of the whole header wrapping or forcing the page wider. */
+  /* Lets the row shrink below its content width, and is what the mobile
+     dropdown panel below overrides to lay its links out as a column. */
   min-width: 0;
 }
-/* No distinct mobile nav pattern by design — a wrapping/collapsing nav adds
-   a second layout to maintain. Below the point where items stop fitting,
-   the row scrolls horizontally instead of overflowing the viewport. */
-@media (max-width: 640px) {
-  .sv-header__nav {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      black var(--sv-space-2),
-      black calc(100% - var(--sv-space-2)),
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      black var(--sv-space-2),
-      black calc(100% - var(--sv-space-2)),
-      transparent 100%
-    );
+/* <details> wraps <nav> so the mobile disclosure needs zero JavaScript: the
+   summary is the tap target, the browser's own open/close state drives it. */
+.sv-header__nav-toggle {
+  position: relative;
+}
+.sv-header__nav-summary {
+  /* The browser renders <summary> like a <li> with a marker; this system
+     draws its own disclosure affordance instead. */
+  list-style: none;
+  display: none;
+}
+.sv-header__nav-summary::-webkit-details-marker {
+  display: none;
+}
+.sv-header__nav-summary::marker {
+  content: '';
+}
+@media (min-width: 641px) {
+  /* Above the breakpoint <details> is a no-op wrapper: the nav always
+     renders regardless of the native open/closed state, and there is
+     nothing to toggle. */
+  .sv-header__nav-toggle .sv-header__nav {
+    display: flex !important;
   }
-  .sv-header__nav::-webkit-scrollbar {
-    display: none;
+}
+@media (max-width: 640px) {
+  .sv-header__nav-summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--sv-space-10);
+    height: var(--sv-space-10);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-sm);
+    color: var(--sv-text-2);
+    cursor: pointer;
+  }
+  .sv-header__nav-summary:hover {
+    color: var(--sv-text);
+    border-color: var(--sv-border-strong);
+  }
+  .sv-header__nav-summary:focus-visible {
+    outline: 2px solid var(--sv-accent-ink);
+    outline-offset: 2px;
+  }
+  /* Closed is the native default (no [open] attribute): the browser hides
+     everything here but <summary> without any rule of ours. Open state
+     turns the nav into a dropdown panel instead of the horizontal row. */
+  .sv-header__nav-toggle[open] .sv-header__nav {
+    position: absolute;
+    top: calc(100% + var(--sv-space-2));
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sv-space-1);
+    min-width: 180px;
+    padding: var(--sv-space-2);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-md);
+    background: var(--sv-surface);
+  }
+  .sv-header__nav-toggle[open] .sv-header__link {
+    padding: var(--sv-space-2) var(--sv-space-3);
+    /* WCAG 2.5.8 (AA) touch target, generous for a coarse pointer. */
+    min-height: 44px;
   }
 }
 .sv-header__link {
