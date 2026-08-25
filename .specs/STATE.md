@@ -90,14 +90,22 @@
 - **Date**: 2026-08-24
 - **Status**: active
 
+### AD-012
+- **Decision**: A superfície Tailwind do pacote é **v4-only**. `peerDependencies.tailwindcss` passa de `>=3 <4` para **`>=4`** (seguindo opcional), e `@still-void/ui/tailwind-preset` é **removido** — junto com `src/tailwind-preset.ts`, sua entry em `tsup.config.ts`, o `typesVersions` correspondente e a raiz `tailwind.config.ts`. A rodada 2 publica **`v3.0.0`**.
+- **Reason**: Decisão do usuário em 2026-08-24: lib e consumidores ficam sempre em Tailwind v4+. O preset é formato v3 e o v4 **ignora** `corePlugins.preflight` — mantê-lo exportado sob peer v4 seria publicar uma armadilha, porque carregá-lo num app v4 reativa o Preflight e briga com `style.css`. O repo já usa `tailwindcss ^4.3.3` em devDependencies, então o lado da lib só precisa parar de carregar o artefato v3.
+- **Trade-off**: Consumidor em Tailwind v3 fica preso na linha `2.x`. Estreitar peer e remover export são as duas formas canônicas de `major` segundo o CONTRIBUTING, então a rodada deixa de ser `patch`+`minor` e vira `v3.0.0`. Efeito colateral: `tests/tailwind-config-contract.test.ts` inteiro e os blocos de preset em `tests/package-contract.test.ts` são apagados — única exceção autorizada à regra de que editar teste existente é regressão de API, porque aqui a remoção da API **é** a decisão.
+- **Scope**: Integração com Tailwind, faixa de peers e política de versionamento da rodada 2.
+- **Date**: 2026-08-24
+- **Status**: active
+
 ## Handoff
 
 - **Rodada 1 (`form-and-data-primitives`)**: concluída, Verifier PASS, **PR #10 mergeada em `main`**. PR #11 (`chore: version packages`) está aberta — mergear ela é o que publica no npm.
 - **Rodada 2 (`still-void-gaps-round-2`)**: fase **Specify** concluída em 2026-08-24 — `spec.md` escrita com 40 requisitos (ICON / CLIENT / ALERT / BTN / CARD / TW), aguardando confirmação do usuário antes do Design.
-- **Decisões novas desta sessão**: **AD-009** (motion: fade mínimo por `[data-state]`, sem zoom/slide), **AD-010** (`lucide-react` como dep direta + componente `Icon` com set curado), **AD-011** (`tailwind.css` só com `@theme`, sem `@source` nem aliases mortos; peer `tailwindcss` volta a `>=3`). `FileInput` (AD-008) confirmado **fora** desta rodada — vai para a rodada 3.
+- **Decisões novas desta sessão**: **AD-009** (motion: fade mínimo por `[data-state]`, sem zoom/slide), **AD-010** (`lucide-react` como dep direta + componente `Icon` com set curado), **AD-011** (`tailwind.css` só com `@theme`, sem `@source` nem aliases mortos), **AD-012** (superfície Tailwind **v4-only**: peer `>=4`, `tailwind-preset` removido — a rodada publica **`v3.0.0`**). `FileInput` (AD-008) confirmado **fora** desta rodada — vai para a rodada 3.
 - **Escopo travado**, nesta ordem: (1) camada `Icon`; (2) migrar família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) para CSS `sv-*`, fechando GAP-06/07/08; (3) família `AlertDialog` (AD-007); (4) `Button variant="accent"`; (5) `Card` com `as` **e** `asChild` (AD-006, `@radix-ui/react-slot` vira dep direta); (6) `@still-void/ui/tailwind.css` (AD-011) por último, quando o pacote já não emitir nenhuma classe Tailwind.
 - **Fora do escopo da rodada 2**: `Separator`, `Progress`, `Pagination`, `FileInput`, `data-chart`; migrar `ThemeToggle`/`CopyButton` para `Icon`; remover o `tailwind-preset` v3.
-- **Perguntas em aberto na spec** (não bloqueiam o Design, defaults escolhidos): default de `showCloseButton` (assumido `true`), alargar o peer `tailwindcss` para `>=3`, e renderizar indicadores nos itens de `Select`/`DropdownMenu` que hoje reservam `pl-8` para um ícone inexistente.
+- **Perguntas em aberto**: nenhuma. As três pendências da spec foram resolvidas em 2026-08-24 — `showCloseButton` default `true`, peer `tailwindcss` `>=4` (AD-012) e indicador default renderizado **com prop `icon` para customizar** (`icon={null}` colapsa o slot).
 - **Rede de segurança**: já existem `tests/ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu` — mesma regra da rodada 1: teste existente que precise de edição é regressão de API, para e reporta.
 - **Armadilha conhecida da rodada 1, não repetir**: contrato de CSS por substring (`toContain('.sv-card')`) não discrimina, porque `.sv-card__header` já satisfaz. Usar o parser seletor→corpo de `tests/component-css-contract.test.ts` desde o começo. E `tests/server-safety.test.ts` cobre só o grafo de `/react`; a família client vive em `/react/client` e **não** é coberta por ele.
 - **Estado do repo**: árvore limpa, branch nova criada a partir de `origin/main`.

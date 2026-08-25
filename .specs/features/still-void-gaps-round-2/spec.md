@@ -28,6 +28,8 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 - [ ] `docs/design-system.md` e o artefato publicado voltam a concordar (`AlertDialog` existe de verdade)
 - [ ] Uma camada de ícones padronizada pelo design system, consumível de fora
 - [ ] Consumidor em Tailwind v4 tem um caminho suportado e documentado (`@still-void/ui/tailwind.css`)
+- [ ] Superfície Tailwind do pacote é **v4-only**: peer `>=4`, preset v3 removido, sem config em formato v3
+      sobrando no repo
 
 ## Out of Scope
 
@@ -37,7 +39,8 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 | Variante `label` + input escondido do `FileInput` (GAP-01) | Abordagem decidida em **AD-008**; execução confirmada para a rodada 3 (2026-08-24) |
 | `data-chart` (GAP-12) | Declarado permanentemente fora — primitivo de gráfico é feature própria |
 | Migrar `ThemeToggle` / `CopyButton` para usar `Icon` | Hoje são texto puro e funcionam; troca é estética, não defeito. Rodada futura |
-| Remover `@still-void/ui/tailwind-preset` | Remover export é **major**; o preset continua servindo consumidores v3 |
+| Suporte a Tailwind v3 no consumidor | Decisão do usuário em 2026-08-24 (**AD-012**): a lib e os consumidores ficam em v4+. O preset v3 sai junto |
+| Compatibilidade retroativa da faixa de peer | Estreitar peer é **major** por definição; esta rodada assume o `v3.0.0` em vez de tentar servir as duas versões |
 | Trocar o motor de portal/foco do Radix | Radix continua sendo o comportamento; esta rodada troca só a camada visual |
 | Novos ícones desenhados à mão | O set curado vem do lucide-react; desenhar próprios é outra feature |
 
@@ -68,12 +71,11 @@ pago em `dependencies` mas não existe em `src/`; `Button` não tem variante de 
 | Forma da API de ícones | Componente `Icon` (`name` + `size`) sobre classe `.sv-icon`, não re-export nomeado por ícone | Decisão do usuário em 2026-08-24. Mantém a superfície pública pequena e força o visual do sistema (currentColor, tamanho em token, stroke fixo) | **y** |
 | Formato do `tailwind.css` | Só `@theme` mapeando `--color-sv-*`/fonte/espaçamento/radius para `var(--sv-*)`. Sem `@source`, sem os aliases `--color-background`/`ring`/`destructive` | Decisão do usuário em 2026-08-24. Depois da migração o `dist` não tem classe Tailwind para o `@source` varrer, e os quatro aliases existiam só por causa das classes que esta rodada elimina | **y** |
 | `FileInput` fica fora da rodada | Rodada 3, abordagem já fixada em AD-008 | Decisão do usuário em 2026-08-24, resolvendo o conflito de escopo registrado no intake | **y** |
-| Botão de fechar do `DialogContent` | Prop `showCloseButton`, **default `true`** | Paridade com o shadcn v4 e fecha a lacuna para quem não souber da prop. **Risco declarado:** adiciona um `<button>` ao DOM de quem já monta o seu — teste de consumidor que conte botões pode quebrar. `showCloseButton={false}` é a saída. Perguntado em 2026-08-24; o usuário respondeu sobre a lib de ícones e não sobre o default | **n** — confirmar |
-| Faixa de peer do `tailwindcss` | Alargar de `>=3 <4` para `>=3` | O estreitamento foi feito na rodada 1 porque o preset é v3 e o v4 ignora `corePlugins`, reativando o Preflight. Com `tailwind.css` publicado o v4 passa a ter caminho suportado. Alargar peer não é breaking | **n** — implícito no GAP-02 |
-| Indicadores visuais de `SelectItem` / `DropdownMenuCheckboxItem` / `DropdownMenuRadioItem` | Passam a renderizar ícone (check / ponto) | Hoje esses itens reservam `pl-8` para um indicador que **nunca é renderizado** — é defeito de layout, não escolha. A camada `Icon` desta rodada é o que torna a correção possível | **n** — implícito no GAP-06 |
+| Botão de fechar do `DialogContent` | Prop `showCloseButton`, **default `true`** | Confirmado pelo usuário em 2026-08-24. Paridade com o shadcn v4 e fecha a lacuna para quem não souber da prop. O `<button>` extra no DOM é mudança de comportamento, mas a rodada já é `major` por AD-012, então entra avisada por semver. `showCloseButton={false}` é a saída | **y** |
+| Faixa de peer do `tailwindcss` | **`>=4`**, seguindo opcional; `tailwind-preset` e `tailwind.config.ts` removidos | Decisão do usuário em 2026-08-24 (**AD-012**): lib e consumidores em v4+. Estreitar peer é `major`; o preset é formato v3 e o v4 ignora seu `corePlugins.preflight`, então mantê-lo sob peer v4 seria publicar uma armadilha | **y** |
+| Indicadores de `SelectItem` / `DropdownMenuCheckboxItem` / `DropdownMenuRadioItem` | Ícone default renderizado, **substituível por prop `icon`** | Decisão do usuário em 2026-08-24: manter o espaço vazio não é aceitável, e o ícone default não pode ser camisa de força. Hoje esses itens reservam `pl-8` para um indicador que **nunca é renderizado** | **y** |
 
-**Open questions:** as três linhas marcadas `n` acima. Nenhuma bloqueia o Design — todas têm default escolhido
-e rationale registrado; a confirmação do usuário pode inverter qualquer uma antes da execução.
+**Open questions:** nenhuma — todas resolvidas com o usuário em 2026-08-24 e registradas acima.
 
 ---
 
@@ -144,6 +146,10 @@ tokens do Still Void.
     `outline: 2px solid var(--sv-accent-ink)` com `outline-offset: 2px` (AD-005) — nunca `ring-*`
 12. WHEN os testes existentes (`ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu`) rodam
     THEN eles SHALL passar **sem edição** — teste existente que precise mudar é regressão de API: parar e reportar
+13. WHEN o consumidor passa a prop `icon` em `SelectItem`, `SelectTrigger`, `DropdownMenuCheckboxItem`,
+    `DropdownMenuRadioItem` ou `DropdownMenuSubTrigger` THEN o nó passado SHALL substituir o ícone default
+    mantendo o mesmo slot de layout; WHEN `icon={null}` THEN nenhum indicador SHALL ser renderizado e o
+    espaço reservado SHALL colapsar — o `pl-8` órfão não volta por outro caminho
 
 **Independent Test**: abrir cada componente em RTL e afirmar as classes emitidas; `style.css` verificado
 como texto no estilo de `tests/field-css-contract.test.ts`.
@@ -234,11 +240,17 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
    `--color-destructive`, `--color-destructive-foreground`
 3. WHEN `package.json` é lido THEN `exports["./tailwind.css"]` SHALL apontar para `./dist/tailwind.css` e
    `scripts/copy-css.mjs` SHALL copiá-lo — no padrão já verificado por `tests/package-contract.test.ts`
-4. WHEN `package.json` é lido THEN `peerDependencies.tailwindcss` SHALL ser `>=3` e continuar **opcional**
+4. WHEN `package.json` é lido THEN `peerDependencies.tailwindcss` SHALL ser `>=4` e continuar **opcional**,
+   e `devDependencies.tailwindcss` SHALL permanecer em `^4`
 5. WHEN `tailwind.css` é lido THEN cada chave `--color-sv-*` SHALL ter um token correspondente em `theme.css`
    (paridade verificada em teste, no estilo de `tests/tokenParity.test.ts`)
-6. WHEN o README é lido THEN a nota sobre Tailwind SHALL declarar que **nenhum** componente exige Tailwind e
-   descrever `tailwind.css` (v4) e `tailwind-preset` (v3) como conveniências para o código do consumidor
+6. WHEN o README é lido THEN a nota sobre Tailwind SHALL declarar que **nenhum** componente exige Tailwind,
+   descrever `tailwind.css` como conveniência para o código do consumidor e afirmar o requisito de v4+
+7. WHEN o pacote publicado é inspecionado THEN `exports["./tailwind-preset"]`, o `typesVersions` do preset,
+   `src/tailwind-preset.ts`, a entrada correspondente em `tsup.config.ts` e a raiz `tailwind.config.ts`
+   SHALL ter sido removidos — nenhum artefato em formato v3 SHALL sobreviver no repo ou no `dist`
+8. WHEN a documentação de migração é lida THEN `docs/migration-v2-to-v3.md` SHALL existir e documentar as duas
+   quebras desta rodada: peer `tailwindcss` `>=4` e remoção do `./tailwind-preset`
 
 **Independent Test**: ler `dist/tailwind.css` após o build e cruzar cada `--color-sv-*` com `theme.css`.
 
@@ -258,6 +270,11 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 - WHEN `AlertDialogAction` é acionado THEN o dialog SHALL fechar (comportamento do Radix preservado)
 - WHEN `style.css` cresce THEN a seção nova SHALL usar o mesmo marcador `/* ---------- Nome ---------- */`
   que os testes de contrato fatiam
+- WHEN o consumidor passa `icon` E o item está desmarcado THEN o ícone customizado SHALL seguir a mesma regra
+  de visibilidade do default (só aparece no estado marcado), não vazar para o estado neutro
+- WHEN `tests/tailwind-config-contract.test.ts` e os blocos de preset em `tests/package-contract.test.ts`
+  forem removidos THEN isso SHALL ser tratado como remoção **intencional** de API (AD-012), declarada no
+  changeset `major` — é a única exceção à regra de que editar teste existente é regressão
 
 ---
 
@@ -283,6 +300,7 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 | CLIENT-10 | P1: Família client — chevrons de `Select` | Design | Pending |
 | CLIENT-11 | P1: Família client — foco por `outline` (AD-005) | Design | Pending |
 | CLIENT-12 | P1: Família client — testes existentes passam sem edição | Design | Pending |
+| CLIENT-13 | P1: Família client — prop `icon` substitui o indicador default | Design | Pending |
 | ALERT-01 | P2: `AlertDialog` — 11 exports no barrel client | Design | Pending |
 | ALERT-02 | P2: `AlertDialog` — `role="alertdialog"` + `aria-modal` | Design | Pending |
 | ALERT-03 | P2: `AlertDialog` — reutiliza CSS do `Dialog` | Design | Pending |
@@ -304,11 +322,13 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 | TW-03 | P2: `tailwind.css` — export + cópia para `dist` | Design | Pending |
 | TW-04 | P2: `tailwind.css` — peer `tailwindcss` `>=3`, opcional | Design | Pending |
 | TW-05 | P2: `tailwind.css` — paridade de tokens com `theme.css` | Design | Pending |
-| TW-06 | P2: `tailwind.css` — README atualizado | Design | Pending |
+| TW-06 | P2: `tailwind.css` — README atualizado, v4+ declarado | Design | Pending |
+| TW-07 | P2: `tailwind.css` — preset v3, entry do tsup e `tailwind.config.ts` removidos | Design | Pending |
+| TW-08 | P2: `tailwind.css` — `docs/migration-v2-to-v3.md` com as duas quebras | Design | Pending |
 
 **ID format:** `[CATEGORIA]-[NÚMERO]`
 **Status:** Pending → In Design → In Tasks → Implementing → Verified
-**Coverage:** 40 requisitos, 0 mapeados para tasks, 40 não mapeados ⚠️ (normal antes da fase Tasks)
+**Coverage:** 43 requisitos, 0 mapeados para tasks, 43 não mapeados ⚠️ (normal antes da fase Tasks)
 
 ---
 
@@ -321,5 +341,7 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 - [ ] `npm run lint:package` (publint + attw) verde com o subpath `./tailwind.css` novo
 - [ ] `npm run build` produz `dist/tailwind.css`
 - [ ] Consumidor sem Tailwind nenhum renderiza os 43 exports client com cor correta nos dois temas
+- [ ] `grep` por `tailwind-preset` no repo (fora de `node_modules` e do `CHANGELOG`) retorna zero
 - [ ] Changesets separados: `patch` para os defeitos (família client), `minor` para o catálogo novo
-      (`Icon`, `AlertDialog`, `variant="accent"`, `Card as/asChild`, `tailwind.css`)
+      (`Icon`, `AlertDialog`, `variant="accent"`, `Card as/asChild`, `tailwind.css`) e **`major`** para as
+      quebras do AD-012 (peer `tailwindcss` `>=4`, remoção do `./tailwind-preset`) — a rodada publica `v3.0.0`
