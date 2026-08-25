@@ -125,16 +125,12 @@
 ## Handoff
 
 - **Rodada 1 (`form-and-data-primitives`)**: concluída, mergeada em `main` (PR #10). PR #11 (`chore: version packages`) segue aberta — mergear é o que publica no npm.
-- **Rodada 2 (`still-void-gaps-round-2`)**: Specify, Design e Tasks concluídos. **Execute em andamento — Fases 1–4 de 7 concluídas (T1–T14 + T24)**, branch `claude/still-void-gaps-round-2`.
-  - Fase 1 (Ícones): `Icon` server-safe + `@heroicons/react` + `.sv-icon` + `server-safety` endurecido contra terceiros — commits `f6697a9 67a85ce 413bb14 dae8d9c`
-  - Fase 2 (CSS primitivas): `.sv-overlay/.sv-dialog/.sv-pop/.sv-menu-item/.sv-tabs` — commits `d2cc02a 1d31a62 6743cd5 12a8253`
-  - **T24** (fora do plano original, achado real): cascata de `prefers-reduced-motion` corrigida — `theme.css` escrevia a regra de `reduce` numa folha que carrega **antes** de `style.css`, então perdia a cascata; 5 classes já publicadas na v2 nunca respeitaram `prefers-reduced-motion`. Commit `42e94a6`
-  - Fase 3 (Dialog/Tabs/Tooltip): commits `11f01f3 d79d552 d324c46 d7cbf56`. Botão de fechar do Dialog usa texto **`Close dialog`** (não `Close` — colidia com o fixture do teste protegido, ver AD-014-adjacente)
-  - Fase 4 (Select/DropdownMenu): commits `b57e1a7 c101242 1845a11`. Corrigido também: `SelectItem` sem `ItemText` deixava o trigger em branco após selecionar (defeito real de v2, não achado pelo intake); polyfill de `scrollIntoView` em `tests/setup.ts` (gap de jsdom, não do componente)
-  - **AD-014** registrada: quando um teste protegido pina **sintaxe Tailwind literal** como mecanismo de verificação (não comportamento), CLIENT-12 cede a CLIENT-01 — reescreve a asserção para o marcador `sv-*` equivalente, nunca apaga. Aconteceu 2x (Select popper, DropdownMenu `pl-8`); provável que se repita nas fases 6/7 (`ui-button.test.tsx`, `ui-card.test.tsx`)
-  - **T25 e T26 agendadas** (achados da Fase 3, não bloqueiam): displayName `undefined` em todo componente derivado do Radix; `.sv-tabs` existe no CSS e nenhum componente emite
-- **Suíte agora**: 1014 testes (era 871 no início da rodada), cobertura 100% nas 4 métricas, `npm run build && npm run lint:package && npm run typecheck` verdes
-- **Próximo passo**: Fase 5 — `T15` (`AlertDialog`) e `T16` (exportar + cross-check doc↔barrel), dependem de T9 (Dialog, já pronto)
-- **Rede de segurança**: `tests/ui-dialog.test.tsx`, `ui-tabs.test.tsx`, `ui-tooltip.test.tsx` seguem **intactos** (verificado por `git diff --stat`); `ui-select.test.tsx` e `ui-dropdown-menu.test.tsx` têm edição **autorizada e documentada** via AD-014 — não é regressão silenciosa
-- **Blockers**: nenhum
+- **Rodada 2 (`still-void-gaps-round-2`)**: ✅ **concluída e verificada.** Specify → Design → Tasks → Execute (24 tasks, 7 fases) → Verifier independente **PASS** (45/45 ACs com evidência, 5/5 gates verdes, 6/6 mutantes mortos pelo sensor). Relatório completo em `.specs/features/still-void-gaps-round-2/validation.md`. Branch `claude/still-void-gaps-round-2`, 39 commits à frente de `origin/main` (`2658472..HEAD`). **PR ainda não aberto.**
+- **O que a rodada entregou**: `Icon` (server-safe, `@heroicons/react`), família client (`Dialog`/`Select`/`DropdownMenu`/`Tabs`/`Tooltip`) migrada de Tailwind para CSS `sv-*`, família `AlertDialog` nova, `Button variant="accent"`, `Card` com `as`/`asChild`, `@still-void/ui/tailwind.css` (v4 CSS-first), remoção do preset v3 e peer `tailwindcss` `>=4`. Suíte: 871 → 1129 testes, 100% cobertura mantida.
+- **Decisões novas desta rodada**: AD-009 (motion), AD-010 (superseded por AD-013), AD-011 (`tailwind.css` só `@theme`), AD-012 (v4-only, `major`), AD-013 (heroicons no lugar do lucide), AD-014 (quando editar teste protegido é a decisão certa — 2 casos), AD-015 (`Slot` vendorizado, `@radix-ui/react-slot` tinha hook de verdade, achado depois do AD-006 original).
+- **Defeitos reais corrigidos que não estavam no intake original**: `Select` deixava o trigger em branco após escolher valor (v2, não pego por nenhum teste); cascata de `prefers-reduced-motion` nunca aplicava para 5 classes já publicadas na v2; `attw` falhava silenciosamente sem `tailwind.css` no `--exclude-entrypoints`.
+- **Fora do escopo, agendado**: T25 (`displayName` `undefined` em componentes derivados do Radix) e T26 (`.sv-tabs` órfão no CSS) — achados da Fase 3, não bloqueiam, não fazem parte dos 45 ACs desta spec.
+- **Changesets prontos**: `patch` (defeitos client), `minor` (catálogo novo), `major` (Tailwind v4 + close button do Dialog) — bump combinado resolve para `v3.0.0` (`npx changeset status` confirma).
+- **Próximo passo**: abrir PR contra `main`, ou pedir para eu abrir. Depois do merge, mesmo fluxo da rodada 1 — `release.yml` abre PR `chore: version packages`, publica no npm quando essa PR mergear.
+- **Blockers**: nenhum.
 - **Branch**: `claude/still-void-gaps-round-2`
