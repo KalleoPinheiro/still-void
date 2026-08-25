@@ -305,55 +305,57 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 
 | Requirement ID | Story | Fase | Status |
 | --- | --- | --- | --- |
-| ICON-01 | P1: Ícones — `<svg class="sv-icon">`, `currentColor`, `aria-hidden` | Design | Pending |
-| ICON-02 | P1: Ícones — `size` em tokens, `md` sem modificador | Design | Pending |
-| ICON-03 | P1: Ícones — `label` troca para `role="img"` + `aria-label` | Design | Pending |
-| ICON-04 | P1: Ícones — server-safe em `@still-void/ui/react` | Design | Pending |
-| ICON-05 | P1: Ícones — `name` inválido cai no default sem lançar | Design | Pending |
-| ICON-06 | P1: Ícones — imports nomeados de `@heroicons/react/24/outline`, tree-shaking preservado | Design | Pending |
-| ICON-07 | P1: Ícones — `server-safety` passa a cobrir dependências de terceiros | Design | Pending |
-| CLIENT-01 | P1: Família client — só classes `sv-*` emitidas | Design | Pending |
-| CLIENT-02 | P1: Família client — todo valor por `var(--sv-*)` | Design | Pending |
-| CLIENT-03 | P1: Família client — `[data-state]` + fade + reduced-motion | Design | Pending |
-| CLIENT-04 | P1: Família client — zero `box-shadow` | Design | Pending |
-| CLIENT-05 | P1: Família client — `aria-modal="true"` no `DialogContent` | Design | Pending |
-| CLIENT-06 | P1: Família client — botão de fechar com `showCloseButton` | Design | Pending |
-| CLIENT-07 | P1: Família client — `displayName` preservado | Design | Pending |
-| CLIENT-08 | P1: Família client — sem `!important`, sem dependência de `@layer` | Design | Pending |
-| CLIENT-09 | P1: Família client — indicadores de item renderizados | Design | Pending |
-| CLIENT-10 | P1: Família client — chevrons de `Select` | Design | Pending |
-| CLIENT-11 | P1: Família client — foco por `outline` (AD-005) | Design | Pending |
-| CLIENT-12 | P1: Família client — testes existentes passam sem edição | Design | Pending |
-| CLIENT-13 | P1: Família client — `SelectItem` envolve children em `ItemText` (trigger em branco) | Design | Pending |
-| CLIENT-14 | P1: Família client — prop `icon` substitui o indicador default | Design | Pending |
-| ALERT-01 | P2: `AlertDialog` — 11 exports no barrel client | Design | Pending |
-| ALERT-02 | P2: `AlertDialog` — `role="alertdialog"` + `aria-modal` | Design | Pending |
-| ALERT-03 | P2: `AlertDialog` — reutiliza CSS do `Dialog` | Design | Pending |
-| ALERT-04 | P2: `AlertDialog` — sem botão de fechar em `X` | Design | Pending |
-| ALERT-05 | P2: `AlertDialog` — `displayName` no padrão da família | Design | Pending |
-| ALERT-06 | P2: `AlertDialog` — doc cruzada com os exports reais | Design | Pending |
-| BTN-01 | P2: `variant="accent"` — classe emitida | Design | Pending |
-| BTN-02 | P2: `variant="accent"` — CSS por token, hover por `color-mix` | Design | Pending |
-| BTN-03 | P2: `variant="accent"` — acompanha `[data-theme]`/`[data-accent]` | Design | Pending |
-| BTN-04 | P2: `variant="accent"` — default inalterado | Design | Pending |
-| CARD-01 | P2: `Card` — `as` troca a tag | Design | Pending |
-| CARD-02 | P2: `Card` — default continua `<div>` | Design | Pending |
-| CARD-03 | P2: `Card` — `asChild` funde no filho | Design | Pending |
-| CARD-04 | P2: `Card` — `asChild` vence `as` (AD-006) | Design | Pending |
-| CARD-05 | P2: `Card` — entry server-safe preservado | Design | Pending |
-| CARD-06 | P2: `Card` — `as` inválido cai em `<div>` | Design | Pending |
-| TW-01 | P2: `tailwind.css` — utilitárias resolvem para `var(--sv-*)` | Design | Pending |
-| TW-02 | P2: `tailwind.css` — `@theme` sem `@source` e sem aliases mortos | Design | Pending |
-| TW-03 | P2: `tailwind.css` — export + cópia para `dist` | Design | Pending |
-| TW-04 | P2: `tailwind.css` — peer `tailwindcss` `>=4`, opcional (AD-012) | Design | Pending |
-| TW-05 | P2: `tailwind.css` — paridade de tokens com `theme.css` | Design | Pending |
-| TW-06 | P2: `tailwind.css` — README atualizado, v4+ declarado | Design | Pending |
-| TW-07 | P2: `tailwind.css` — preset v3, entry do tsup e `tailwind.config.ts` removidos | Design | Pending |
-| TW-08 | P2: `tailwind.css` — `docs/migration-v2-to-v3.md` com as duas quebras | Design | Pending |
+| ICON-01 | P1: Ícones — `<svg class="sv-icon">`, `currentColor`, `aria-hidden` | Execute | ✅ Verified |
+| ICON-02 | P1: Ícones — `size` em tokens, `md` sem modificador | Execute | ✅ Verified |
+| ICON-03 | P1: Ícones — `label` troca para `role="img"` + `aria-label` | Execute | ✅ Verified |
+| ICON-04 | P1: Ícones — server-safe em `@still-void/ui/react` | Execute | ✅ Verified |
+| ICON-05 | P1: Ícones — `name` inválido cai no default sem lançar | Execute | ✅ Verified |
+| ICON-06 | P1: Ícones — imports nomeados de `@heroicons/react/24/outline`, tree-shaking preservado | Execute | ✅ Verified |
+| ICON-07 | P1: Ícones — `server-safety` passa a cobrir dependências de terceiros | Execute | ✅ Verified |
+| CLIENT-01 | P1: Família client — só classes `sv-*` emitidas | Execute | ✅ Verified |
+| CLIENT-02 | P1: Família client — todo valor por `var(--sv-*)` | Execute | ✅ Verified |
+| CLIENT-03 | P1: Família client — `[data-state]` + fade + reduced-motion | Execute | ✅ Verified |
+| CLIENT-04 | P1: Família client — zero `box-shadow` | Execute | ✅ Verified |
+| CLIENT-05 | P1: Família client — `aria-modal="true"` no `DialogContent` | Execute | ✅ Verified |
+| CLIENT-06 | P1: Família client — botão de fechar com `showCloseButton` | Execute | ✅ Verified |
+| CLIENT-07 | P1: Família client — `displayName` preservado | Execute | ✅ Verified |
+| CLIENT-08 | P1: Família client — sem `!important`, sem dependência de `@layer` | Execute | ✅ Verified |
+| CLIENT-09 | P1: Família client — indicadores de item renderizados | Execute | ✅ Verified |
+| CLIENT-10 | P1: Família client — chevrons de `Select` | Execute | ✅ Verified |
+| CLIENT-11 | P1: Família client — foco por `outline` (AD-005) | Execute | ✅ Verified |
+| CLIENT-12 | P1: Família client — testes existentes passam sem edição | Execute | ✅ Verified |
+| CLIENT-13 | P1: Família client — `SelectItem` envolve children em `ItemText` (trigger em branco) | Execute | ✅ Verified |
+| CLIENT-14 | P1: Família client — prop `icon` substitui o indicador default | Execute | ✅ Verified |
+| ALERT-01 | P2: `AlertDialog` — 11 exports no barrel client | Execute | ✅ Verified |
+| ALERT-02 | P2: `AlertDialog` — `role="alertdialog"` + `aria-modal` | Execute | ✅ Verified |
+| ALERT-03 | P2: `AlertDialog` — reutiliza CSS do `Dialog` | Execute | ✅ Verified |
+| ALERT-04 | P2: `AlertDialog` — sem botão de fechar em `X` | Execute | ✅ Verified |
+| ALERT-05 | P2: `AlertDialog` — `displayName` no padrão da família | Execute | ✅ Verified |
+| ALERT-06 | P2: `AlertDialog` — doc cruzada com os exports reais | Execute | ✅ Verified |
+| BTN-01 | P2: `variant="accent"` — classe emitida | Execute | ✅ Verified |
+| BTN-02 | P2: `variant="accent"` — CSS por token, hover por `color-mix` | Execute | ✅ Verified |
+| BTN-03 | P2: `variant="accent"` — acompanha `[data-theme]`/`[data-accent]` | Execute | ✅ Verified |
+| BTN-04 | P2: `variant="accent"` — default inalterado | Execute | ✅ Verified |
+| CARD-01 | P2: `Card` — `as` troca a tag | Execute | ✅ Verified |
+| CARD-02 | P2: `Card` — default continua `<div>` | Execute | ✅ Verified |
+| CARD-03 | P2: `Card` — `asChild` funde no filho | Execute | ✅ Verified |
+| CARD-04 | P2: `Card` — `asChild` vence `as` (AD-006) | Execute | ✅ Verified |
+| CARD-05 | P2: `Card` — entry server-safe preservado | Execute | ✅ Verified |
+| CARD-06 | P2: `Card` — `as` inválido cai em `<div>` | Execute | ✅ Verified |
+| TW-01 | P2: `tailwind.css` — utilitárias resolvem para `var(--sv-*)` | Execute | ✅ Verified |
+| TW-02 | P2: `tailwind.css` — `@theme` sem `@source` e sem aliases mortos | Execute | ✅ Verified |
+| TW-03 | P2: `tailwind.css` — export + cópia para `dist` | Execute | ✅ Verified |
+| TW-04 | P2: `tailwind.css` — peer `tailwindcss` `>=4`, opcional (AD-012) | Execute | ✅ Verified |
+| TW-05 | P2: `tailwind.css` — paridade de tokens com `theme.css` | Execute | ✅ Verified |
+| TW-06 | P2: `tailwind.css` — README atualizado, v4+ declarado | Execute | ✅ Verified |
+| TW-07 | P2: `tailwind.css` — preset v3, entry do tsup e `tailwind.config.ts` removidos | Execute | ✅ Verified |
+| TW-08 | P2: `tailwind.css` — `docs/migration-v2-to-v3.md` com as duas quebras | Execute | ✅ Verified |
 
 **ID format:** `[CATEGORIA]-[NÚMERO]`
 **Status:** Pending → In Design → In Tasks → Implementing → Verified
 **Coverage:** 45 requisitos, 45 mapeados para as tasks T1–T23, 0 não mapeados
+
+**Verificado**: Verifier independente PASS para os 45/45 (evidência `file:line` por requisito em `.specs/features/still-void-gaps-round-2/validation.md`, "Overall: ✅ Ready"). Mergeado em `main` via PR #12 (`c367631`, 2026-08-25). Esta tabela ficou marcada `Pending` desde o merge apesar do PASS já registrado — corrigido a pedido do usuário depois de achado durante o fechamento da PR #15.
 
 ---
 
