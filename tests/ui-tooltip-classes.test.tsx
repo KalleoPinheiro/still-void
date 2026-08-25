@@ -56,7 +56,7 @@ describe('Tooltip — no utility survives in the source (CLIENT-01)', () => {
     // itself carries nothing else — the string it replaces packed eleven
     // `animate-in` / `data-[side=…]` variants that no render exercises at once.
     const source = readFileSync(resolve(process.cwd(), 'src/components/ui/tooltip.tsx'), 'utf-8');
-    const literals = [...source.matchAll(/"([^"]*)"/g)].map((match) => match[1]);
+    const literals = [...source.matchAll(/"([^"]*)"/g)].flatMap((match) => match[1] ?? []);
     const classLiterals = literals.filter(
       (literal) => literal !== 'react' && !literal.includes('/'),
     );

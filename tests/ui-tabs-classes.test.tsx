@@ -105,7 +105,7 @@ describe('Tabs — no utility survives in the source (CLIENT-01)', () => {
     // itself carries nothing else — a utility parked in a variant string on a
     // branch no test exercises would slip past the sweep.
     const source = readFileSync(resolve(process.cwd(), 'src/components/ui/tabs.tsx'), 'utf-8');
-    const literals = [...source.matchAll(/"([^"]*)"/g)].map((match) => match[1]);
+    const literals = [...source.matchAll(/"([^"]*)"/g)].flatMap((match) => match[1] ?? []);
     const classLiterals = literals.filter(
       (literal) => literal !== 'react' && !literal.includes('/'),
     );
