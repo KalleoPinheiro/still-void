@@ -114,6 +114,14 @@
 - **Date**: 2026-08-25
 - **Status**: active
 
+### AD-015
+- **Decision**: `Card` **não** importa `@radix-ui/react-slot` nem `@radix-ui/react-compose-refs`. `asChild` é servido por um `Slot` **vendorizado** em `src/components/ui/slot.tsx`, portando só a lógica de merge de ref/className/style/handlers do Slot real — sem `Slottable`, sem suporte a componente lazy — porque `Card` só compõe um único filho de verdade. O ref combinado usa a função pura `composeRefs`, reimplementada localmente, chamada direto como callback ref, nunca memoizada por `useCallback`.
+- **Reason**: Decisão do usuário em 2026-08-25, depois de um achado que invalida a premissa técnica do AD-006. Verificado por leitura direta de `node_modules/@radix-ui/react-slot/dist` e `node_modules/@radix-ui/react-compose-refs/dist`: `Slot` chama `useComposedRefs`, que chama `React.useCallback` — hook de verdade, `'use client'` ou não. Um hook sem dispatcher lança em Server Component real; importar o pacote teria quebrado exatamente a propriedade que `tests/server-safety.test.ts` existe para proteger, do mesmo jeito que quase aconteceu com o `lucide-react` (AD-013). Um import nomeado só de `composeRefs` (a metade sem hook) ainda falha o walker do `server-safety` — ele varre o **conteúdo** do módulo resolvido, não qual export foi de fato chamado, e não tem como provar que o hook não utilizado é inalcançável. Vendorizar torna a propriedade de segurança mecanicamente verdadeira, não argumentada.
+- **Trade-off**: `Card` não acompanha automaticamente correções futuras do `Slot` real do Radix (ex.: suporte a `Slottable` para composição aninhada) — se um caso de uso genuíno precisar disso, é um novo componente a portar, não um bump de dependência. Sem memoização do ref composto, o callback tem identidade nova a cada render (custo real, mas pequeno: um `<a>`/`<button>` sendo re-anexado ao invés de reaproveitado — irrelevante no padrão de uso de `Card`).
+- **Scope**: `Card`; precedente para qualquer futuro `asChild` no catálogo server-safe.
+- **Date**: 2026-08-25
+- **Status**: active
+
 ## Handoff
 
 - **Rodada 1 (`form-and-data-primitives`)**: concluída, mergeada em `main` (PR #10). PR #11 (`chore: version packages`) segue aberta — mergear é o que publica no npm.

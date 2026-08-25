@@ -155,3 +155,21 @@ describe('@heroicons/react ships as a direct runtime dependency', () => {
     expect(packageJson.peerDependencies['@heroicons/react']).toBeUndefined();
   });
 });
+
+/**
+ * AD-006 / AD-015. Design.md's original plan was to promote
+ * @radix-ui/react-slot to a direct dependency for Card's `asChild`. That plan
+ * changed after verifying (against the installed package's own dist) that
+ * Slot calls useComposedRefs, which calls React.useCallback — a real hook,
+ * `'use client'` directive or not — which would throw in a real Server
+ * Component. src/components/ui/slot.tsx ports only the hook-free ref-merge
+ * logic instead, with no import of either @radix-ui/react-slot or
+ * @radix-ui/react-compose-refs. This pins that neither package re-enters
+ * `dependencies` by accident in a future change.
+ */
+describe('Card does not depend on @radix-ui/react-slot or react-compose-refs (AD-015)', () => {
+  test('neither package is a direct dependency', () => {
+    expect(packageJson.dependencies['@radix-ui/react-slot']).toBeUndefined();
+    expect(packageJson.dependencies['@radix-ui/react-compose-refs']).toBeUndefined();
+  });
+});
