@@ -66,6 +66,7 @@
     },
     "./theme.css": "./dist/theme.css",
     "./style.css": "./dist/style.css",
+    "./tailwind.css": "./dist/tailwind.css",
     "./shadcn-overrides.css": "./dist/shadcn-overrides.css",
     "./package.json": "./package.json"
   },
