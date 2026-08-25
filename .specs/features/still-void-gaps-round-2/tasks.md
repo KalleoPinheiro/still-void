@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: Draft
+**Status**: In Progress — Fase 1 concluída (T1–T4)
 
 ---
 
@@ -105,7 +105,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ## Task Breakdown
 
-### T1: Seção `Icons` no `style.css`
+### ✅ T1: Seção `Icons` no `style.css` — `f6697a9`
 
 **What**: declarar `.sv-icon`, `.sv-icon--sm` e `.sv-icon--lg` com tamanho, cor e traço vindos de token.
 **Where**: `src/css/style.css` (seção nova `/* ---------- Icons ---------- */`), `tests/icon-css-contract.test.ts`
@@ -128,7 +128,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T2: `@heroicons/react` como dependência direta
+### ✅ T2: `@heroicons/react` como dependência direta — `67a85ce`
 
 **What**: adicionar `@heroicons/react` a `dependencies` e travar o contrato no `package-contract`.
 **Where**: `package.json`, `package-lock.json`, `tests/package-contract.test.ts`
@@ -150,7 +150,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T3: Componente `Icon` e set curado
+### ✅ T3: Componente `Icon` e set curado — `413bb14`
 
 **What**: criar o `Icon` server-safe com union fechada de nomes mapeada para `@heroicons/react/24/outline`.
 **Where**: `src/components/ui/icon.tsx`, `src/components/ui/icon-set.ts`, `src/react/index.ts`, `tests/ui-icon.test.tsx`
@@ -177,7 +177,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T4: `server-safety` passa a cobrir terceiros
+### ✅ T4: `server-safety` passa a cobrir terceiros — `dae8d9c`
 
 **What**: estender o walker para resolver especificador bare e varrer o `dist` da dependência por `'use client'` e hooks.
 **Where**: `tests/server-safety.test.ts`

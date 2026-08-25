@@ -101,8 +101,9 @@ vem antes por dependência técnica.
    `aria-label`, tornando o ícone anunciável
 4. WHEN `Icon` é importado de `@still-void/ui/react` THEN o import SHALL funcionar em Server Component —
    nenhum arquivo alcançável a partir dele contém `'use client'` ou hook do React
-5. WHEN um `name` fora do set curado é passado em runtime THEN o sistema SHALL renderizar o ícone default
-   sem lançar exceção (a union de TS já barra em tempo de compilação)
+5. WHEN um `name` fora do set curado é passado em runtime THEN o sistema SHALL renderizar
+   **`alert-circle`** (exportado como `ICON_FALLBACK_NAME`) sem lançar exceção — nome desconhecido é defeito
+   de quem chama e deve parecer um. A union de TS já barra o caso em tempo de compilação
 6. WHEN o bundle do consumidor é montado THEN cada ícone SHALL vir de import nomeado em
    `@heroicons/react/24/outline` (nunca `import * as`, nunca o barrel raiz), preservando tree-shaking
 7. WHEN `tests/server-safety.test.ts` roda THEN ele SHALL cobrir também os **pacotes de terceiros**
