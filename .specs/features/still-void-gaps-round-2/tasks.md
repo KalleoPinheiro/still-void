@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: In Progress — Fase 1 concluída (T1–T4)
+**Status**: In Progress — Fases 1 e 2 concluídas (T1–T8 + T24)
 
 ---
 
@@ -200,7 +200,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T5: Primitivas `.sv-overlay` e `.sv-dialog*` [P]
+### ✅ T5: Primitivas `.sv-overlay` e `.sv-dialog*` [P] — `d2cc02a`
 
 **What**: escrever as seções `Overlays` e `Dialog` do `style.css`, com fade por `[data-state]` e reduced-motion.
 **Where**: `src/css/style.css`, `src/css/theme.css` (bloco reduced-motion), `tests/client-css-contract.test.ts` (novo)
@@ -225,7 +225,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T6: Primitiva `.sv-pop` e `.sv-tooltip` [P]
+### ✅ T6: Primitiva `.sv-pop` e `.sv-tooltip` [P] — `1d31a62`
 
 **What**: superfície flutuante compartilhada por `Select`, `DropdownMenu` e `Tooltip`.
 **Where**: `src/css/style.css`, `tests/client-css-contract.test.ts`
@@ -248,7 +248,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T7: Primitiva `.sv-menu-item` e irmãos [P]
+### ✅ T7: Primitiva `.sv-menu-item` e irmãos [P] — `6743cd5`
 
 **What**: item de lista compartilhado por `Select` e `DropdownMenu`, com slot de indicador.
 **Where**: `src/css/style.css`, `tests/client-css-contract.test.ts`
@@ -271,7 +271,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T8: Seção `Tabs` do `style.css` [P]
+### ✅ T8: Seção `Tabs` do `style.css` [P] — `12a8253`
 
 **What**: `.sv-tabs`, `__list`, `__trigger`, `__content`.
 **Where**: `src/css/style.css`, `tests/client-css-contract.test.ts`
@@ -642,6 +642,29 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 **Commit**: `chore(changeset): describe the round 2 release`
 
 ---
+
+---
+
+### ✅ T24: Corrigir a cascata do `prefers-reduced-motion` — `42e94a6`
+
+**What**: mover as regras de `reduce` para a folha onde as classes são declaradas, para o override vencer a cascata.
+**Where**: `src/css/style.css`, `src/css/theme.css`, `tests/reduced-motion-contract.test.ts` (novo), `tests/client-css-contract.test.ts`
+**Depends on**: T5–T8
+**Requirement**: CLIENT-03
+
+**Por que existe**: levantada pelo worker da Fase 2 e confirmada por inspeção. `@media` não soma especificidade
+e o README documenta a ordem `theme.css` → `style.css`, então todo `transition: none` que `theme.css` escrevia
+para classe declarada em `style.css` perdia para a regra base. 8 classes afetadas, **5 já publicadas na v2**.
+
+**Done when**:
+- [x] Bloco de `reduce` das classes de `style.css` movido para o fim de `style.css`
+- [x] `theme.css` mantém só `.sv-card-hover` e `.sv-skeleton`, que ele mesmo declara
+- [x] Contrato afirma a **propriedade** (mesma folha, depois da base), não a lista de arquivos
+- [x] `.sv-btn`, `.sv-badge`, `.sv-table__row`, `.sv-menu-item`, `.sv-tabs__trigger` entram na lista
+- [x] Gate: `npm run test` — 971 passando, cobertura 100%
+
+**Tests**: unit (contrato) · **Gate**: quick
+**Commit**: `fix(css): make the reduced-motion overrides win the cascade`
 
 ## Parallel Execution Map
 

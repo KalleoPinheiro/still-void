@@ -132,7 +132,10 @@ tokens do Still Void.
    z-index por `var(--sv-*)` — nenhum literal hex, `px` ou número de camada solto
 3. WHEN `[data-state="open"]` ou `[data-state="closed"]` está no elemento THEN o CSS SHALL definir a opacidade
    correspondente com transição de `--sv-duration-fast` e `--sv-ease-hover`, e dentro de
-   `@media (prefers-reduced-motion: reduce)` SHALL zerar essa transição
+   `@media (prefers-reduced-motion: reduce)` SHALL zerar essa transição — e a regra de `reduce` SHALL estar
+   na **mesma folha** em que a classe é declarada, depois dela. `@media` não soma especificidade e
+   `style.css` carrega depois de `theme.css`, então uma regra de `reduce` escrita na folha errada perde a
+   cascata e nunca se aplica (defeito real: 5 classes shipparam assim na v2)
 4. WHEN `style.css` é lido THEN nenhuma regra da família client SHALL conter `box-shadow` com valor diferente
    de `none` — `DialogContent` perde o `shadow-lg`, `SelectContent` o `shadow-md`, `TabsTrigger` o `shadow-sm`
 5. WHEN `DialogContent` é aberto THEN o elemento com `role="dialog"` SHALL expor `aria-modal="true"`
