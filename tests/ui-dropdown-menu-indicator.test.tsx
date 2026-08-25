@@ -141,6 +141,24 @@ describe('DropdownMenu — CLIENT-14, icon is substitutable on checkbox, radio a
     expect(item.querySelector('.sv-menu-item__dot')).not.toBeInTheDocument();
   });
 
+  test('icon={null} on a checked DropdownMenuRadioItem renders no indicator', () => {
+    render(
+      <DropdownMenu defaultOpen modal={false}>
+        <DropdownMenuPortal>
+          <DropdownMenuContent>
+            <DropdownMenuRadioGroup value="a">
+              <DropdownMenuRadioItem value="a" icon={null}>
+                Option A
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenu>,
+    );
+    const item = screen.getByText('Option A').closest('[role="menuitemradio"]') as HTMLElement;
+    expect(item.querySelector('.sv-menu-item__indicator')).not.toBeInTheDocument();
+  });
+
   test('icon={null} on DropdownMenuSubTrigger renders no chevron', () => {
     render(
       <DropdownMenu defaultOpen modal={false}>
