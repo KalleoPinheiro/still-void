@@ -339,7 +339,7 @@ servir o código **do consumidor**, não o do pacote. Por isso vem por último.
 
 **ID format:** `[CATEGORIA]-[NÚMERO]`
 **Status:** Pending → In Design → In Tasks → Implementing → Verified
-**Coverage:** 45 requisitos, 0 mapeados para tasks, 45 não mapeados ⚠️ (normal antes da fase Tasks)
+**Coverage:** 45 requisitos, 45 mapeados para as tasks T1–T23, 0 não mapeados
 
 ---
 
