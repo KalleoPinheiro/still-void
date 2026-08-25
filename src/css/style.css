@@ -1018,3 +1018,108 @@ body.sv-body {
   width: var(--sv-space-6);
   height: var(--sv-space-6);
 }
+
+/* ---------- Overlays ---------- */
+/* The shared backdrop behind Dialog and AlertDialog. The class this replaces
+   named `bg-background/80`, a color no config in this package ever declared, so
+   the overlay rendered fully transparent and the page behind a modal stayed at
+   full contrast. Mixing over --sv-bg follows [data-theme] with zero consumer
+   configuration, and the layer comes from the named z scale rather than the
+   literal `z-50` that made a dialog and a tooltip stack by accident. */
+.sv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sv-z-backdrop);
+  background: color-mix(in srgb, var(--sv-bg) 80%, transparent);
+  backdrop-filter: blur(var(--sv-space-1));
+  -webkit-backdrop-filter: blur(var(--sv-space-1));
+  transition: opacity var(--sv-duration-fast) var(--sv-ease-hover);
+}
+/* AD-009: fade only -- no zoom, no slide. The selector is always anchored to
+   the system class, because a bare [data-state='open'] would reach into the
+   consumer's own markup. */
+.sv-overlay[data-state='open'] {
+  opacity: 1;
+}
+.sv-overlay[data-state='closed'] {
+  opacity: 0;
+}
+
+/* ---------- Dialog ---------- */
+/* Centred panel on the modal layer. `shadow-lg` is gone: depth in this system
+   comes from the surface step and the border, never from a shadow. The max
+   width is the old max-w-lg (32rem) expressed on the spacing scale so it stays
+   in step with the rest of the sheet. */
+.sv-dialog {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--sv-z-modal);
+  display: grid;
+  gap: var(--sv-space-4);
+  width: 100%;
+  max-width: calc(var(--sv-space-16) * 8);
+  padding: var(--sv-space-6);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-lg);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  transition: opacity var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-dialog[data-state='open'] {
+  opacity: 1;
+}
+.sv-dialog[data-state='closed'] {
+  opacity: 0;
+}
+
+.sv-dialog__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-1);
+}
+.sv-dialog__footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: var(--sv-space-2);
+}
+.sv-dialog__title {
+  font-family: var(--sv-font-display);
+  font-size: var(--sv-text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--sv-text);
+}
+.sv-dialog__description {
+  font-size: var(--sv-text-sm);
+  line-height: 1.5;
+  color: var(--sv-text-2);
+}
+/* The close button is a bare control: no border, no fill, and a hit target the
+   icon alone would not give it. Focus is an outline (AD-005) -- the ring-* the
+   shadcn layer used is box-shadow based and named a color that did not exist,
+   so this button had no visible focus at all. */
+.sv-dialog__close {
+  position: absolute;
+  top: var(--sv-space-4);
+  right: var(--sv-space-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sv-space-1);
+  border: none;
+  border-radius: var(--sv-radius-sm);
+  background: none;
+  color: var(--sv-text-2);
+  cursor: pointer;
+  transition: color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-dialog__close:hover {
+  color: var(--sv-text);
+}
+.sv-dialog__close:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}

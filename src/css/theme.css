@@ -251,4 +251,12 @@
   .sv-toc__link {
     transition: none;
   }
+  /* AD-009 lets the portal family fade because open/closed carries state, but
+     the fade is still an enhancement — under reduced motion the panel simply
+     appears. Zeroing the transition leaves the [data-state] opacities intact,
+     so the closed panel stays invisible rather than snapping into view. */
+  .sv-overlay,
+  .sv-dialog {
+    transition: none;
+  }
 }
