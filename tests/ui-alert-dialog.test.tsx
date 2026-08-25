@@ -185,17 +185,17 @@ describe('AlertDialog — dismissal', () => {
   });
 });
 
-describe('AlertDialog — component identity (ALERT-05)', () => {
-  test('displayName on every member follows the same pattern as Dialog', () => {
-    // Radix ships its primitives without a displayName (confirmed for Dialog in
-    // ui-dialog-behavior.test.tsx); the forwarded members here inherit the same
-    // `undefined`, and the two plain-div members carry the literal string.
-    expect(AlertDialogContent.displayName).toBeUndefined();
-    expect(AlertDialogOverlay.displayName).toBeUndefined();
-    expect(AlertDialogTitle.displayName).toBeUndefined();
-    expect(AlertDialogDescription.displayName).toBeUndefined();
-    expect(AlertDialogAction.displayName).toBeUndefined();
-    expect(AlertDialogCancel.displayName).toBeUndefined();
+describe('AlertDialog — component identity (ALERT-05, R3-01)', () => {
+  test('every member carries a literal displayName equal to its export name', () => {
+    // Radix ships its primitives without a displayName (confirmed for Dialog
+    // in ui-dialog-behavior.test.tsx); every forwardRef member here is now
+    // assigned a literal string instead of inheriting from the primitive.
+    expect(AlertDialogContent.displayName).toBe('AlertDialogContent');
+    expect(AlertDialogOverlay.displayName).toBe('AlertDialogOverlay');
+    expect(AlertDialogTitle.displayName).toBe('AlertDialogTitle');
+    expect(AlertDialogDescription.displayName).toBe('AlertDialogDescription');
+    expect(AlertDialogAction.displayName).toBe('AlertDialogAction');
+    expect(AlertDialogCancel.displayName).toBe('AlertDialogCancel');
     expect(AlertDialogHeader.displayName).toBe('AlertDialogHeader');
     expect(AlertDialogFooter.displayName).toBe('AlertDialogFooter');
   });

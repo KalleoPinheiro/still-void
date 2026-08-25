@@ -76,3 +76,21 @@ describe('DropdownMenu family', () => {
     expect(screen.getByText('⌘S')).toBeInTheDocument();
   });
 });
+
+describe('DropdownMenu — component identity (R3-01)', () => {
+  test('every member carries a literal displayName equal to its export name', () => {
+    // Radix ships these primitives without a displayName (`X.displayName =
+    // DropdownMenuPrimitive.Y.displayName` used to resolve to `undefined`),
+    // so every member is now assigned a literal string instead of inheriting
+    // from the primitive.
+    expect(DropdownMenuSubTrigger.displayName).toBe('DropdownMenuSubTrigger');
+    expect(DropdownMenuSubContent.displayName).toBe('DropdownMenuSubContent');
+    expect(DropdownMenuContent.displayName).toBe('DropdownMenuContent');
+    expect(DropdownMenuItem.displayName).toBe('DropdownMenuItem');
+    expect(DropdownMenuCheckboxItem.displayName).toBe('DropdownMenuCheckboxItem');
+    expect(DropdownMenuRadioItem.displayName).toBe('DropdownMenuRadioItem');
+    expect(DropdownMenuLabel.displayName).toBe('DropdownMenuLabel');
+    expect(DropdownMenuSeparator.displayName).toBe('DropdownMenuSeparator');
+    expect(DropdownMenuShortcut.displayName).toBe('DropdownMenuShortcut');
+  });
+});

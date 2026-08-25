@@ -1312,6 +1312,10 @@ body.sv-body {
 .sv-tabs {
   display: flex;
   flex-direction: column;
+  /* align-items defaults to stretch, which would force .sv-tabs__list — an
+     inline-flex element — to the container's full width, contradicting its
+     own display. flex-start keeps the list sized to its content. */
+  align-items: flex-start;
 }
 .sv-tabs__list {
   display: inline-flex;

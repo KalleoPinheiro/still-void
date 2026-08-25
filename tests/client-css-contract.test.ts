@@ -437,6 +437,13 @@ describe('client CSS contract — the tabs section', () => {
     expect([...tabs.keys()]).toContain(selector);
   });
 
+  test('.sv-tabs aligns to flex-start so the inline-flex list is never stretched (R3-02)', () => {
+    // align-items defaults to stretch, which would force .sv-tabs__list — an
+    // inline-flex element — to the container's full width, contradicting its
+    // own display: inline-flex.
+    expect(decl(tabs, '.sv-tabs', 'align-items')).toBe('flex-start');
+  });
+
   test('.sv-tabs__list is a raised strip built from tokens', () => {
     expect(decl(tabs, '.sv-tabs__list', 'background')).toBe('var(--sv-surface-2)');
     expect(decl(tabs, '.sv-tabs__list', 'border-radius')).toBe('var(--sv-radius-md)');

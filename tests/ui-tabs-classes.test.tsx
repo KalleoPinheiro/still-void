@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createRef } from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, test } from 'vitest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../src/components/ui/tabs';
@@ -88,14 +89,56 @@ describe('Tabs — consumer className (CLIENT-01 control case)', () => {
   });
 });
 
-describe('Tabs — component identity (CLIENT-07)', () => {
-  test('displayName on the three members is unchanged by the migration', () => {
-    // Radix ships these primitives without a displayName, so the value the
-    // migration must not disturb is `undefined`. Asserting it pins the
-    // identity the barrel and the stories resolve against.
-    expect(TabsList.displayName).toBeUndefined();
-    expect(TabsTrigger.displayName).toBeUndefined();
-    expect(TabsContent.displayName).toBeUndefined();
+describe('Tabs — root container class (R3-02)', () => {
+  test('renders sv-tabs on the root with no className passed', () => {
+    const { container } = render(
+      <Tabs defaultValue="one">
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Panel</TabsContent>
+      </Tabs>,
+    );
+    expect(container.firstElementChild).toHaveClass('sv-tabs');
+  });
+
+  test('merges a consumer className onto sv-tabs, never replaces it', () => {
+    const { container } = render(
+      <Tabs defaultValue="one" className="mine">
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Panel</TabsContent>
+      </Tabs>,
+    );
+    expect(container.firstElementChild).toHaveClass('sv-tabs');
+    expect(container.firstElementChild).toHaveClass('mine');
+  });
+
+  test('forwards the ref to the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Tabs defaultValue="one" ref={ref}>
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Panel</TabsContent>
+      </Tabs>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+});
+
+describe('Tabs — component identity (CLIENT-07, R3-01)', () => {
+  test('every member carries a literal displayName equal to its export name', () => {
+    // Radix ships these primitives without a displayName (`X.displayName =
+    // XPrimitive.Y.displayName` used to resolve to `undefined`), so every
+    // member is now assigned a literal string instead of inheriting from the
+    // primitive.
+    expect(Tabs.displayName).toBe('Tabs');
+    expect(TabsList.displayName).toBe('TabsList');
+    expect(TabsTrigger.displayName).toBe('TabsTrigger');
+    expect(TabsContent.displayName).toBe('TabsContent');
   });
 });
 
@@ -105,9 +148,13 @@ describe('Tabs — no utility survives in the source (CLIENT-01)', () => {
     // itself carries nothing else — a utility parked in a variant string on a
     // branch no test exercises would slip past the sweep.
     const source = readFileSync(resolve(process.cwd(), 'src/components/ui/tabs.tsx'), 'utf-8');
-    const literals = [...source.matchAll(/"([^"]*)"/g)].flatMap((match) => match[1] ?? []);
-    const classLiterals = literals.filter(
-      (literal) => literal !== 'react' && !literal.includes('/'),
+    // Only className positions — a bare string sweep would also pick up module
+    // specifiers, displayName values and words quoted inside comments.
+    const classAttributes = [...source.matchAll(/className=(?:\{cn\(([^)]*)\)\}|"([^"]*)")/g)];
+    const classLiterals = classAttributes.flatMap(([, call, literal]) =>
+      literal === undefined
+        ? [...(call ?? '').matchAll(/"([^"]*)"/g)].flatMap((m) => m[1] ?? [])
+        : [literal],
     );
     expect(classLiterals.length).toBeGreaterThan(0);
     for (const literal of classLiterals) {

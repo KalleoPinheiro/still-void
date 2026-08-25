@@ -56,9 +56,13 @@ describe('Tooltip — no utility survives in the source (CLIENT-01)', () => {
     // itself carries nothing else — the string it replaces packed eleven
     // `animate-in` / `data-[side=…]` variants that no render exercises at once.
     const source = readFileSync(resolve(process.cwd(), 'src/components/ui/tooltip.tsx'), 'utf-8');
-    const literals = [...source.matchAll(/"([^"]*)"/g)].flatMap((match) => match[1] ?? []);
-    const classLiterals = literals.filter(
-      (literal) => literal !== 'react' && !literal.includes('/'),
+    // Only className positions — a bare string sweep would also pick up module
+    // specifiers, displayName values and words quoted inside comments.
+    const classAttributes = [...source.matchAll(/className=(?:\{cn\(([^)]*)\)\}|"([^"]*)")/g)];
+    const classLiterals = classAttributes.flatMap(([, call, literal]) =>
+      literal === undefined
+        ? [...(call ?? '').matchAll(/"([^"]*)"/g)].flatMap((m) => m[1] ?? [])
+        : [literal],
     );
     expect(classLiterals.length).toBeGreaterThan(0);
     for (const literal of classLiterals) {
@@ -78,11 +82,12 @@ describe('Tooltip — consumer className (CLIENT-01 control case)', () => {
   });
 });
 
-describe('Tooltip — component identity (CLIENT-07)', () => {
-  test('displayName is unchanged by the migration', () => {
-    // Radix ships Content without a displayName, so the value the migration
-    // must not disturb is `undefined`. Asserting it pins the identity the
-    // barrel and the stories resolve against.
-    expect(TooltipContent.displayName).toBeUndefined();
+describe('Tooltip — component identity (CLIENT-07, R3-01)', () => {
+  test('carries a literal displayName equal to its export name', () => {
+    // Radix ships Content without a displayName (`TooltipContent.displayName
+    // = TooltipPrimitive.Content.displayName` used to resolve to
+    // `undefined`), so it is now assigned a literal string instead of
+    // inheriting from the primitive.
+    expect(TooltipContent.displayName).toBe('TooltipContent');
   });
 });
