@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: In Progress — Fases 1–4 concluídas (T1–T14 + T24)
+**Status**: In Progress — Fases 1–5 concluídas (T1–T16 + T24)
 
 ---
 
@@ -436,7 +436,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T15: Componente `AlertDialog`
+### ✅ T15: Componente `AlertDialog` — `cd440e6`
 
 **What**: portar a família do shadcn usando as classes já existentes do `Dialog`.
 **Where**: `src/components/ui/alert-dialog.tsx`, `tests/ui-alert-dialog.test.tsx` (novo)
@@ -461,7 +461,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T16: Exportar `AlertDialog` e cruzar a doc
+### ✅ T16: Exportar `AlertDialog` e cruzar a doc — `c73b45c`
 
 **What**: exportar do barrel client e travar o cross-check doc↔barrel que falhou na rodada 1.
 **Where**: `src/react/client/shadcn.ts`, `tests/shadcn-barrel.test.ts`, `docs/design-system.md`
