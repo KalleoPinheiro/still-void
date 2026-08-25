@@ -25,4 +25,20 @@ describe('CategoryPill RawColor story documents its detector exception', () => {
     const precedingLine = lines[colorLineIndex - 1];
     expect(precedingLine).toMatch(/impeccable-disable-next-line design-system-color:/);
   });
+
+  test('the preceding comment block explains the passthrough and cites Content.tsx, not just the directive name', () => {
+    const colorLineIndex = lines.findIndex((line) => line.includes("color: '#ff5566'"));
+    expect(colorLineIndex).toBeGreaterThan(-1);
+    // Walk upward collecting the contiguous `//` comment block immediately
+    // above the flagged line — the directive alone names the rule, but a
+    // reader needs the rationale to trust the exception is real, not just
+    // a scanner being silenced.
+    const commentLines: string[] = [];
+    for (let i = colorLineIndex - 1; i >= 0 && lines[i]?.trim().startsWith('//'); i--) {
+      commentLines.unshift(lines[i] as string);
+    }
+    const commentBlock = commentLines.join('\n');
+    expect(commentBlock).toMatch(/passthrough/);
+    expect(commentBlock).toMatch(/Content\.tsx/);
+  });
 });
