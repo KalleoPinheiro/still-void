@@ -27,6 +27,7 @@ const expectedExports = [
   'Footer',
   'Header',
   'Hero',
+  'Icon',
   'Input',
   'Layout',
   'Lead',
