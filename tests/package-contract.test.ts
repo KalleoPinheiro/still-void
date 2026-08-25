@@ -22,6 +22,8 @@ const packageJson = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf-
   exports: Record<string, unknown>;
   scripts: Record<string, string>;
   files: string[];
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
   peerDependencies: Record<string, string>;
   peerDependenciesMeta?: Record<string, { optional?: boolean }>;
   typesVersions?: { '*'?: Record<string, string[]> };
@@ -130,5 +132,26 @@ describe('src/tailwind-preset.ts is the single source of truth for the preset', 
   test('the imported preset default-exports the same color binding tailwind.config.ts used to declare literally', () => {
     expect(stillVoidPreset.theme.extend.colors['sv-bg']).toBe('var(--sv-bg)');
     expect(stillVoidPreset.corePlugins.preflight).toBe(false);
+  });
+});
+
+/**
+ * ICON-06: the icons the package renders itself come from `@heroicons/react`,
+ * so the consumer has to receive it from `npm install @still-void/ui` without
+ * asking. Which section it sits in is the whole contract: a devDependency is
+ * not installed for consumers and a peerDependency makes them install it by
+ * hand — either one publishes a package whose Icon renders nothing.
+ */
+
+describe('@heroicons/react ships as a direct runtime dependency', () => {
+  test('dependencies["@heroicons/react"] is a caret-2 range', () => {
+    // AD-013 pinned the major line: 2.x is the release verified to carry no
+    // 'use client' and no hook, which is what keeps Icon server-safe.
+    expect(packageJson.dependencies['@heroicons/react']).toMatch(/^\^2(?:\.|$)/);
+  });
+
+  test('it is declared in neither devDependencies nor peerDependencies', () => {
+    expect(packageJson.devDependencies['@heroicons/react']).toBeUndefined();
+    expect(packageJson.peerDependencies['@heroicons/react']).toBeUndefined();
   });
 });
