@@ -1,5 +1,13 @@
 # @still-void/ui
 
+## 3.0.1
+
+### Patch Changes
+
+- [#13](https://github.com/KalleoPinheiro/still-void/pull/13) [`18d4660`](https://github.com/KalleoPinheiro/still-void/commit/18d4660d0d4996adacdaf04d5a732952acf17e90) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Give every Radix-derived component in the client family a real `displayName`. `Dialog`, `Tabs`, `Tooltip`, `Select`, `DropdownMenu`, and `AlertDialog` previously copied `displayName` from the underlying Radix primitive (`X.displayName = XPrimitive.Y.displayName`), but `@radix-ui/react-dialog`, `-tabs`, `-tooltip`, `-select`, and `-dropdown-menu` never declare one — so every one of these components showed up as `ForwardRef` in React DevTools instead of its own name. No behavior change.
+
+- [#13](https://github.com/KalleoPinheiro/still-void/pull/13) [`64fa362`](https://github.com/KalleoPinheiro/still-void/commit/64fa3625070259b167372151c52fa1f4bffb2b64) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - `Tabs` now emits the `sv-tabs` container class on its root element and merges any consumer `className`, matching every other member of the family. `.sv-tabs` was already published in the package's CSS but nothing rendered it — worse, its default `align-items: stretch` would have forced the `inline-flex` `.sv-tabs__list` to the container's full width the moment a consumer applied the class by hand, so the rule now sets `align-items: flex-start`. No existing usage changes: `Tabs` still accepts every prop `TabsPrimitive.Root` does.
+
 ## 3.0.0
 
 ### Major Changes
