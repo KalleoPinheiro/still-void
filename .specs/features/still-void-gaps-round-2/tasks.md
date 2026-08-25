@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: In Progress — Fases 1–5 concluídas (T1–T16 + T24)
+**Status**: In Progress — Fases 1–6 concluídas (T1–T18 + T24)
 
 ---
 
@@ -482,7 +482,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T17: `Button variant="accent"` [P]
+### ✅ T17: `Button variant="accent"` [P] — `658a614`
 
 **What**: somar `.sv-btn--accent` ao CSS e o valor à union.
 **Where**: `src/css/style.css`, `src/components/ui/button.tsx`, `tests/ui-button.test.tsx`, `tests/contrast.test.ts`
@@ -505,7 +505,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T18: `Card` com `as` e `asChild` [P]
+### ✅ T18: `Card` com `as` e `asChild` [P] — `beab964`
 
 **What**: promover `@radix-ui/react-slot` a dep direta e abrir o elemento do `Card`.
 **Where**: `package.json`, `src/components/ui/card.tsx`, `tests/ui-card.test.tsx`, `tests/package-contract.test.ts`
