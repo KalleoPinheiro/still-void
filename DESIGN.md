@@ -218,7 +218,7 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 ### Cards — PostCard / FeaturedPostCard
 - **Corner Style:** 12px (`rounded.lg`).
 - **Background:** Panel, no shadow, 1px Hairline border.
-- **Shadow Strategy:** none — see Elevation. Hover applies `.sv-card-hover` (1px lift + border brighten); `FeaturedPostCard` additionally wears `.sv-gradient-border`.
+- **Shadow Strategy:** none — see Elevation. Hover applies `.sv-card-hover` (2px lift + border brighten); `FeaturedPostCard` additionally wears `.sv-gradient-border`.
 - **Internal Padding:** 24px comfortable (`spacing.6`) / 16px dense variant (`spacing.4`) for `PostCard`; 32px (`spacing.8`) for `FeaturedPostCard`.
 
 ### Callouts
