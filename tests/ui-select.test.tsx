@@ -6,6 +6,8 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
@@ -80,5 +82,21 @@ describe('Select family', () => {
     expect(content.className).not.toContain('sv-pop--popper');
     const viewport = document.querySelector('[data-radix-select-viewport]') as HTMLElement;
     expect(viewport.className).not.toContain('sv-pop__viewport--popper');
+  });
+});
+
+describe('Select — component identity (R3-01)', () => {
+  test('every member carries a literal displayName equal to its export name', () => {
+    // Radix ships these primitives without a displayName (`X.displayName =
+    // SelectPrimitive.Y.displayName` used to resolve to `undefined`), so
+    // every member is now assigned a literal string instead of inheriting
+    // from the primitive.
+    expect(SelectTrigger.displayName).toBe('SelectTrigger');
+    expect(SelectScrollUpButton.displayName).toBe('SelectScrollUpButton');
+    expect(SelectScrollDownButton.displayName).toBe('SelectScrollDownButton');
+    expect(SelectContent.displayName).toBe('SelectContent');
+    expect(SelectItem.displayName).toBe('SelectItem');
+    expect(SelectLabel.displayName).toBe('SelectLabel');
+    expect(SelectSeparator.displayName).toBe('SelectSeparator');
   });
 });

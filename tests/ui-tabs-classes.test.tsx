@@ -88,14 +88,15 @@ describe('Tabs — consumer className (CLIENT-01 control case)', () => {
   });
 });
 
-describe('Tabs — component identity (CLIENT-07)', () => {
-  test('displayName on the three members is unchanged by the migration', () => {
-    // Radix ships these primitives without a displayName, so the value the
-    // migration must not disturb is `undefined`. Asserting it pins the
-    // identity the barrel and the stories resolve against.
-    expect(TabsList.displayName).toBeUndefined();
-    expect(TabsTrigger.displayName).toBeUndefined();
-    expect(TabsContent.displayName).toBeUndefined();
+describe('Tabs — component identity (CLIENT-07, R3-01)', () => {
+  test('every member carries a literal displayName equal to its export name', () => {
+    // Radix ships these primitives without a displayName (`X.displayName =
+    // XPrimitive.Y.displayName` used to resolve to `undefined`), so every
+    // member is now assigned a literal string instead of inheriting from the
+    // primitive.
+    expect(TabsList.displayName).toBe('TabsList');
+    expect(TabsTrigger.displayName).toBe('TabsTrigger');
+    expect(TabsContent.displayName).toBe('TabsContent');
   });
 });
 
@@ -105,9 +106,13 @@ describe('Tabs — no utility survives in the source (CLIENT-01)', () => {
     // itself carries nothing else — a utility parked in a variant string on a
     // branch no test exercises would slip past the sweep.
     const source = readFileSync(resolve(process.cwd(), 'src/components/ui/tabs.tsx'), 'utf-8');
-    const literals = [...source.matchAll(/"([^"]*)"/g)].flatMap((match) => match[1] ?? []);
-    const classLiterals = literals.filter(
-      (literal) => literal !== 'react' && !literal.includes('/'),
+    // Only className positions — a bare string sweep would also pick up module
+    // specifiers, displayName values and words quoted inside comments.
+    const classAttributes = [...source.matchAll(/className=(?:\{cn\(([^)]*)\)\}|"([^"]*)")/g)];
+    const classLiterals = classAttributes.flatMap(([, call, literal]) =>
+      literal === undefined
+        ? [...(call ?? '').matchAll(/"([^"]*)"/g)].flatMap((m) => m[1] ?? [])
+        : [literal],
     );
     expect(classLiterals.length).toBeGreaterThan(0);
     for (const literal of classLiterals) {

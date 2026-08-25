@@ -9,6 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
   DialogTitle,
   DialogTrigger,
 } from '../src/components/ui/dialog';
@@ -202,14 +203,16 @@ describe('Dialog — the default close button (CLIENT-06)', () => {
   });
 });
 
-describe('Dialog — component identity (CLIENT-07)', () => {
-  test('displayName on every member is unchanged by the migration', () => {
-    // Radix ships its primitives without a displayName, so the value the
-    // migration must not disturb is `undefined` for the forwarded members and
-    // the literal string for the two plain-div members.
-    expect(DialogContent.displayName).toBeUndefined();
-    expect(DialogTitle.displayName).toBeUndefined();
-    expect(DialogDescription.displayName).toBeUndefined();
+describe('Dialog — component identity (CLIENT-07, R3-01)', () => {
+  test('every member carries a literal displayName equal to its export name', () => {
+    // Radix ships its primitives without a displayName (`X.displayName =
+    // XPrimitive.Y.displayName` used to resolve to `undefined`), so every
+    // forwardRef member is now assigned a literal string instead of
+    // inheriting from the primitive.
+    expect(DialogOverlay.displayName).toBe('DialogOverlay');
+    expect(DialogContent.displayName).toBe('DialogContent');
+    expect(DialogTitle.displayName).toBe('DialogTitle');
+    expect(DialogDescription.displayName).toBe('DialogDescription');
     expect(DialogHeader.displayName).toBe('DialogHeader');
     expect(DialogFooter.displayName).toBe('DialogFooter');
   });
