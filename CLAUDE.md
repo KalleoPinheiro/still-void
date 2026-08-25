@@ -1,10 +1,10 @@
 # Still Void UI
 
-`@still-void/ui` — framework-agnostic TypeScript design system, ported literally from the `blog.kalleopinheiro.dev` "Still Void" prototype. Core is pure CSS variables + class-returning recipes (works with any framework); an optional React adapter splits into a server-safe entry (`@still-void/ui/react`, no hooks, renders in Next.js Server Components) and a `'use client'` entry (`@still-void/ui/react/client`).
+`@still-void/ui` — a React/Next.js-first design system, ported literally from the `blog.kalleopinheiro.dev` "Still Void" prototype. Built on shadcn/ui, it splits into a server-safe entry (`@still-void/ui/react`, no hooks, renders in Next.js Server Components) and a `'use client'` entry (`@still-void/ui/react/client`). The package was framework-agnostic through `1.x`; the `2.0` breaking change (see [docs/migration-v1-to-v2.md](docs/migration-v1-to-v2.md)) removed the bare framework-agnostic core entry point in favor of this React/Next.js-only positioning — tokens and recipes still stay plain TypeScript/CSS underneath the React layer, but there is no public non-React entry point anymore.
 
 ## Design Context
 
-- [PRODUCT.md](PRODUCT.md) — register (product), users (dev consumers of the library), positioning (framework-agnostic + RSC-safe), anti-references, design principles.
+- [PRODUCT.md](PRODUCT.md) — register (product), users (dev consumers of the library), positioning (React/Next.js-first + RSC-safe), anti-references, design principles.
 - [DESIGN.md](DESIGN.md) — visual system: dark-first near-black palette, one switchable accent (`data-accent`), Sora/Manrope/JetBrains Mono, zero shadows, `.sv-gradient-border` as the one deliberate signature flourish.
 
 Read both before making component or visual decisions. In one line: **port, don't redesign** — every token value is literal from the spec; approximating a color "for elegance" is a regression.
