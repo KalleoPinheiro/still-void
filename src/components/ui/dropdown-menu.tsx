@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { cn } from "../../lib/utils"
+import { Icon } from "./icon"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
@@ -9,22 +10,36 @@ const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
+/**
+ * `icon` is the same contract as Select's (CLIENT-14): omit it and the system
+ * icon renders, pass a node and that node takes the slot, pass `null` and the
+ * slot collapses. The default lives in the parameter, not a fallback
+ * expression, so it only fires on `undefined` — `null` has to stay `null`.
+ */
+export interface DropdownMenuSubTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> {
+  inset?: boolean
+  icon?: React.ReactNode
+}
+
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
-    inset?: boolean
-  }
->(({ className, inset, ...props }, ref) => (
-  <DropdownMenuPrimitive.SubTrigger
-    ref={ref}
-    className={cn(
-      "flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm font-medium outline-none focus:bg-sv-surface data-[state=open]:bg-sv-surface-2",
-      inset && "pl-8",
-      className
-    )}
-    {...props}
-  />
-))
+  DropdownMenuSubTriggerProps
+>(
+  (
+    { className, inset, children, icon = <Icon name="chevron-right" />, ...props },
+    ref
+  ) => (
+    <DropdownMenuPrimitive.SubTrigger
+      ref={ref}
+      className={cn("sv-menu-item", inset && "sv-menu-item--inset", className)}
+      {...props}
+    >
+      {children}
+      {icon}
+    </DropdownMenuPrimitive.SubTrigger>
+  )
+)
 DropdownMenuSubTrigger.displayName =
   DropdownMenuPrimitive.SubTrigger.displayName
 
@@ -34,10 +49,7 @@ const DropdownMenuSubContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.SubContent
     ref={ref}
-    className={cn(
-      "min-w-[8rem] overflow-hidden rounded-md border border-sv-border bg-sv-surface p-1 text-sv-text",
-      className
-    )}
+    className={cn("sv-pop", className)}
     {...props}
   />
 ))
@@ -51,10 +63,7 @@ const DropdownMenuContent = React.forwardRef<
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
-      className={cn(
-        "min-w-[8rem] overflow-hidden rounded-md border border-sv-border bg-sv-surface p-1 text-sv-text",
-        className
-      )}
+      className={cn("sv-pop", className)}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -69,45 +78,64 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-sv-surface-2 focus:text-sv-text data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      inset && "pl-8",
-      className
-    )}
+    className={cn("sv-menu-item", inset && "sv-menu-item--inset", className)}
     {...props}
   />
 ))
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
+export interface DropdownMenuCheckboxItemProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> {
+  icon?: React.ReactNode
+}
+
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
->(({ className, ...props }, ref) => (
+  DropdownMenuCheckboxItemProps
+>(({ className, children, icon = <Icon name="check" />, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-sv-surface-2 focus:text-sv-text data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
+    className={cn("sv-menu-item", className)}
     {...props}
-  />
+  >
+    {icon === null ? null : (
+      <DropdownMenuPrimitive.ItemIndicator className="sv-menu-item__indicator">
+        {icon}
+      </DropdownMenuPrimitive.ItemIndicator>
+    )}
+    {children}
+  </DropdownMenuPrimitive.CheckboxItem>
 ))
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName
 
+export interface DropdownMenuRadioItemProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem> {
+  icon?: React.ReactNode
+}
+
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
->(({ className, ...props }, ref) => (
-  <DropdownMenuPrimitive.RadioItem
-    ref={ref}
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-sv-surface-2 focus:text-sv-text data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
-    {...props}
-  />
-))
+  DropdownMenuRadioItemProps
+>(
+  (
+    { className, children, icon = <span className="sv-menu-item__dot" />, ...props },
+    ref
+  ) => (
+    <DropdownMenuPrimitive.RadioItem
+      ref={ref}
+      className={cn("sv-menu-item", className)}
+      {...props}
+    >
+      {icon === null ? null : (
+        <DropdownMenuPrimitive.ItemIndicator className="sv-menu-item__indicator">
+          {icon}
+        </DropdownMenuPrimitive.ItemIndicator>
+      )}
+      {children}
+    </DropdownMenuPrimitive.RadioItem>
+  )
+)
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
 const DropdownMenuLabel = React.forwardRef<
@@ -118,11 +146,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn(
-      "px-2 py-1.5 text-sm font-semibold",
-      inset && "pl-8",
-      className
-    )}
+    className={cn("sv-menu-label", inset && "sv-menu-item--inset", className)}
     {...props}
   />
 ))
@@ -134,7 +158,7 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-sv-border", className)}
+    className={cn("sv-menu-separator", className)}
     {...props}
   />
 ))
@@ -144,10 +168,7 @@ const DropdownMenuShortcut = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span
-    className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
-    {...props}
-  />
+  <span className={cn("sv-menu-shortcut", className)} {...props} />
 )
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 
