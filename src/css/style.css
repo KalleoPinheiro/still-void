@@ -64,7 +64,19 @@ body.sv-body {
 @media (min-width: 641px) {
   /* Above the breakpoint <details> is a no-op wrapper: the nav always
      renders regardless of the native open/closed state, and there is
-     nothing to toggle. */
+     nothing to toggle. Newer browsers project non-summary content through
+     a ::details-content pseudo-element that the UA stylesheet sets to
+     `content-visibility: hidden` (plus a collapsed block-size) while
+     closed — overriding `display` on .sv-header__nav alone doesn't reach
+     past that ancestor, so it has to be reset here too. Older browsers
+     without ::details-content support just skip this rule; the `display`
+     override below is what reaches their `details:not([open]) > *` UA
+     rule instead. */
+  .sv-header__nav-toggle::details-content {
+    content-visibility: visible !important;
+    block-size: auto !important;
+    overflow: visible !important;
+  }
   .sv-header__nav-toggle .sv-header__nav {
     display: flex !important;
   }

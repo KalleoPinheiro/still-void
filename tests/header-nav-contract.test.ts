@@ -93,7 +93,10 @@ function decl(
 }
 
 const BASE_SELECTORS = ['.sv-header__nav', '.sv-header__nav-toggle', '.sv-header__nav-summary'] as const;
-const MIN_WIDTH_SELECTORS = ['.sv-header__nav-toggle .sv-header__nav'] as const;
+const MIN_WIDTH_SELECTORS = [
+  '.sv-header__nav-toggle .sv-header__nav',
+  '.sv-header__nav-toggle::details-content',
+] as const;
 const MAX_WIDTH_SELECTORS = [
   '.sv-header__nav-summary',
   '.sv-header__nav-summary:hover',
@@ -128,6 +131,26 @@ describe('the disclosure is a no-op wrapper above 640px', () => {
   test('the summary toggle is hidden by default, outside any media query', () => {
     expect(decl('.sv-header__nav-summary', 'display', header)).toBe('none');
     expect(decl('.sv-header__nav-summary', 'list-style', header)).toBe('none');
+  });
+
+  // Newer browsers project non-summary <details> content through a
+  // ::details-content pseudo-element the UA stylesheet hides
+  // (content-visibility: hidden) while closed — a display override on the
+  // light-DOM .sv-header__nav child alone doesn't reach past that shadow
+  // ancestor, so it has to be reset separately. A real browser is required
+  // to prove this actually renders (jsdom has no ::details-content model at
+  // all — see the file-level comment), so this only pins the CSS text
+  // exists; it cannot substitute for a browser-rendered check.
+  test('::details-content is reset to visible/auto, not just .sv-header__nav', () => {
+    expect(decl('.sv-header__nav-toggle::details-content', 'content-visibility', headerMinWidth)).toBe(
+      'visible !important',
+    );
+    expect(decl('.sv-header__nav-toggle::details-content', 'block-size', headerMinWidth)).toBe(
+      'auto !important',
+    );
+    expect(decl('.sv-header__nav-toggle::details-content', 'overflow', headerMinWidth)).toBe(
+      'visible !important',
+    );
   });
 });
 
