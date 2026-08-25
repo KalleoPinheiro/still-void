@@ -628,6 +628,14 @@ body.sv-body {
   cursor: not-allowed;
   opacity: 0.5;
 }
+/* Invalid state reads the native aria-invalid attribute, not a boolean prop
+   — Input/Textarea/NativeSelect/FileInput need no change to support it. */
+.sv-field[aria-invalid='true'] {
+  border-color: var(--sv-danger-ink);
+}
+.sv-field[aria-invalid='true']:focus-visible {
+  outline-color: var(--sv-danger-ink);
+}
 
 .sv-field--textarea {
   height: auto;
@@ -664,6 +672,19 @@ body.sv-body {
   color: var(--sv-text);
   font: inherit;
   cursor: pointer;
+}
+
+/* Helper/error text sat under a field, associated via aria-describedby. */
+.sv-field-message {
+  display: block;
+  margin-top: var(--sv-space-2);
+  color: var(--sv-text-2);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-sm);
+  line-height: 1.5;
+}
+.sv-field-message--error {
+  color: var(--sv-danger-ink);
 }
 
 /* No appearance:none — the native check/radio chrome follows color-scheme

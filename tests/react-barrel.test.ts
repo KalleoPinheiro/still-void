@@ -74,6 +74,7 @@ const expectedExports = [
   'featuredPostCardClasses',
   'field',
   'fieldClasses',
+  'fieldMessage',
   'fontFamilies',
   'fontSizes',
   'fontWeights',

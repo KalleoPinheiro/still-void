@@ -204,6 +204,7 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 - **Type scale:** `var(--sv-text-base)` (15px) — the one visual value in this pass that isn't a literal carry-over from the previous shadcn defaults (those were Tailwind's unspecified `text-sm`, 14px, not a Still Void token; see the `patch` changeset for the reancoring).
 - **Disabled:** `cursor: not-allowed`, `opacity: 0.5`.
 - **`FileInput`** additionally styles its native `::file-selector-button` (`-webkit-file-upload-button` fallback) with the same border/radius/surface tokens; `NativeSelect` keeps the browser's native affordance (no `appearance: none`) so `color-scheme` carries the dropdown chrome and native `multiple` list boxes into the right theme for free.
+- **Invalid state:** reads the native `aria-invalid="true"` attribute, not a boolean prop — `Input`/`Textarea`/`NativeSelect`/`FileInput` already spread `...props`, so `<Input aria-invalid="true" />` alone paints the border in `var(--sv-danger-ink)` (and swaps the focus outline to the same token) with zero component changes, matching the "composition over configuration" principle. Pair it with `aria-describedby` pointing at a `fieldMessage({ variant: 'error' })` element (recipe: `fieldMessage`) for the visible error text; the same recipe with no variant (or `variant: 'hint'`) styles ordinary helper text in `var(--sv-text-2)`.
 
 ### Focus state (all interactive controls)
 
