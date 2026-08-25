@@ -998,3 +998,23 @@ body.sv-body {
   border-color: var(--sv-border);
   color: var(--sv-text);
 }
+
+/* ---------- Icons ---------- */
+/* Heroicons render on the 24 grid with no width/height attribute and no size
+   prop, so CSS is the only thing that sizes them. `md` is the default and is
+   carried by the base rule, which is why it has no modifier. Each step is a
+   spacing token so an icon lines up with the control it sits inside. */
+.sv-icon {
+  width: var(--sv-space-5);
+  height: var(--sv-space-5);
+  color: currentColor;
+  flex-shrink: 0;
+}
+.sv-icon--sm {
+  width: var(--sv-space-4);
+  height: var(--sv-space-4);
+}
+.sv-icon--lg {
+  width: var(--sv-space-6);
+  height: var(--sv-space-6);
+}
