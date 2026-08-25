@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createRef } from 'react';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, test } from 'vitest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../src/components/ui/tabs';
@@ -88,12 +89,53 @@ describe('Tabs — consumer className (CLIENT-01 control case)', () => {
   });
 });
 
+describe('Tabs — root container class (R3-02)', () => {
+  test('renders sv-tabs on the root with no className passed', () => {
+    const { container } = render(
+      <Tabs defaultValue="one">
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Panel</TabsContent>
+      </Tabs>,
+    );
+    expect(container.firstElementChild).toHaveClass('sv-tabs');
+  });
+
+  test('merges a consumer className onto sv-tabs, never replaces it', () => {
+    const { container } = render(
+      <Tabs defaultValue="one" className="mine">
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Panel</TabsContent>
+      </Tabs>,
+    );
+    expect(container.firstElementChild).toHaveClass('sv-tabs');
+    expect(container.firstElementChild).toHaveClass('mine');
+  });
+
+  test('forwards the ref to the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Tabs defaultValue="one" ref={ref}>
+        <TabsList>
+          <TabsTrigger value="one">One</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Panel</TabsContent>
+      </Tabs>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+});
+
 describe('Tabs — component identity (CLIENT-07, R3-01)', () => {
   test('every member carries a literal displayName equal to its export name', () => {
     // Radix ships these primitives without a displayName (`X.displayName =
     // XPrimitive.Y.displayName` used to resolve to `undefined`), so every
     // member is now assigned a literal string instead of inheriting from the
     // primitive.
+    expect(Tabs.displayName).toBe('Tabs');
     expect(TabsList.displayName).toBe('TabsList');
     expect(TabsTrigger.displayName).toBe('TabsTrigger');
     expect(TabsContent.displayName).toBe('TabsContent');
