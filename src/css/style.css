@@ -865,6 +865,14 @@ body.sv-body {
   text-decoration: underline;
 }
 
+.sv-btn--accent {
+  background: var(--sv-accent-ink);
+  color: var(--sv-bg);
+}
+.sv-btn--accent:hover {
+  background: color-mix(in srgb, var(--sv-accent-ink) 90%, transparent);
+}
+
 .sv-btn--sm {
   height: calc(var(--sv-space-8) + var(--sv-space-1));
   padding: 0 var(--sv-space-3);

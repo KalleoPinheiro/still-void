@@ -47,3 +47,21 @@ describe('WCAG AA text contrast — semantic state "ink" (danger/success/info/wa
     }
   }
 });
+
+// BTN-02: `.sv-btn--accent` paints `background: var(--sv-accent-ink)` with
+// `color: var(--sv-bg)` — the accent-ink/bg pair used as background/text, not
+// text/surface as the ramps above check. WCAG's ratio is symmetric in its two
+// inputs, but this pairing is asserted explicitly (rather than relying on the
+// bg entry already present in surfacesByTheme above) so BTN-02 has its own
+// dedicated, spec-traceable evidence — `--sv-accent-ink` resolves to one of
+// the four per-accent inks depending on `[data-accent]`, so every one is
+// checked in both themes.
+describe('WCAG AA contrast — Button variant="accent" (background accent-ink, text sv-bg)', () => {
+  for (const theme of ['dark', 'light'] as const) {
+    for (const [name, ink] of Object.entries(accentsInk[theme])) {
+      test(`${theme} accent-${name}-ink background with sv-bg text clears ${AA_TEXT}:1`, () => {
+        expect(contrastRatio(colors[theme].bg, ink)).toBeGreaterThanOrEqual(AA_TEXT);
+      });
+    }
+  }
+});
