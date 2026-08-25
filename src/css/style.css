@@ -1166,6 +1166,32 @@ body.sv-body {
   cursor: default;
 }
 
+/* In "popper" mode Radix anchors SelectContent to the trigger and writes
+   data-side once it resolves which side it flipped to; --sv-space-1 (4px) is
+   the same nudge the old build wrote as Tailwind's `translate-y-1`, now a
+   real declaration instead of four arbitrary-variant utilities. */
+.sv-pop--popper[data-side='bottom'] {
+  transform: translateY(var(--sv-space-1));
+}
+.sv-pop--popper[data-side='top'] {
+  transform: translateY(calc(var(--sv-space-1) * -1));
+}
+.sv-pop--popper[data-side='right'] {
+  transform: translateX(var(--sv-space-1));
+}
+.sv-pop--popper[data-side='left'] {
+  transform: translateX(calc(var(--sv-space-1) * -1));
+}
+/* Matches the panel to the trigger's own footprint so it never renders
+   narrower or wider than the control that opened it. The custom properties
+   are Radix's own — set on the DOM node regardless of build tooling — not a
+   Tailwind arbitrary value, so this needs no bracket syntax to read them. */
+.sv-pop__viewport--popper {
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+  height: var(--radix-select-trigger-height);
+}
+
 /* ---------- Tooltip ---------- */
 /* Declares only what differs from .sv-pop: a tooltip floats above every other
    layer, holds one line of text rather than a list, and needs no min-width. */
