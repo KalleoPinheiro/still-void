@@ -86,7 +86,7 @@ export const AllTypes: Story = {
 export const FocusState: Story = {
   args: {
     type: 'text',
-    placeholder: 'Focus this input (ring-2 ring-accent)',
+    placeholder: 'Focus this input (2px accent-ink outline)',
     autoFocus: true,
   },
 };
