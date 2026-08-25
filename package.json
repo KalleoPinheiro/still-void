@@ -54,16 +54,6 @@
         "default": "./dist/react/client/index.cjs"
       }
     },
-    "./tailwind-preset": {
-      "import": {
-        "types": "./dist/tailwind-preset.d.ts",
-        "default": "./dist/tailwind-preset.js"
-      },
-      "require": {
-        "types": "./dist/tailwind-preset.d.cts",
-        "default": "./dist/tailwind-preset.cjs"
-      }
-    },
     "./theme.css": "./dist/theme.css",
     "./style.css": "./dist/style.css",
     "./tailwind.css": "./dist/tailwind.css",
@@ -77,9 +67,6 @@
       ],
       "react/client": [
         "./dist/react/client/index.d.ts"
-      ],
-      "tailwind-preset": [
-        "./dist/tailwind-preset.d.ts"
       ]
     }
   },
@@ -95,7 +82,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint:package": "publint --strict && attw --pack . --exclude-entrypoints theme.css style.css shadcn-overrides.css",
+    "lint:package": "publint --strict && attw --pack . --exclude-entrypoints theme.css style.css tailwind.css shadcn-overrides.css",
     "changeset": "changeset",
     "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
     "release": "npm run build && changeset publish",
@@ -105,7 +92,7 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "tailwindcss": ">=3 <4"
+    "tailwindcss": ">=4"
   },
   "peerDependenciesMeta": {
     "tailwindcss": {
