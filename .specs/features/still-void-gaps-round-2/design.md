@@ -86,7 +86,7 @@ reescreverem `--sv-*`, `@theme inline` é requisito de correção, não estilo.
 | Família `Dialog` migrada | `src/components/ui/dialog.tsx` | `AlertDialog` reusa CSS e estrutura, trocando o primitivo do Radix |
 | `SelectPrimitive.ItemText` / `ItemIndicator` / `Icon` | `@radix-ui/react-select` (verificado no dist) | Fecham o trigger em branco e o `pl-8` órfão |
 | `DropdownMenuPrimitive.ItemIndicator` | `@radix-ui/react-dropdown-menu` (verificado) | Indicador de checkbox/radio |
-| `@radix-ui/react-slot@1.3.3` | já presente como transitiva | Promovido a dep direta para o `asChild` do `Card` |
+| `@radix-ui/react-compose-refs` (função `composeRefs`, não o hook) | verificado sem hook no `dist` | Base do `Slot` vendorizado em `src/components/ui/slot.tsx` — **AD-015 supersede este plano**: `@radix-ui/react-slot@1.3.3` chama `useComposedRefs` (hook de verdade), então nunca foi promovido a dep; ver "Tech Decisions" |
 
 ### Pontos de integração
 
@@ -246,7 +246,7 @@ Sem `@source`, sem aliases mortos (AD-011). Copiado para `dist/` por `scripts/co
 | --- | --- | --- |
 | `Icon name` fora da union em runtime | Fallback para o ícone default, sem `throw` | Renderiza um ícone genérico em vez de quebrar a página |
 | `Card as` fora da union em runtime | Lookup em `Set` de tags permitidas → `'div'` | HTML válido, sem elemento inventado |
-| `Card asChild` com múltiplos filhos | Comportamento do `Slot` do Radix (erro explícito) | Erro em dev, na hora, com mensagem do Radix |
+| `Card asChild` com múltiplos filhos | Comportamento do `Slot` vendorizado (erro explícito, AD-015) | Erro em dev, na hora, com mensagem descritiva |
 | Consumidor sem Tailwind | Nada acontece — nenhum componente depende dele | Renderiza normal (é o objetivo da rodada) |
 | Consumidor em Tailwind v3 | `npm install` avisa peer incompatível | Precisa migrar para v4 ou ficar na `2.x` (AD-012) |
 | `prefers-reduced-motion` | Transição zerada por media query | Abrir/fechar instantâneo |
