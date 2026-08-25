@@ -64,21 +64,42 @@
 - **Trade-off**: Mais superfície de API e mais teste para 2 call sites. O modo de input escondido exige cuidado extra de a11y — foco visível no `label` e exposição do arquivo escolhido.
 - **Scope**: `FileInput`.
 - **Date**: 2026-08-23
-- **Status**: active — **agendada, não incluída na rodada 2** (ver nota de conflito de escopo no intake)
+- **Status**: active — execução confirmada para a **rodada 3** (2026-08-24); fora da rodada 2
+
+### AD-009
+- **Decision**: Abrir/fechar dos componentes com portal (`Dialog`, `AlertDialog`, `Select`, `DropdownMenu`, `Tooltip`) anima com **fade mínimo**: transição de `opacity` dirigida por `[data-state="open"|"closed"]`, com `var(--sv-duration-fast)` e `var(--sv-ease-hover)`, zerada dentro de `@media (prefers-reduced-motion: reduce)`. Nada de zoom, slide ou translate.
+- **Reason**: Decisão do usuário em 2026-08-24. `DESIGN.md:192` só permite motion quando ela carrega estado — abrir/fechar é exatamente isso, enquanto zoom/slide é decoração. Custo zero de regressão: as classes `animate-in`/`zoom-*`/`slide-*` que os componentes emitem hoje dependem de `tailwindcss-animate`, que **nunca esteve instalado** neste repo, logo nada anima atualmente.
+- **Trade-off**: Perde-se o "feel" do shadcn upstream, que é o que a maioria dos consumidores reconhece. Em troca, ~60 linhas de keyframes a menos e uma regra de motion que o design system consegue defender.
+- **Scope**: Toda camada visual de componente com estado aberto/fechado.
+- **Date**: 2026-08-24
+- **Status**: active
+
+### AD-010
+- **Decision**: `lucide-react` entra como **dependência direta**, e o design system expõe um componente **`Icon`** server-safe (`name` de union fechada sobre um set curado, `size`, `label`) sobre a classe `.sv-icon`. Ícone é `currentColor`, tamanho vem de `var(--sv-space-*)`, `aria-hidden` por padrão e `role="img"` + `aria-label` quando `label` é passado. Cada ícone é importado nominalmente do lucide — nunca `import * as`.
+- **Reason**: Decisão do usuário em 2026-08-24, com o custo declarado na mesa (31 MB desempacotado no `node_modules` de todo consumidor). Objetivo explícito: padronizar o uso de ícones também nas aplicações consumidoras, não só dentro do pacote. `lucide-react` é o padrão de fato do shadcn, tem zero dependências e trata `react` como peer.
+- **Trade-off**: 31 MB de install para quem usa só `Button` e `Card` — 300× o peso do `@radix-ui/react-alert-dialog` que o próprio intake tratou como problema. O bundle final continua ~1 KB por ícone graças ao tree-shaking, então o custo é de disco/instalação, não de runtime. `Icon` com set curado (em vez de re-export nomeado por ícone) mantém a API pública pequena: ampliar o set é `minor`, e nenhum ícone individual vira export que só sai em `major`.
+- **Scope**: Camada de ícones do pacote e todo componente que precise de indicador visual.
+- **Date**: 2026-08-24
+- **Status**: active
+
+### AD-011
+- **Decision**: `@still-void/ui/tailwind.css` é publicado contendo **apenas** um bloco `@theme` que mapeia `--color-sv-*`, fonte, espaçamento e raio para `var(--sv-*)`. Sem `@source` e sem os aliases `--color-background`, `--color-ring`, `--color-destructive`, `--color-destructive-foreground`. O peer `tailwindcss` volta a `>=3`, seguindo opcional, e `@still-void/ui/tailwind-preset` (v3) continua exportado.
+- **Reason**: Decisão do usuário em 2026-08-24. Depois de migrar a família client para CSS `sv-*`, o `dist` não emite mais nenhuma classe Tailwind — o `@source` pedido pelo relatório não teria o que varrer, e os quatro aliases existiam só por causa das classes que a migração elimina. O arquivo deixa de servir o pacote e passa a servir o **código do consumidor**, que quer `bg-sv-surface` nos componentes dele.
+- **Trade-off**: Diverge do bloco literal que o relatório do VittaFlow pediu; se algum consumidor já tiver copiado aquele bloco à mão, os quatro aliases continuam do lado dele (o que é correto — são apelidos do app, não do design system).
+- **Scope**: Superfície de integração com Tailwind.
+- **Date**: 2026-08-24
+- **Status**: active
 
 ## Handoff
 
-- **Feature concluída**: `form-and-data-primitives` — ✅ Verifier rodada 2 PASS (871 testes, 100% cobertura, 11/11 mutantes mortos). Nada em aberto.
-- **Próximo trabalho**: rodada 2 — `.specs/features/still-void-gaps-round-2/intake.md`. **As 6 decisões estão tomadas** (AD-006, AD-007, AD-008 + tabela no intake). Não há bloqueio: entrar direto em **Specify**.
-- **Escopo travado (P0 + P1)**:
-  1. GAP-06/07/08 — migrar família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`: 5 arquivos, 498 linhas, 43 exports) para CSS `sv-*`; fecha `dialog-shadow`, as classes de cor inexistentes, `dialog-close-button` e `dialog-aria-modal`
-  2. GAP-02 — publicar `@still-void/ui/tailwind.css` (v4 CSS-first, `@source` + `@theme`); fazer **depois** de 1, quando o bloco `@theme` já estiver mínimo
-  3. GAP-03 — portar e exportar a família `AlertDialog` (AD-007)
-  4. GAP-04 — `Button variant="accent"`; trivial agora que `.sv-btn` existe com modificadores
-  5. GAP-05 — `Card` com `as` **e** `asChild` (AD-006); `@radix-ui/react-slot` vira dep direta
-- **Fora do escopo da rodada 2**: `Separator`, `Progress`, `Pagination`, `FileInput` (abordagem decidida em AD-008, execução adiada), `data-chart` (declarado fora)
-- **Rede de segurança**: já existem `tests/ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu` — mesma regra da rodada 1 vale: teste existente que precise de edição é regressão de API, para e reporta
-- **Armadilha conhecida da rodada 1, não repetir**: contrato de CSS por substring (`toContain('.sv-card')`) não discrimina, porque `.sv-card__header` já satisfaz. Usar o parser seletor→corpo de `tests/component-css-contract.test.ts` desde o começo. E `tests/server-safety.test.ts` já cobre o grafo de `/react` — a família client vive em `/react/client` e **não** é coberta por ele; se um componente client for movido para server-safe, o teste pega sozinho
-- **Estado do repo**: árvore limpa, 39 commits em `4422b64..HEAD`, PR da rodada 1 ainda **não** aberto para `main`
-- **Blockers**: nenhum
-- **Branch**: `claude/tlc-spec-still-void-gaps-ee7589`
+- **Rodada 1 (`form-and-data-primitives`)**: concluída, Verifier PASS, **PR #10 mergeada em `main`**. PR #11 (`chore: version packages`) está aberta — mergear ela é o que publica no npm.
+- **Rodada 2 (`still-void-gaps-round-2`)**: fase **Specify** concluída em 2026-08-24 — `spec.md` escrita com 40 requisitos (ICON / CLIENT / ALERT / BTN / CARD / TW), aguardando confirmação do usuário antes do Design.
+- **Decisões novas desta sessão**: **AD-009** (motion: fade mínimo por `[data-state]`, sem zoom/slide), **AD-010** (`lucide-react` como dep direta + componente `Icon` com set curado), **AD-011** (`tailwind.css` só com `@theme`, sem `@source` nem aliases mortos; peer `tailwindcss` volta a `>=3`). `FileInput` (AD-008) confirmado **fora** desta rodada — vai para a rodada 3.
+- **Escopo travado**, nesta ordem: (1) camada `Icon`; (2) migrar família client (`dialog`, `dropdown-menu`, `select`, `tabs`, `tooltip`) para CSS `sv-*`, fechando GAP-06/07/08; (3) família `AlertDialog` (AD-007); (4) `Button variant="accent"`; (5) `Card` com `as` **e** `asChild` (AD-006, `@radix-ui/react-slot` vira dep direta); (6) `@still-void/ui/tailwind.css` (AD-011) por último, quando o pacote já não emitir nenhuma classe Tailwind.
+- **Fora do escopo da rodada 2**: `Separator`, `Progress`, `Pagination`, `FileInput`, `data-chart`; migrar `ThemeToggle`/`CopyButton` para `Icon`; remover o `tailwind-preset` v3.
+- **Perguntas em aberto na spec** (não bloqueiam o Design, defaults escolhidos): default de `showCloseButton` (assumido `true`), alargar o peer `tailwindcss` para `>=3`, e renderizar indicadores nos itens de `Select`/`DropdownMenu` que hoje reservam `pl-8` para um ícone inexistente.
+- **Rede de segurança**: já existem `tests/ui-dialog`, `ui-select`, `ui-tabs`, `ui-tooltip`, `ui-dropdown-menu` — mesma regra da rodada 1: teste existente que precise de edição é regressão de API, para e reporta.
+- **Armadilha conhecida da rodada 1, não repetir**: contrato de CSS por substring (`toContain('.sv-card')`) não discrimina, porque `.sv-card__header` já satisfaz. Usar o parser seletor→corpo de `tests/component-css-contract.test.ts` desde o começo. E `tests/server-safety.test.ts` cobre só o grafo de `/react`; a família client vive em `/react/client` e **não** é coberta por ele.
+- **Estado do repo**: árvore limpa, branch nova criada a partir de `origin/main`.
+- **Blockers**: nenhum.
+- **Branch**: `claude/still-void-gaps-round-2`
