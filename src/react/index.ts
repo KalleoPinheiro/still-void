@@ -14,6 +14,7 @@ export { Button, type ButtonProps } from '../components/ui/button';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from '../components/ui/card';
 export { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
 export { Badge, type BadgeProps } from '../components/ui/badge';
+export { Icon, type IconProps, type IconName } from '../components/ui/icon';
 export { Input, type InputProps } from '../components/ui/input';
 export { Textarea, type TextareaProps } from '../components/ui/textarea';
 export { NativeSelect, type NativeSelectProps } from '../components/ui/native-select';

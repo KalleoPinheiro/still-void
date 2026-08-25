@@ -1,0 +1,11 @@
+---
+"@still-void/ui": minor
+---
+
+Add `Icon`, the `AlertDialog` family, a `Button` accent variant, `Card`'s `as`/`asChild`, and a Tailwind v4 theme entry.
+
+- **`Icon`** (`@still-void/ui/react`, server-safe) — a curated icon set over `@heroicons/react`, with `size` (`sm`/`md`/`lg`, sized entirely through CSS tokens, never a pixel prop) and an optional `label` for an accessible name. Every icon in the package's own components (the `Dialog` close button, `Select`'s chevron and check, `DropdownMenu`'s indicators) now renders through this same component.
+- **`AlertDialog` family** (`@still-void/ui/react/client`) — `AlertDialog`, `AlertDialogTrigger`, `AlertDialogPortal`, `AlertDialogOverlay`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogFooter`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogAction`, and `AlertDialogCancel`. `@radix-ui/react-alert-dialog` was already an installed dependency with zero call sites; this exports the family the documentation already announced. No close button by default — a destructive confirmation resolves through explicit `Action`/`Cancel`, composed with `Button` via `asChild`.
+- **`Button variant="accent"`** — a filled button using the active accent color (`background: var(--sv-accent-ink)`, `color: var(--sv-bg)`), for the primary action in a view. Follows `[data-theme]`/`[data-accent]` like every other accent-bearing element.
+- **`Card` gains `as` and `asChild`.** `as="section" | "article" | "li" | "aside"` picks the rendered tag (default stays `div`); `asChild` merges the card's class, ref, and props onto a single child instead of rendering a wrapper. `asChild` wins when both are given. `Card` stays fully server-safe — `asChild` is served by a small vendored ref-merge utility rather than `@radix-ui/react-slot`, which turned out to call a React hook internally and would have broken inside a real Server Component.
+- **`@still-void/ui/tailwind.css`** — a Tailwind v4 CSS-first `@theme inline` entry mapping `--color-sv-*`, `--font-sv-*`, `--spacing`, and `--radius-sv-*` to `var(--sv-*)`, for consumers who want `bg-sv-surface`-style utilities in their **own** markup. No component this package ships needs it — every one of them already styles itself through `style.css`.

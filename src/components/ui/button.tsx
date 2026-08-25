@@ -3,7 +3,7 @@ import { cn } from "../../lib/utils"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "accent"
   size?: "default" | "sm" | "lg" | "icon"
 }
 
@@ -17,6 +17,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         variant === "secondary" && "sv-btn--secondary",
         variant === "ghost" && "sv-btn--ghost",
         variant === "link" && "sv-btn--link",
+        variant === "accent" && "sv-btn--accent",
         size === "sm" && "sv-btn--sm",
         size === "lg" && "sv-btn--lg",
         size === "icon" && "sv-btn--icon",

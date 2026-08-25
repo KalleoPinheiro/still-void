@@ -58,14 +58,20 @@ describe('DropdownMenu family', () => {
     );
 
     expect(screen.getByText('Actions')).toBeInTheDocument();
-    expect(screen.getByText('Inset label')).toHaveClass('pl-8');
+    // 'pl-8' was the Tailwind indent utility `inset` used to add. Round 2
+    // replaces every Tailwind utility in this component with sv-* classes
+    // (CLIENT-01), same as the identical conflict already resolved in
+    // tests/ui-select.test.tsx: the visual behavior — an inset item is
+    // indented, a plain one is not — is unchanged, only the class name that
+    // proves it moved to '.sv-menu-item--inset'.
+    expect(screen.getByText('Inset label')).toHaveClass('sv-menu-item--inset');
     expect(screen.getByText('Plain item')).toBeInTheDocument();
-    expect(screen.getByText('Inset item')).toHaveClass('pl-8');
+    expect(screen.getByText('Inset item')).toHaveClass('sv-menu-item--inset');
     expect(screen.getByText('Checkbox item')).toBeInTheDocument();
     expect(screen.getByText('Radio A')).toBeInTheDocument();
     expect(screen.getByText('Radio B')).toBeInTheDocument();
-    expect(screen.getByText('Plain sub trigger')).not.toHaveClass('pl-8');
-    expect(screen.getByText('Inset sub trigger')).toHaveClass('pl-8');
+    expect(screen.getByText('Plain sub trigger')).not.toHaveClass('sv-menu-item--inset');
+    expect(screen.getByText('Inset sub trigger')).toHaveClass('sv-menu-item--inset');
     expect(screen.getByText('Sub item')).toBeInTheDocument();
     expect(screen.getByText('⌘S')).toBeInTheDocument();
   });

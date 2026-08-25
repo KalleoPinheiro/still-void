@@ -224,6 +224,35 @@
   }
 }
 
+/* Shared fade for every portal surface in style.css (.sv-overlay, .sv-dialog,
+   .sv-pop). Radix's Presence decides whether to keep a closing element
+   mounted long enough to animate out by reading the node's computed
+   `animation-name` — it listens for `animationstart`/`animationend`, never
+   `transitionend` (verified directly in @radix-ui/react-presence's source).
+   A `transition`-based fade never sets `animation-name`, so Presence sees
+   "none" and unmounts before a single frame renders; `animation` +
+   `@keyframes` is what it is actually built to detect. Declared here, not in
+   style.css's Overlays/Dialog/Popovers sections: those sections are parsed by
+   a flat, non-recursive selector-body regex in the CSS contract tests, which
+   cannot handle a rule with nested braces — the same reason
+   `sv-skeleton-shimmer` above lives here instead of next to `.sv-skeleton`. */
+@keyframes sv-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes sv-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .sv-glass {
   background: color-mix(in srgb, var(--sv-bg-elev) 72%, transparent);
   backdrop-filter: blur(12px) saturate(1.4);
@@ -240,15 +269,8 @@
   .sv-skeleton {
     animation: none;
   }
-  /* Hover/active color fades across nav, pills and the copy button are
-     non-essential motion too — instant is the reduced-motion default.
-     (The reading progress bar is intentionally excluded: its transition is
-     1:1 with the user's own scroll input, not decorative.) */
-  .sv-header__link,
-  .sv-footer__link,
-  .sv-pill--interactive,
-  .sv-code-block__copy,
-  .sv-toc__link {
-    transition: none;
-  }
+  /* Everything else this block used to name is declared in style.css, which
+     loads after this file. A media query adds no specificity, so the override
+     lost the cascade to the base rule every time — the reduce rules for those
+     classes now live at the end of style.css, where they can win. */
 }

@@ -7,16 +7,19 @@
 `blog.kalleopinheiro.dev` prototype. Ships as two entry points: a server-safe entry that
 renders inside Next.js Server Components with zero hydration cost, and a `'use client'`
 entry for interactive pieces. See [docs/design-system.md](docs/design-system.md) for the
-full architecture and component catalog, and
+full architecture and component catalog,
 [docs/migration-v1-to-v2.md](docs/migration-v1-to-v2.md) if you're upgrading from the
-framework-agnostic `1.x` line.
+framework-agnostic `1.x` line, and
+[docs/migration-v2-to-v3.md](docs/migration-v2-to-v3.md) for the `2.x` → `3.x` breaking
+changes (Tailwind v4 is now required, and the v3 preset is gone).
 
 ## Architecture
 
 | Layer | Entry | Runs where | What it is |
 |---|---|---|---|
 | **Theme CSS** | `@still-void/ui/theme.css` | browser | CSS vars (`--sv-*`), dark/light via `data-theme`, accents via `data-accent`, signature utilities |
-| **Component CSS** | `@still-void/ui/style.css` | browser | All component classes (`sv-*`) |
+| **Component CSS** | `@still-void/ui/style.css` | browser | All component classes (`sv-*`) — every component this package ships needs only this, never Tailwind |
+| **Tailwind theme (optional)** | `@still-void/ui/tailwind.css` | browser (Tailwind v4 build) | `@theme inline` mapping `--color-sv-*`/`--font-sv-*`/`--spacing`/`--radius-sv-*` to `var(--sv-*)`, for `bg-sv-surface`-style utilities in **your own** markup |
 | **React (server-safe)** | `@still-void/ui/react` | server or client | Tokens, recipes, and components without hooks — render inside Server Components |
 | **React (client)** | `@still-void/ui/react/client` | client | `'use client'` bundle: DOM behaviors (`createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard`), `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, hooks |
 
@@ -151,8 +154,9 @@ before your chosen font loads — see [Fidelity rules](#fidelity-rules-do-not-re
 A selection of **shadcn/ui** components has been ported to Still Void with the design system's palette, typography, and spacing applied. Both server-safe and client-only variants are available:
 
 **Server-safe components** (import from `@still-void/ui/react`):
-- `Button` — with variants (default, destructive, outline, secondary, ghost, link) and sizes (sm, default, lg, icon)
-- `Card` — with header, title, description, content, footer
+- `Button` — with variants (default, destructive, outline, secondary, ghost, link, **accent**) and sizes (sm, default, lg, icon)
+- `Card` — with header, title, description, content, footer; renders as `<div>` by default, or any of `section`/`article`/`li`/`aside` via `as`, or merges onto a single child via `asChild`
+- `Icon` — a curated set of icons (`@heroicons/react` under the hood) with `size` (`sm`/`md`/`lg`) and an accessible `label`
 - `Input` — text input with placeholder, disabled, and focus states
 - `Alert` — with optional title and description
 - `Badge` — with variants (default, secondary, destructive, outline)
@@ -163,10 +167,12 @@ A selection of **shadcn/ui** components has been ported to Still Void with the d
 - `RadioGroup` / `RadioGroupItem` — `<fieldset>`/`<legend>` group of native radios
 - `Table` family — `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`, a presentational data table with a scrolling container
 
-All of the above style themselves through real `sv-*` CSS classes — no Tailwind required (see the note below).
+All of the above style themselves through real `sv-*` CSS classes — **no Tailwind required**,
+for any component this package ships, in any version.
 
 **Client-only components** (import from `@still-void/ui/react/client`):
-- `Dialog` — modal with trigger, content, header, footer, title, description
+- `Dialog` — modal with trigger, content, header, footer, title, description; renders a close button by default (`showCloseButton={false}` to opt out)
+- `AlertDialog` — the same modal mechanics as `Dialog`, without a close button, for destructive confirmations that must be resolved through explicit `Action`/`Cancel`
 - `Select` — dropdown with groups, labels, and scroll
 - `Dropdown` — menu with items, checkboxes, radio groups, labels, separators
 - `Tabs` — tabbed interface with triggers and content
@@ -211,23 +217,26 @@ export function SettingsDialog() {
 }
 ```
 
-**Note on Tailwind:** every **server-safe** component — the shadcn-derived ones (`Button`,
-`Card`, `Alert`, `Badge`, `Input`) and the form/table primitives above — styles itself
-through real `sv-*` classes in `@still-void/ui/style.css`, driven by `var(--sv-*)`, so it
-follows `[data-theme]`/`[data-accent]` with **zero Tailwind config**.
+**Note on Tailwind:** **no component this package ships requires Tailwind at all**, in either
+entry. Every component — server-safe or client — styles itself through real `sv-*` classes in
+`@still-void/ui/style.css`, driven by `var(--sv-*)`, so it follows `[data-theme]`/
+`[data-accent]` with **zero Tailwind config**. That was not always true: before `3.0.0`, the
+client-only family (`Dialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) still emitted
+Tailwind utility classes and rendered unstyled without one — see
+[docs/migration-v2-to-v3.md](docs/migration-v2-to-v3.md) if you're coming from `2.x`.
 
-The **client-only** family (`Dialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) has not
-been migrated yet and still emits Tailwind utility classes. If you use those, your app needs
-Tailwind configured against Still Void's tokens. On **v3**, import
-`@still-void/ui/tailwind-preset`. On **v4**, map the tokens in your own `@theme` block and add
-an `@source` pointing at `node_modules/@still-void/ui/dist` — the preset is a v3-format config
-and v4 ignores its `corePlugins.preflight`, so loading it there would re-enable Preflight and
-fight `style.css`. That is why the `tailwindcss` peer range is `>=3 <4`. Without one of the two
-paths those five components render unstyled, silently and with no build error.
+`@still-void/ui/tailwind.css` exists for a different reason: if **your own** markup wants
+`bg-sv-surface`/`text-sv-text`/`rounded-sv-lg`-style utilities built from this package's
+tokens, `@import "@still-void/ui/tailwind.css";` in a Tailwind **v4** project wires them up —
+a `@theme inline` block, so the generated utilities keep following `[data-theme]`/
+`[data-accent]` at runtime instead of freezing on whichever value was in scope at build time.
+This is why `tailwindcss` is declared as a peer dependency at `>=4` — the package no longer
+supports Tailwind v3 in any form, preset included (see the migration doc). The peer stays
+**optional**: a consumer with no Tailwind at all still gets every component correctly styled.
 
-`tailwindcss` is therefore declared as an **optional** peer dependency. There is also an
-opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element `box-shadow: none
-!important` resets) for consumers who install additional unstyled shadcn components of their
+There is also an opt-in `@still-void/ui/shadcn-overrides.css` subpath (bare-element
+`box-shadow: none !important` resets) for consumers who install additional unstyled shadcn
+components of their
 own — it is never imported automatically.
 
 ## Fidelity rules (do not regress)

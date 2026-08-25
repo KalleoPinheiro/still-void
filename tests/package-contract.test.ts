@@ -1,14 +1,13 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import stillVoidPreset from '../src/tailwind-preset';
 
 /**
  * D4: `shadcn-overrides.css` existed in `src/css/` but was never copied to
  * `dist/` and never given an export subpath, even though DESIGN.md:226
  * claims the layer is active. This contract pins the fix at the source —
  * text-level checks on the build script and `package.json`, in the style of
- * `tests/tokenParity.test.ts` and `tests/tailwind-config-contract.test.ts`.
+ * `tests/tokenParity.test.ts`.
  *
  * The sheet must stay **opt-in**: it applies `box-shadow: none !important`
  * to bare `button`/`input`/`select`/`textarea` selectors (see design.md's
@@ -22,14 +21,14 @@ const packageJson = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf-
   exports: Record<string, unknown>;
   scripts: Record<string, string>;
   files: string[];
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
   peerDependencies: Record<string, string>;
   peerDependenciesMeta?: Record<string, { optional?: boolean }>;
   typesVersions?: { '*'?: Record<string, string[]> };
 };
 const themeCss = readFileSync(resolve(root, 'src/css/theme.css'), 'utf-8');
 const styleCss = readFileSync(resolve(root, 'src/css/style.css'), 'utf-8');
-const tailwindConfigSource = readFileSync(resolve(root, 'tailwind.config.ts'), 'utf-8');
-const tailwindPresetSource = readFileSync(resolve(root, 'src/tailwind-preset.ts'), 'utf-8');
 
 describe('scripts/copy-css.mjs copies all three CSS files', () => {
   test.each(['theme.css', 'style.css', 'shadcn-overrides.css'])(
@@ -60,51 +59,44 @@ describe('shadcn-overrides.css stays opt-in, never auto-loaded', () => {
   });
 });
 
-describe('attw excludes the CSS-only entrypoints, including the new subpath', () => {
-  test('lint:package passes --exclude-entrypoints theme.css style.css shadcn-overrides.css', () => {
+describe('attw excludes every CSS-only entrypoint, tailwind.css included', () => {
+  test('lint:package passes --exclude-entrypoints for all four CSS subpaths', () => {
+    // attw flags any subpath with no type declarations as NoResolution
+    // unless it's listed here — confirmed the hard way when tailwind.css
+    // (T19) shipped without being added and lint:package started failing.
     const lintScript = packageJson.scripts['lint:package'];
     expect(lintScript).toContain('--exclude-entrypoints');
     expect(lintScript).toMatch(/--exclude-entrypoints[^&]*\btheme\.css\b/);
     expect(lintScript).toMatch(/--exclude-entrypoints[^&]*\bstyle\.css\b/);
+    expect(lintScript).toMatch(/--exclude-entrypoints[^&]*\btailwind\.css\b/);
     expect(lintScript).toMatch(/--exclude-entrypoints[^&]*\bshadcn-overrides\.css\b/);
   });
 });
 
 /**
- * D2/D3: the Tailwind preset was never published (no subpath, no `files`
- * coverage) and `tailwindcss` was never declared as a peer, so a consumer
- * following DESIGN.md had to copy the config by hand. These checks pin the
- * fix at the same text/JSON level as the checks above.
+ * AD-012: the Tailwind surface went v4-only in round 2 — the v3-format
+ * `./tailwind-preset` export, `src/tailwind-preset.ts` and `tailwind.config.ts`
+ * were removed outright (not deprecated), and the peer range moved from
+ * `>=3 <4` to `>=4`, kept optional (a consumer with no Tailwind at all still
+ * gets every component styled through style.css's sv-* classes, AD-001).
+ * These checks pin the removal as a permanent state, not a one-time diff —
+ * this is the one place editing a check IS the point, not a regression: the
+ * API being gone is the decision.
  */
 
-describe('package.json exposes the ./tailwind-preset subpath, ESM and CJS', () => {
-  test('exports["./tailwind-preset"] declares import and require conditions with types', () => {
-    expect(packageJson.exports['./tailwind-preset']).toEqual({
-      import: {
-        types: './dist/tailwind-preset.d.ts',
-        default: './dist/tailwind-preset.js',
-      },
-      require: {
-        types: './dist/tailwind-preset.d.cts',
-        default: './dist/tailwind-preset.cjs',
-      },
-    });
+describe('the v3 tailwind-preset surface is gone (AD-012)', () => {
+  test('exports has no ./tailwind-preset entry', () => {
+    expect(packageJson.exports['./tailwind-preset']).toBeUndefined();
   });
 
-  test('typesVersions maps tailwind-preset like the existing react/react-client subpaths', () => {
-    expect(packageJson.typesVersions?.['*']?.['tailwind-preset']).toEqual([
-      './dist/tailwind-preset.d.ts',
-    ]);
-  });
-
-  test('files includes dist, so the built preset ships in the tarball', () => {
-    expect(packageJson.files).toContain('dist');
+  test('typesVersions has no tailwind-preset entry', () => {
+    expect(packageJson.typesVersions?.['*']?.['tailwind-preset']).toBeUndefined();
   });
 });
 
-describe('tailwindcss is declared as an optional peer dependency', () => {
-  test('peerDependencies.tailwindcss is present', () => {
-    expect(packageJson.peerDependencies.tailwindcss).toBeDefined();
+describe('tailwindcss is a required-major, optional peer dependency (AD-012)', () => {
+  test('peerDependencies.tailwindcss requires v4+', () => {
+    expect(packageJson.peerDependencies.tailwindcss).toBe('>=4');
   });
 
   test('peerDependenciesMeta.tailwindcss.optional is true', () => {
@@ -112,23 +104,52 @@ describe('tailwindcss is declared as an optional peer dependency', () => {
   });
 });
 
-describe('src/tailwind-preset.ts is the single source of truth for the preset', () => {
-  test('tailwind.config.ts only re-exports src/tailwind-preset.ts', () => {
-    expect(tailwindConfigSource).toMatch(
-      /export\s*\{\s*default\s*\}\s*from\s*['"]\.\/src\/tailwind-preset['"]/,
-    );
-    // No duplicate copy of the theme.extend.colors block left behind at the root.
-    expect(tailwindConfigSource).not.toMatch(/colors:\s*\{/);
+describe('no v3-format artifact survives on disk (TW-07)', () => {
+  test.each(['src/tailwind-preset.ts', 'tailwind.config.ts'])('%s does not exist', (relPath) => {
+    expect(existsSync(resolve(root, relPath))).toBe(false);
   });
 
-  test('src/tailwind-preset.ts does not import a type from tailwindcss (avoids the v3/v4 Config mismatch)', () => {
-    // Anchored to an actual `import ... from 'tailwindcss'` statement, not
-    // the doc comment that explains why that import is deliberately absent.
-    expect(tailwindPresetSource).not.toMatch(/^\s*import\b[^\n]*from\s*['"]tailwindcss['"]/m);
+  test('tsup.config.ts has no tailwind-preset entry', () => {
+    const tsupConfig = readFileSync(resolve(root, 'tsup.config.ts'), 'utf-8');
+    expect(tsupConfig).not.toMatch(/tailwind-preset/);
+  });
+});
+
+/**
+ * ICON-06: the icons the package renders itself come from `@heroicons/react`,
+ * so the consumer has to receive it from `npm install @still-void/ui` without
+ * asking. Which section it sits in is the whole contract: a devDependency is
+ * not installed for consumers and a peerDependency makes them install it by
+ * hand — either one publishes a package whose Icon renders nothing.
+ */
+
+describe('@heroicons/react ships as a direct runtime dependency', () => {
+  test('dependencies["@heroicons/react"] is a caret-2 range', () => {
+    // AD-013 pinned the major line: 2.x is the release verified to carry no
+    // 'use client' and no hook, which is what keeps Icon server-safe.
+    expect(packageJson.dependencies['@heroicons/react']).toMatch(/^\^2(?:\.|$)/);
   });
 
-  test('the imported preset default-exports the same color binding tailwind.config.ts used to declare literally', () => {
-    expect(stillVoidPreset.theme.extend.colors['sv-bg']).toBe('var(--sv-bg)');
-    expect(stillVoidPreset.corePlugins.preflight).toBe(false);
+  test('it is declared in neither devDependencies nor peerDependencies', () => {
+    expect(packageJson.devDependencies['@heroicons/react']).toBeUndefined();
+    expect(packageJson.peerDependencies['@heroicons/react']).toBeUndefined();
+  });
+});
+
+/**
+ * AD-006 / AD-015. Design.md's original plan was to promote
+ * @radix-ui/react-slot to a direct dependency for Card's `asChild`. That plan
+ * changed after verifying (against the installed package's own dist) that
+ * Slot calls useComposedRefs, which calls React.useCallback — a real hook,
+ * `'use client'` directive or not — which would throw in a real Server
+ * Component. src/components/ui/slot.tsx ports only the hook-free ref-merge
+ * logic instead, with no import of either @radix-ui/react-slot or
+ * @radix-ui/react-compose-refs. This pins that neither package re-enters
+ * `dependencies` by accident in a future change.
+ */
+describe('Card does not depend on @radix-ui/react-slot or react-compose-refs (AD-015)', () => {
+  test('neither package is a direct dependency', () => {
+    expect(packageJson.dependencies['@radix-ui/react-slot']).toBeUndefined();
+    expect(packageJson.dependencies['@radix-ui/react-compose-refs']).toBeUndefined();
   });
 });

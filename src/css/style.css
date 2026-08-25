@@ -865,6 +865,14 @@ body.sv-body {
   text-decoration: underline;
 }
 
+.sv-btn--accent {
+  background: var(--sv-accent-ink);
+  color: var(--sv-bg);
+}
+.sv-btn--accent:hover {
+  background: color-mix(in srgb, var(--sv-accent-ink) 90%, transparent);
+}
+
 .sv-btn--sm {
   height: calc(var(--sv-space-8) + var(--sv-space-1));
   padding: 0 var(--sv-space-3);
@@ -997,4 +1005,404 @@ body.sv-body {
   background: transparent;
   border-color: var(--sv-border);
   color: var(--sv-text);
+}
+
+/* ---------- Icons ---------- */
+/* Heroicons render on the 24 grid with no width/height attribute and no size
+   prop, so CSS is the only thing that sizes them. `md` is the default and is
+   carried by the base rule, which is why it has no modifier. Each step is a
+   spacing token so an icon lines up with the control it sits inside. */
+.sv-icon {
+  width: var(--sv-space-5);
+  height: var(--sv-space-5);
+  color: currentcolor;
+  flex-shrink: 0;
+}
+.sv-icon--sm {
+  width: var(--sv-space-4);
+  height: var(--sv-space-4);
+}
+.sv-icon--lg {
+  width: var(--sv-space-6);
+  height: var(--sv-space-6);
+}
+
+/* ---------- Overlays ---------- */
+/* Shared fade for every portal surface (overlay, dialog panel, popover panel).
+   Driven by `animation`, not `transition` — Radix's Presence decides whether
+   to keep a closing element mounted long enough to animate out by reading the
+   node's computed `animation-name`, and a `transition` never sets it, so
+   Presence would unmount before a frame renders. The `sv-fade-in`/
+   `sv-fade-out` keyframes themselves live in theme.css, next to
+   `sv-skeleton-shimmer` — this section's own selector-body parser (in the CSS
+   contract tests) is flat and cannot handle a rule with nested braces. */
+
+/* The shared backdrop behind Dialog and AlertDialog. The class this replaces
+   named `bg-background/80`, a color no config in this package ever declared, so
+   the overlay rendered fully transparent and the page behind a modal stayed at
+   full contrast. Mixing over --sv-bg follows [data-theme] with zero consumer
+   configuration, and the layer comes from the named z scale rather than the
+   literal `z-50` that made a dialog and a tooltip stack by accident. */
+.sv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sv-z-backdrop);
+  background: color-mix(in srgb, var(--sv-bg) 80%, transparent);
+  backdrop-filter: blur(var(--sv-space-1));
+  -webkit-backdrop-filter: blur(var(--sv-space-1));
+}
+/* AD-009: fade only -- no zoom, no slide. The selector is always anchored to
+   the system class, because a bare [data-state='open'] would reach into the
+   consumer's own markup. */
+.sv-overlay[data-state='open'] {
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-overlay[data-state='closed'] {
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+/* ---------- Dialog ---------- */
+/* Centred panel on the modal layer. `shadow-lg` is gone: depth in this system
+   comes from the surface step and the border, never from a shadow. The max
+   width is the old max-w-lg (32rem) expressed on the spacing scale so it stays
+   in step with the rest of the sheet. */
+.sv-dialog {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--sv-z-modal);
+  display: grid;
+  gap: var(--sv-space-4);
+  width: 100%;
+  max-width: calc(var(--sv-space-16) * 8);
+  padding: var(--sv-space-6);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-lg);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-dialog[data-state='open'] {
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-dialog[data-state='closed'] {
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-dialog__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-1);
+}
+.sv-dialog__footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: var(--sv-space-2);
+}
+.sv-dialog__title {
+  font-family: var(--sv-font-display);
+  font-size: var(--sv-text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--sv-text);
+}
+.sv-dialog__description {
+  font-size: var(--sv-text-sm);
+  line-height: 1.5;
+  color: var(--sv-text-2);
+}
+/* The close button is a bare control: no border, no fill, and a hit target the
+   icon alone would not give it. Focus is an outline (AD-005) -- the ring-* the
+   shadcn layer used is box-shadow based and named a color that did not exist,
+   so this button had no visible focus at all. */
+.sv-dialog__close {
+  position: absolute;
+  top: var(--sv-space-4);
+  right: var(--sv-space-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sv-space-1);
+  border: none;
+  border-radius: var(--sv-radius-sm);
+  background: none;
+  color: var(--sv-text-2);
+  cursor: pointer;
+  transition: color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-dialog__close:hover {
+  color: var(--sv-text);
+}
+.sv-dialog__close:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- Popovers ---------- */
+/* One floating surface for the SelectContent, the DropdownMenuContent and the
+   TooltipContent. They were three near-identical utility strings before, which
+   is how SelectContent kept a `shadow-md` that Flat-By-Default forbids while
+   the other two had already lost theirs. min-width is the old 8rem expressed on
+   the spacing scale, so the panel stays in step with the rest of the sheet. */
+.sv-pop {
+  z-index: var(--sv-z-dropdown);
+  min-width: calc(var(--sv-space-16) * 2);
+  overflow: hidden;
+  padding: var(--sv-space-1);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+}
+.sv-pop[data-state='open'] {
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-pop[data-state='closed'] {
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+/* The scrollable window inside a Select. The cap is the old max-h-96 (24rem)
+   on the spacing scale; without it a long option list runs off the viewport. */
+.sv-pop__viewport {
+  max-height: calc(var(--sv-space-16) * 6);
+  overflow-y: auto;
+}
+/* Select's scroll-up / scroll-down affordances. */
+.sv-pop__scroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--sv-space-5);
+  color: var(--sv-text-2);
+  cursor: default;
+}
+
+/* In "popper" mode Radix anchors SelectContent to the trigger and writes
+   data-side once it resolves which side it flipped to; --sv-space-1 (4px) is
+   the same nudge the old build wrote as Tailwind's `translate-y-1`, now a
+   real declaration instead of four arbitrary-variant utilities. */
+.sv-pop--popper[data-side='bottom'] {
+  transform: translateY(var(--sv-space-1));
+}
+.sv-pop--popper[data-side='top'] {
+  transform: translateY(calc(var(--sv-space-1) * -1));
+}
+.sv-pop--popper[data-side='right'] {
+  transform: translateX(var(--sv-space-1));
+}
+.sv-pop--popper[data-side='left'] {
+  transform: translateX(calc(var(--sv-space-1) * -1));
+}
+/* Matches the panel to the trigger's own footprint so it never renders
+   narrower or wider than the control that opened it. The custom properties
+   are Radix's own — set on the DOM node regardless of build tooling — not a
+   Tailwind arbitrary value, so this needs no bracket syntax to read them. */
+.sv-pop__viewport--popper {
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+  height: var(--radix-select-trigger-height);
+}
+
+/* ---------- Tooltip ---------- */
+/* Declares only what differs from .sv-pop: a tooltip floats above every other
+   layer, holds one line of text rather than a list, and needs no min-width. */
+.sv-tooltip {
+  z-index: var(--sv-z-tooltip);
+  min-width: 0;
+  padding: var(--sv-space-1) var(--sv-space-3);
+  font-size: var(--sv-text-sm);
+}
+
+/* ---------- Menu items ---------- */
+/* The shared list row for Select and DropdownMenu, plus the labels, separators
+   and shortcuts that sit beside it. The indicator gets a real slot in the flex
+   row instead of the `pl-8` these items used to carry: that padding reserved
+   room for an indicator neither component ever rendered, so every option sat
+   indented against nothing. */
+.sv-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-2);
+  width: 100%;
+  padding: var(--sv-space-1) var(--sv-space-2);
+  border-radius: var(--sv-radius-sm);
+  color: var(--sv-text);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  line-height: 1.5;
+  text-align: start;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover);
+}
+/* Radix moves [data-highlighted] with the keyboard as well as the pointer, so
+   hover and roving focus have to look identical or the two input modes drift. */
+.sv-menu-item:hover,
+.sv-menu-item[data-highlighted] {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-menu-item:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-menu-item[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+/* An inset row lines up with the rows that do carry an indicator. */
+.sv-menu-item--inset {
+  padding-left: var(--sv-space-8);
+}
+
+.sv-menu-item__indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--sv-space-4);
+  height: var(--sv-space-4);
+}
+/* An indicator that renders nothing must take no room. A reserved-but-empty
+   slot is exactly the defect this section replaces, and `icon={null}` has to
+   collapse it rather than reintroduce it under a new name. */
+.sv-menu-item__indicator:empty {
+  display: none;
+}
+/* The radio mark is a circle in CSS: the curated heroicons set has no dot on
+   the 24 grid, and currentColor keeps it in step with the row's text. */
+.sv-menu-item__dot {
+  width: var(--sv-space-2);
+  height: var(--sv-space-2);
+  border-radius: var(--sv-radius-full);
+  background: currentcolor;
+}
+
+.sv-menu-label {
+  padding: var(--sv-space-1) var(--sv-space-2);
+  color: var(--sv-text-2);
+  font-size: var(--sv-text-sm);
+  font-weight: 600;
+}
+/* A border rather than a filled box: the hairline is a length the spacing scale
+   does not carry, and border-width is where a literal 1px belongs. */
+.sv-menu-separator {
+  height: 0;
+  margin: var(--sv-space-1) 0;
+  border: none;
+  border-top: 1px solid var(--sv-border);
+}
+.sv-menu-shortcut {
+  margin-inline-start: auto;
+  color: var(--sv-text-3);
+  font-family: var(--sv-font-mono);
+  font-size: var(--sv-text-xs);
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Tabs ---------- */
+/* The list is a raised strip and the active trigger sits on the base surface,
+   one tonal step above it. That step is the whole affordance: the shadcn
+   original stacked a `shadow-sm` on top, which Flat-By-Default forbids and
+   which this system reads as depth the border already carries. */
+.sv-tabs {
+  display: flex;
+  flex-direction: column;
+}
+.sv-tabs__list {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sv-space-1);
+  height: var(--sv-space-10);
+  padding: var(--sv-space-1);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface-2);
+  color: var(--sv-text-2);
+}
+.sv-tabs__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sv-space-1) var(--sv-space-3);
+  border: none;
+  border-radius: var(--sv-radius-sm);
+  background: none;
+  color: inherit;
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+/* AD-005: the ring-* utilities this replaces are box-shadow based and named a
+   ring color the package never declared, so a keyboard user tabbing through
+   the strip saw nothing at all. */
+.sv-tabs__trigger:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-tabs__trigger:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+.sv-tabs__trigger[data-state='active'] {
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-tabs__content {
+  margin-top: var(--sv-space-2);
+}
+.sv-tabs__content:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced motion ---------- */
+/* This block lives here, at the end of style.css, and not in theme.css, for a
+   cascade reason: `@media` adds no specificity, and README documents the
+   import order as theme.css then style.css. A `transition: none` written in
+   theme.css therefore loses to the base rule in this file — same specificity,
+   later document order — and the override silently never applies. Five classes
+   shipped in v2 exactly that way. tests/reduced-motion-contract.test.ts pins
+   the property: the reduce rule for a class must sit in the same sheet as its
+   base rule, and after it. */
+@media (prefers-reduced-motion: reduce) {
+  /* Hover and active colour fades across nav, pills, buttons, badges, table
+     rows and menu chrome are non-essential motion — instant is the
+     reduced-motion default. The reading progress bar is deliberately absent:
+     its transition tracks the user's own scroll input 1:1, so it is not
+     decoration. */
+  .sv-header__link,
+  .sv-footer__link,
+  .sv-pill--interactive,
+  .sv-code-block__copy,
+  .sv-toc__link,
+  .sv-table__row,
+  .sv-btn,
+  .sv-badge,
+  .sv-dialog__close,
+  .sv-menu-item,
+  .sv-tabs__trigger {
+    transition: none;
+  }
+  /* AD-009 lets the portal family fade because open/closed carries state, but
+     the fade is still an enhancement — under reduced motion the panel simply
+     appears/disappears. `animation: none` (not `transition: none` — the fade
+     is driven by @keyframes so Presence's animationend-based unmount timing
+     detects it) means Presence sees no animation and unmounts on close the
+     same instant it would if the browser had no reduced-motion support at
+     all — the closed panel never has a chance to snap into view. */
+  .sv-overlay,
+  .sv-dialog,
+  .sv-pop {
+    animation: none;
+  }
 }

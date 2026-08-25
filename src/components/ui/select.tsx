@@ -1,24 +1,48 @@
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { cn } from "../../lib/utils"
+import { Icon } from "./icon"
 
 const Select = SelectPrimitive.Root
 const SelectGroup = SelectPrimitive.Group
 const SelectValue = SelectPrimitive.Value
 
+/**
+ * `icon` is the same contract on every member that owns an indicator slot
+ * (CLIENT-14): omit it and the system icon renders, pass a node and that node
+ * takes the slot, pass `null` and nothing is rendered at all so the slot
+ * collapses. `null` has to be distinguishable from "omitted", which is why the
+ * default lives in the parameter — a default only fires on `undefined`.
+ */
+export interface SelectTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> {
+  icon?: React.ReactNode
+}
+
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-sv-border bg-sv-surface px-3 py-2 text-sm ring-offset-background placeholder:text-sv-text-2 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
-    )}
-    {...props}
-  />
-))
+  SelectTriggerProps
+>(
+  (
+    { className, children, icon = <Icon name="chevron-down" />, ...props },
+    ref
+  ) => (
+    // The trigger IS a form field, so it shares .sv-field with Input, Textarea
+    // and NativeSelect rather than restating the frame. The utility string this
+    // replaces named `ring-offset-background` and `focus:ring-accent`, neither
+    // of which this package ever declared: the field had no visible focus.
+    <SelectPrimitive.Trigger
+      ref={ref}
+      className={cn("sv-field", className)}
+      {...props}
+    >
+      {children}
+      {icon === null ? null : (
+        <SelectPrimitive.Icon>{icon}</SelectPrimitive.Icon>
+      )}
+    </SelectPrimitive.Trigger>
+  )
+)
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef<
@@ -27,12 +51,11 @@ const SelectScrollUpButton = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.ScrollUpButton
     ref={ref}
-    className={cn(
-      "flex cursor-pointer items-center justify-center py-1",
-      className
-    )}
+    className={cn("sv-pop__scroll", className)}
     {...props}
-  />
+  >
+    <Icon name="chevron-up" />
+  </SelectPrimitive.ScrollUpButton>
 ))
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
 
@@ -42,12 +65,11 @@ const SelectScrollDownButton = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.ScrollDownButton
     ref={ref}
-    className={cn(
-      "flex cursor-pointer items-center justify-center py-1",
-      className
-    )}
+    className={cn("sv-pop__scroll", className)}
     {...props}
-  />
+  >
+    <Icon name="chevron-down" />
+  </SelectPrimitive.ScrollDownButton>
 ))
 SelectScrollDownButton.displayName =
   SelectPrimitive.ScrollDownButton.displayName
@@ -57,23 +79,25 @@ const SelectContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
 >(({ className, children, position = "popper", ...props }, ref) => (
   <SelectPrimitive.Portal>
+    {/*
+      In "popper" mode Radix anchors the panel to the trigger and sets
+      data-side/data-align for the flip it resolved; "item-aligned" has no
+      anchor to nudge against, so the modifier only applies in the former.
+      The old Tailwind build carried this as
+      `position === "popper" && "data-[side=bottom]:translate-y-1 ..."` —
+      same behavior, ported to .sv-pop--popper/[data-side] in style.css.
+    */}
     <SelectPrimitive.Content
       ref={ref}
-      className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-sv-border bg-sv-surface text-sv-text shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-        className
-      )}
+      className={cn("sv-pop", position === "popper" && "sv-pop--popper", className)}
       position={position}
       {...props}
     >
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={cn(
-          "p-1",
-          position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+          "sv-pop__viewport",
+          position === "popper" && "sv-pop__viewport--popper",
         )}
       >
         {children}
@@ -84,18 +108,34 @@ const SelectContent = React.forwardRef<
 ))
 SelectContent.displayName = SelectPrimitive.Content.displayName
 
+export interface SelectItemProps
+  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> {
+  icon?: React.ReactNode
+}
+
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, ...props }, ref) => (
+  SelectItemProps
+>(({ className, children, icon = <Icon name="check" />, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
-    className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-sv-surface-2 focus:text-sv-text data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
+    className={cn("sv-menu-item", className)}
     {...props}
-  />
+  >
+    {icon === null ? null : (
+      <SelectPrimitive.ItemIndicator className="sv-menu-item__indicator">
+        {icon}
+      </SelectPrimitive.ItemIndicator>
+    )}
+    {/*
+      CLIENT-13. Without ItemText the children are plain markup inside the
+      option: Radix has nothing to portal into the trigger, and SelectValue —
+      which renders nothing of its own once a value is set — leaves the trigger
+      BLANK the moment the user picks something. ItemText both labels the option
+      and feeds the trigger, so it is not optional decoration.
+    */}
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+  </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
 
@@ -105,7 +145,7 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+    className={cn("sv-menu-label", className)}
     {...props}
   />
 ))
@@ -117,7 +157,7 @@ const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-sv-border", className)}
+    className={cn("sv-menu-separator", className)}
     {...props}
   />
 ))

@@ -1,0 +1,72 @@
+/**
+ * Still Void — Tailwind v4 CSS-first theme entry.
+ * Import once, after theme.css: `@import "@still-void/ui/tailwind.css";`
+ *
+ * This file exists for the CONSUMER's own markup, not for this package's
+ * components — every component this package ships styles itself through
+ * `sv-*` classes in style.css and needs zero Tailwind configuration (AD-001).
+ * If a consumer wants `bg-sv-surface`, `text-sv-text` and similar utilities
+ * available in their own JSX, this is what wires the design tokens into
+ * Tailwind's utility generator.
+ *
+ * `@theme inline`, not a bare `@theme`: every value below is `var(--sv-*)`,
+ * and those variables are redeclared under `[data-theme='light']` and each
+ * `[data-accent]` in theme.css. Without `inline`, Tailwind resolves the
+ * theme variable once and bakes that value into the generated utility class
+ * — the utility would freeze on whichever value was in scope wherever the
+ * @theme block itself happened to be read, and stop following `[data-theme]`
+ * switches. `inline` keeps the utility referencing the CSS variable at the
+ * point of use instead, which is what lets it react to the runtime switch
+ * the same way every `sv-*` class in style.css already does. Confirmed
+ * against Tailwind's own docs before writing this (see design.md).
+ *
+ * No `@source` here (AD-011): after round 2 no component in `dist` emits a
+ * Tailwind class for a scanner to find — the family that used to (Dialog,
+ * DropdownMenu, Select, Tabs, Tooltip) migrated to `sv-*` in this same round.
+ * A `@source` pointed at this package's `dist` would scan an empty target.
+ *
+ * Color and radius keys are namespaced `sv-*` (`--color-sv-*`, `--radius-sv-*`)
+ * rather than overriding Tailwind's own `--color-gray-*` / `--radius-md` etc:
+ * a consumer using vanilla `rounded-md` elsewhere in their app must not have
+ * its value silently changed by importing this file.
+ */
+
+@theme inline {
+  /* Colors -> bg-sv-*, text-sv-*, border-sv-*, fill-sv-*, ... */
+  --color-sv-bg: var(--sv-bg);
+  --color-sv-bg-elev: var(--sv-bg-elev);
+  --color-sv-surface: var(--sv-surface);
+  --color-sv-surface-2: var(--sv-surface-2);
+  --color-sv-border: var(--sv-border);
+  --color-sv-border-strong: var(--sv-border-strong);
+  --color-sv-text: var(--sv-text);
+  --color-sv-text-2: var(--sv-text-2);
+  --color-sv-text-3: var(--sv-text-3);
+  --color-sv-signal-cyan: var(--sv-accent-cyan);
+  --color-sv-twilight-violet: var(--sv-accent-violet);
+  --color-sv-quiet-mint: var(--sv-accent-mint);
+  --color-sv-warm-amber: var(--sv-accent-amber);
+
+  /* Fonts -> font-sv-display, font-sv-body, font-sv-mono */
+  --font-sv-display: var(--sv-font-display);
+  --font-sv-body: var(--sv-font-body);
+  --font-sv-mono: var(--sv-font-mono);
+
+  /*
+   * Spacing -> every padding, margin, gap, width and height utility.
+   * Tailwind computes its whole numeric spacing scale as
+   * calc(var(--spacing) times N); sv-space-1 IS that atomic unit (4px), and
+   * every other sv-space-N step is already N times it (sv-space-6 = 24px =
+   * 6 times 4px). Overriding the single multiplier ties the entire scale to
+   * the token in one line instead of redeclaring each step, and keeps
+   * values in sync automatically if sv-space-1 ever changes.
+   */
+  --spacing: var(--sv-space-1);
+
+  /* Radius -> rounded-sv-sm .. rounded-sv-full */
+  --radius-sv-sm: var(--sv-radius-sm);
+  --radius-sv-md: var(--sv-radius-md);
+  --radius-sv-lg: var(--sv-radius-lg);
+  --radius-sv-xl: var(--sv-radius-xl);
+  --radius-sv-full: var(--sv-radius-full);
+}

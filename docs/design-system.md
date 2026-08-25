@@ -29,7 +29,7 @@ utilities on top of Still Void's tokens:
 
 | Entry | What it is |
 | --- | --- |
-| `@still-void/ui/tailwind-preset` | A Tailwind preset mapping `sv-*` color/spacing/radius keys to `var(--sv-*)`. Optional — the components themselves style through real `sv-*` CSS and need no Tailwind at all (see "Tailwind is optional" below) |
+| `@still-void/ui/tailwind.css` | A Tailwind **v4** CSS-first `@theme inline` block mapping `--color-sv-*`, `--font-sv-*`, `--spacing`, and `--radius-sv-*` to `var(--sv-*)`. `@import` it once; optional — the components themselves style through real `sv-*` CSS and need no Tailwind at all (see "Tailwind is optional" below) |
 
 **Rule of thumb:** import from `@still-void/ui/react` by default. Reach for
 `@still-void/ui/react/client` only for the specific pieces that need it (theme
@@ -39,13 +39,17 @@ slots/`children`, never by making a whole page a Client Component.
 
 ### Tailwind is optional
 
-Every server-safe component — including the shadcn-derived `Button`, `Card`, `Alert`,
-`Badge` and the form/table primitives below — styles itself through real `sv-*` classes
-in `style.css`, driven by `var(--sv-*)`. None of them need Tailwind, a Tailwind config,
-or any build-time CSS processing beyond loading `theme.css` + `style.css`. `tailwindcss`
-is declared as an **optional peer dependency**: install it and load
-`@still-void/ui/tailwind-preset` only if you're composing your own markup with Tailwind
-utilities against Still Void's tokens — the package's own components don't need it.
+Every component this package ships — server-safe or client, including the shadcn-derived
+`Button`, `Card`, `Alert`, `Badge`, the form/table primitives, and the `Dialog`/`Select`/
+`DropdownMenu`/`Tabs`/`Tooltip`/`AlertDialog` family — styles itself through real `sv-*`
+classes in `style.css`, driven by `var(--sv-*)`. None of them need Tailwind, a Tailwind
+config, or any build-time CSS processing beyond loading `theme.css` + `style.css`.
+`tailwindcss` is declared as a peer dependency at `>=4` (still **optional**): install it
+and `@import "@still-void/ui/tailwind.css"` only if you're composing your **own** markup
+with Tailwind utilities against Still Void's tokens — the package's own components don't
+need it. Tailwind v3 is no longer supported in any form (the `v2.x` line's
+`./tailwind-preset` export is gone as of `3.0.0`) — see
+[migration-v2-to-v3.md](migration-v2-to-v3.md) if you're upgrading.
 
 ## Design tokens
 
@@ -93,7 +97,8 @@ component:
 | `Header`, `Logo`, `Footer` | Shell layout pieces |
 | `Content` primitives — `CategoryPill`, `PostCard`, `FeaturedPostCard`, `PostGrid`, `Layout`, `Sidebar`, `SidebarSection`, `Hero`, `Skeleton`, `CardSkeleton` | Blog/content layout |
 | `Article`, `ThemeScript` | Article shell; `ThemeScript` inlines the pre-hydration theme script to avoid FOUC |
-| `Button`, `Card` (+ `CardHeader`/`CardFooter`/`CardTitle`/`CardDescription`/`CardContent`), `Alert` (+ `AlertTitle`/`AlertDescription`), `Badge`, `Input` | shadcn/ui components with no internal state |
+| `Button` (variants `default`/`destructive`/`outline`/`secondary`/`ghost`/`link`/`accent`), `Card` (+ `CardHeader`/`CardFooter`/`CardTitle`/`CardDescription`/`CardContent`; renders `<div>` by default, `as="section"\|"article"\|"li"\|"aside"` to pick another tag, or `asChild` to merge onto a single child — `asChild` wins if both are given), `Alert` (+ `AlertTitle`/`AlertDescription`), `Badge`, `Input` | shadcn/ui components with no internal state |
+| `Icon` | Curated, server-safe icon set over `@heroicons/react/24/outline`. `name` (a closed union), `size` (`sm`\|`md`\|`lg`, default `md`, sized via `.sv-icon` tokens, never a `size` prop on the underlying SVG), `label` for an accessible name (otherwise `aria-hidden`) |
 | `Textarea` | `<textarea>`, styled via `field({ variant: 'textarea' })`. Accepts `rows` — the attribute `Input` never took |
 | `NativeSelect` | Real `<select>` — form field, serializes into `FormData`, driveable by `userEvent.selectOptions`. **Coexists on purpose with `Select`** (client-only Radix combobox) — see "NativeSelect vs. Select" below |
 | `FileInput` | `<input type="file">` with a styled `::file-selector-button`. `type` is fixed to `"file"` even if a caller passes another `type` |
@@ -132,7 +137,7 @@ declare its own. A `RadioGroupItem`'s own `name` always wins over the group's.
 | `TableOfContents` | Wraps scroll-spy behavior for active-heading tracking |
 | `ReadingProgress` | Wraps `createReadingProgress` |
 | `useScrollSpy`, `useReadingProgress` | Raw hooks, if you want to build custom UI around the behaviors |
-| shadcn/ui: `Dialog` family, `AlertDialog` family, `DropdownMenu` family, `Select` family, `Tabs` family, `Tooltip` family | Radix-backed, require client state |
+| shadcn/ui: `Dialog` family, `AlertDialog` family, `DropdownMenu` family, `Select` family, `Tabs` family, `Tooltip` family | Radix-backed, require client state. `DialogContent` renders a close button by default (`<Icon name="x" />`, opt out with `showCloseButton={false}`); `AlertDialogContent` never does — a destructive confirmation resolves through explicit `AlertDialogAction`/`AlertDialogCancel`, not an escape-hatch X |
 
 Every shadcn component (server-safe or client) follows the Still Void CSS rules —
 no box-shadow, tokens for spacing/radii, one accent at a time. See CONTRIBUTING.md if

@@ -13,6 +13,7 @@ export {
   DialogClose,
   DialogTrigger,
   DialogContent,
+  type DialogContentProps,
   DialogHeader,
   DialogFooter,
   DialogTitle,
@@ -20,12 +21,28 @@ export {
 } from '../../components/ui/dialog';
 
 export {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '../../components/ui/alert-dialog';
+
+export {
   Select,
   SelectGroup,
   SelectValue,
   SelectTrigger,
+  type SelectTriggerProps,
   SelectContent,
   SelectItem,
+  type SelectItemProps,
   SelectLabel,
   SelectSeparator,
   SelectScrollUpButton,
@@ -38,7 +55,9 @@ export {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
+  type DropdownMenuCheckboxItemProps,
   DropdownMenuRadioItem,
+  type DropdownMenuRadioItemProps,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
@@ -47,6 +66,7 @@ export {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  type DropdownMenuSubTriggerProps,
   DropdownMenuRadioGroup,
 } from '../../components/ui/dropdown-menu';
 
