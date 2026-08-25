@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: In Progress — Fases 1–6 concluídas (T1–T18 + T24)
+**Status**: Implementação concluída — T1–T24 (todas as 7 fases). Aguardando Verifier.
 
 ---
 
@@ -530,7 +530,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T19: Publicar `@still-void/ui/tailwind.css`
+### ✅ T19: Publicar `@still-void/ui/tailwind.css` — `a5d8e88`
 
 **What**: criar o arquivo `@theme inline`, copiar para `dist` e expor o subpath.
 **Where**: `src/css/tailwind.css` (novo), `scripts/copy-css.mjs`, `package.json`, `tests/tailwind-css-contract.test.ts` (novo)
@@ -554,7 +554,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T20: Tailwind v4-only — remover o preset e estreitar o peer
+### ✅ T20: Tailwind v4-only — remover o preset e estreitar o peer — `91a151e`
 
 **What**: apagar o artefato v3 e mover o peer para `>=4`.
 **Where**: `src/tailwind-preset.ts` (remover), `tailwind.config.ts` (remover), `tsup.config.ts`, `package.json`, `tests/package-contract.test.ts`, `tests/tailwind-config-contract.test.ts` (remover)
@@ -577,7 +577,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T21: Documentação
+### ✅ T21: Documentação — `0058513`
 
 **What**: atualizar README e `docs/design-system.md`, e escrever a doc de migração `v2 → v3`.
 **Where**: `README.md`, `docs/design-system.md`, `docs/migration-v2-to-v3.md` (novo), `DESIGN.md:243`
@@ -601,7 +601,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T22: Stories do Storybook
+### ✅ T22: Stories do Storybook — `c5fda6d`
 
 **What**: story para `Icon` e para `AlertDialog`.
 **Where**: `src/react/stories/Icon.stories.tsx`, `src/react/stories/AlertDialog.stories.tsx`
@@ -622,7 +622,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T23: Changesets
+### ✅ T23: Changesets — `f5d7428`
 
 **What**: escrever os três changesets da rodada, no nível de bump correto.
 **Where**: `.changeset/*.md`
