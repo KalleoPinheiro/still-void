@@ -1175,3 +1175,91 @@ body.sv-body {
   padding: var(--sv-space-1) var(--sv-space-3);
   font-size: var(--sv-text-sm);
 }
+
+/* ---------- Menu items ---------- */
+/* The shared list row for Select and DropdownMenu, plus the labels, separators
+   and shortcuts that sit beside it. The indicator gets a real slot in the flex
+   row instead of the `pl-8` these items used to carry: that padding reserved
+   room for an indicator neither component ever rendered, so every option sat
+   indented against nothing. */
+.sv-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-2);
+  width: 100%;
+  padding: var(--sv-space-1) var(--sv-space-2);
+  border-radius: var(--sv-radius-sm);
+  color: var(--sv-text);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  line-height: 1.5;
+  text-align: start;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover);
+}
+/* Radix moves [data-highlighted] with the keyboard as well as the pointer, so
+   hover and roving focus have to look identical or the two input modes drift. */
+.sv-menu-item:hover,
+.sv-menu-item[data-highlighted] {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-menu-item:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-menu-item[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+/* An inset row lines up with the rows that do carry an indicator. */
+.sv-menu-item--inset {
+  padding-left: var(--sv-space-8);
+}
+
+.sv-menu-item__indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--sv-space-4);
+  height: var(--sv-space-4);
+}
+/* An indicator that renders nothing must take no room. A reserved-but-empty
+   slot is exactly the defect this section replaces, and `icon={null}` has to
+   collapse it rather than reintroduce it under a new name. */
+.sv-menu-item__indicator:empty {
+  display: none;
+}
+/* The radio mark is a circle in CSS: the curated heroicons set has no dot on
+   the 24 grid, and currentColor keeps it in step with the row's text. */
+.sv-menu-item__dot {
+  width: var(--sv-space-2);
+  height: var(--sv-space-2);
+  border-radius: var(--sv-radius-full);
+  background: currentColor;
+}
+
+.sv-menu-label {
+  padding: var(--sv-space-1) var(--sv-space-2);
+  color: var(--sv-text-2);
+  font-size: var(--sv-text-sm);
+  font-weight: 600;
+}
+/* A border rather than a filled box: the hairline is a length the spacing scale
+   does not carry, and border-width is where a literal 1px belongs. */
+.sv-menu-separator {
+  height: 0;
+  margin: var(--sv-space-1) 0;
+  border: none;
+  border-top: 1px solid var(--sv-border);
+}
+.sv-menu-shortcut {
+  margin-inline-start: auto;
+  color: var(--sv-text-3);
+  font-family: var(--sv-font-mono);
+  font-size: var(--sv-text-xs);
+  letter-spacing: 0.05em;
+}

@@ -313,3 +313,94 @@ describe('client CSS contract — the floating panel primitive', () => {
     expect(decl(reducedMotion, '.sv-pop', 'transition')).toBe('none');
   });
 });
+
+// ---------------------------------------------------------------------------
+// T7 -- Menu items
+// ---------------------------------------------------------------------------
+
+const menu = rulesOf('Menu items');
+
+describe('client CSS contract — the menu item primitive', () => {
+  test.each([
+    ['.sv-menu-item'],
+    ['.sv-menu-item--inset'],
+    ['.sv-menu-item__indicator'],
+    ['.sv-menu-item__dot'],
+    ['.sv-menu-label'],
+    ['.sv-menu-separator'],
+    ['.sv-menu-shortcut'],
+  ])('%s exists as an exact selector, not a prefix match', (selector) => {
+    // `.sv-menu-item__dot` contains the substring `.sv-menu-item`; only an
+    // exact-key lookup proves the rule itself is present.
+    expect([...menu.keys()]).toContain(selector);
+  });
+
+  test('.sv-menu-item is a token-built row', () => {
+    expect(decl(menu, '.sv-menu-item', 'gap')).toBe('var(--sv-space-2)');
+    expect(decl(menu, '.sv-menu-item', 'padding')).toBe(
+      'var(--sv-space-1) var(--sv-space-2)',
+    );
+    expect(decl(menu, '.sv-menu-item', 'border-radius')).toBe('var(--sv-radius-sm)');
+    expect(decl(menu, '.sv-menu-item', 'color')).toBe('var(--sv-text)');
+    expect(decl(menu, '.sv-menu-item', 'font-size')).toBe('var(--sv-text-base)');
+  });
+
+  test.each([
+    ['.sv-menu-item:hover'],
+    ['.sv-menu-item[data-highlighted]'],
+  ])('%s highlights on the raised surface step', (selector) => {
+    // Radix moves [data-highlighted] with the keyboard, so the two input modes
+    // have to resolve to the same fill or they drift apart.
+    expect(decl(menu, selector, 'background')).toBe('var(--sv-surface-2)');
+  });
+
+  test('.sv-menu-item[data-disabled] is dimmed and inert', () => {
+    expect(decl(menu, '.sv-menu-item[data-disabled]', 'opacity')).toBe('0.5');
+    expect(decl(menu, '.sv-menu-item[data-disabled]', 'pointer-events')).toBe('none');
+  });
+
+  test('.sv-menu-item states focus with an outline, never a ring (CLIENT-11)', () => {
+    const focus = bodyOf(menu, '.sv-menu-item:focus-visible');
+    expect(focus).toMatch(/outline:\s*2px solid var\(--sv-accent-ink\)/);
+    expect(focus).toMatch(/outline-offset:\s*2px/);
+  });
+
+  test('.sv-menu-item__indicator reserves a token-sized slot (CLIENT-09)', () => {
+    expect(decl(menu, '.sv-menu-item__indicator', 'width')).toBe('var(--sv-space-4)');
+    expect(decl(menu, '.sv-menu-item__indicator', 'height')).toBe('var(--sv-space-4)');
+    expect(decl(menu, '.sv-menu-item__indicator', 'flex-shrink')).toBe('0');
+  });
+
+  test('an empty indicator collapses instead of reserving dead space', () => {
+    // This is the `pl-8` defect in one rule: without :empty, `icon={null}`
+    // would indent the row against an indicator that renders nothing.
+    expect(decl(menu, '.sv-menu-item__indicator:empty', 'display')).toBe('none');
+  });
+
+  test('.sv-menu-item--inset shifts the row and nothing else', () => {
+    // A modifier that also restated the fill or the radius would let inset and
+    // non-inset rows diverge visually.
+    expect(properties(menu, '.sv-menu-item--inset')).toEqual(['padding-left']);
+    expect(decl(menu, '.sv-menu-item--inset', 'padding-left')).toBe('var(--sv-space-8)');
+  });
+
+  test('.sv-menu-item__dot is a round, token-sized mark in the row color', () => {
+    expect(decl(menu, '.sv-menu-item__dot', 'width')).toBe('var(--sv-space-2)');
+    expect(decl(menu, '.sv-menu-item__dot', 'height')).toBe('var(--sv-space-2)');
+    expect(decl(menu, '.sv-menu-item__dot', 'border-radius')).toBe('var(--sv-radius-full)');
+    expect(decl(menu, '.sv-menu-item__dot', 'background')).toBe('currentColor');
+  });
+
+  test('the label, separator and shortcut read from tokens', () => {
+    expect(decl(menu, '.sv-menu-label', 'color')).toBe('var(--sv-text-2)');
+    expect(decl(menu, '.sv-menu-separator', 'border-top')).toBe(
+      '1px solid var(--sv-border)',
+    );
+    expect(decl(menu, '.sv-menu-shortcut', 'color')).toBe('var(--sv-text-3)');
+    expect(decl(menu, '.sv-menu-shortcut', 'font-family')).toBe('var(--sv-font-mono)');
+  });
+
+  test('the Menu items section obeys the Still Void design rules', () => {
+    expectSystemRules(menu);
+  });
+});
