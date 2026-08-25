@@ -1263,3 +1263,64 @@ body.sv-body {
   font-size: var(--sv-text-xs);
   letter-spacing: 0.05em;
 }
+
+/* ---------- Tabs ---------- */
+/* The list is a raised strip and the active trigger sits on the base surface,
+   one tonal step above it. That step is the whole affordance: the shadcn
+   original stacked a `shadow-sm` on top, which Flat-By-Default forbids and
+   which this system reads as depth the border already carries. */
+.sv-tabs {
+  display: flex;
+  flex-direction: column;
+}
+.sv-tabs__list {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sv-space-1);
+  height: var(--sv-space-10);
+  padding: var(--sv-space-1);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface-2);
+  color: var(--sv-text-2);
+}
+.sv-tabs__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sv-space-1) var(--sv-space-3);
+  border: none;
+  border-radius: var(--sv-radius-sm);
+  background: none;
+  color: inherit;
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+/* AD-005: the ring-* utilities this replaces are box-shadow based and named a
+   ring color the package never declared, so a keyboard user tabbing through
+   the strip saw nothing at all. */
+.sv-tabs__trigger:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-tabs__trigger:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+.sv-tabs__trigger[data-state='active'] {
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-tabs__content {
+  margin-top: var(--sv-space-2);
+}
+.sv-tabs__content:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}

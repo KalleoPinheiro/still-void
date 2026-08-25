@@ -404,3 +404,61 @@ describe('client CSS contract — the menu item primitive', () => {
     expectSystemRules(menu);
   });
 });
+
+// ---------------------------------------------------------------------------
+// T8 -- Tabs
+// ---------------------------------------------------------------------------
+
+const tabs = rulesOf('Tabs');
+
+describe('client CSS contract — the tabs section', () => {
+  test.each([
+    ['.sv-tabs'],
+    ['.sv-tabs__list'],
+    ['.sv-tabs__trigger'],
+    ['.sv-tabs__content'],
+  ])('%s exists as an exact selector, not a prefix match', (selector) => {
+    // `.sv-tabs__list` contains the substring `.sv-tabs`; only an exact-key
+    // lookup proves the base rule itself is present.
+    expect([...tabs.keys()]).toContain(selector);
+  });
+
+  test('.sv-tabs__list is a raised strip built from tokens', () => {
+    expect(decl(tabs, '.sv-tabs__list', 'background')).toBe('var(--sv-surface-2)');
+    expect(decl(tabs, '.sv-tabs__list', 'border-radius')).toBe('var(--sv-radius-md)');
+    expect(decl(tabs, '.sv-tabs__list', 'height')).toBe('var(--sv-space-10)');
+    expect(decl(tabs, '.sv-tabs__list', 'padding')).toBe('var(--sv-space-1)');
+  });
+
+  test('the active trigger lifts by surface step alone (CLIENT-04)', () => {
+    // shadow-sm was the shadcn affordance here; the tonal step between
+    // --sv-surface-2 and --sv-surface replaces it entirely.
+    const active = bodyOf(tabs, ".sv-tabs__trigger[data-state='active']");
+    expect(decl(tabs, ".sv-tabs__trigger[data-state='active']", 'background')).toBe(
+      'var(--sv-surface)',
+    );
+    expect(decl(tabs, ".sv-tabs__trigger[data-state='active']", 'color')).toBe(
+      'var(--sv-text)',
+    );
+    expect(active).not.toMatch(/box-shadow/);
+  });
+
+  test.each([
+    ['.sv-tabs__trigger:focus-visible'],
+    ['.sv-tabs__content:focus-visible'],
+  ])('%s states focus with an outline, never a ring (CLIENT-11)', (selector) => {
+    // ring-ring / ring-offset-background named colors this package never
+    // declared, so the strip had no visible keyboard focus at all.
+    const focus = bodyOf(tabs, selector);
+    expect(focus).toMatch(/outline:\s*2px solid var\(--sv-accent-ink\)/);
+    expect(focus).toMatch(/outline-offset:\s*2px/);
+  });
+
+  test('.sv-tabs__content is spaced from the strip by a token', () => {
+    expect(decl(tabs, '.sv-tabs__content', 'margin-top')).toBe('var(--sv-space-2)');
+  });
+
+  test('the Tabs section obeys the Still Void design rules', () => {
+    expectSystemRules(tabs);
+  });
+});
