@@ -140,9 +140,18 @@ tokens do Still Void.
    de `none` — `DialogContent` perde o `shadow-lg`, `SelectContent` o `shadow-md`, `TabsTrigger` o `shadow-sm`
 5. WHEN `DialogContent` é aberto THEN o elemento com `role="dialog"` SHALL expor `aria-modal="true"`
 6. WHEN `DialogContent` é aberto com o default THEN o sistema SHALL renderizar um botão de fechar com
-   `<Icon name="x" />` e texto `Close` em `sv-sr-only`, e clicar nele SHALL fechar o dialog; WHEN
-   `showCloseButton={false}` THEN esse botão NÃO SHALL ser renderizado
-7. WHEN qualquer componente migrado é inspecionado THEN seu `displayName` SHALL ser idêntico ao de hoje
+   `<Icon name="x" />` e o texto **`Close dialog`** em `sv-sr-only`, e clicar nele SHALL fechar o dialog; WHEN
+   `showCloseButton={false}` THEN esse botão NÃO SHALL ser renderizado.
+   **Nota de precisão (2026-08-24):** a spec dizia `Close`, e isso colidiu com o próprio fixture de
+   `tests/ui-dialog.test.tsx`, que renderiza `<DialogClose>Close</DialogClose>` e consulta por
+   `getByText('Close')` — dois nós com o mesmo texto. A colisão **é** o risco declarado de ligar
+   `showCloseButton` por padrão, e confirma que o bump `major` é o aviso certo. Resolvida alargando o rótulo,
+   que de quebra dá um nome acessível mais descritivo quando o dialog tem mais de um controle de dispensa
+7. WHEN qualquer componente migrado é inspecionado THEN seu `displayName` SHALL ser idêntico ao de hoje.
+   **Achado (2026-08-24):** hoje esse valor é `undefined` para todo membro derivado do Radix — `react-tabs`,
+   `react-tooltip` e `react-dialog` não declaram `displayName` em lugar nenhum do `dist`, então
+   `TabsList.displayName = TabsPrimitive.List.displayName` atribui `undefined`. O AC fica vacuoso nesses
+   componentes; dar nome de verdade é **T25**, fora do "idêntico ao de hoje" e por isso tratado à parte
 8. WHEN `style.css` é lido THEN nenhuma regra nova SHALL usar `!important`, e nenhuma SHALL depender de
    `@layer` do Tailwind para vencer a cascata
 9. WHEN `SelectItem` está selecionado THEN o sistema SHALL renderizar um `<Icon name="check" />` no espaço

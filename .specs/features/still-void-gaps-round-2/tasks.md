@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: [design.md](design.md)
-**Status**: In Progress — Fases 1 e 2 concluídas (T1–T8 + T24)
+**Status**: In Progress — Fases 1, 2 e 3 concluídas (T1–T11 + T24)
 
 ---
 
@@ -42,8 +42,9 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 | Gate Level | When to Use | Command |
 | --- | --- | --- |
-| Quick | Depois de task com teste unitário/contrato | `npm run test` |
-| Full | Depois de task que muda tipo público ou assinatura | `npm run test && npm run typecheck` |
+| Quick | Depois de task que **não cria arquivo de teste novo** | `npm run test` |
+| Full | Task que cria arquivo de teste novo, muda tipo público ou muda assinatura | `npm run test && npm run typecheck` |
+| — | **Correção registrada em 2026-08-24**: o gate quick roda só o vitest, que **não** enxerga erro de tipo em arquivo de teste. T10 e T11 passaram no quick e deixaram dois erros de `noUncheckedIndexedAccess` que só apareceram no gate full do T9 (`d324c46`). Toda task que adiciona teste usa full. | |
 | Build | Fim de fase, ou task que toca manifesto/build/CSS publicado | `npm run build && npm run lint:package && npm run test:coverage` |
 
 ---
@@ -293,7 +294,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T9: Migrar `Dialog` [P]
+### ✅ T9: Migrar `Dialog` [P] — `d7cbf56`
 
 **What**: trocar utilitárias por `sv-*`, adicionar `aria-modal` e o botão de fechar com opt-out.
 **Where**: `src/components/ui/dialog.tsx`, `tests/ui-dialog-behavior.test.tsx` (novo)
@@ -318,7 +319,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T10: Migrar `Tabs` [P]
+### ✅ T10: Migrar `Tabs` [P] — `11f01f3`
 
 **What**: trocar utilitárias por `.sv-tabs*`.
 **Where**: `src/components/ui/tabs.tsx`, `tests/ui-tabs-classes.test.tsx` (novo)
@@ -340,7 +341,7 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 
 ---
 
-### T11: Migrar `Tooltip` [P]
+### ✅ T11: Migrar `Tooltip` [P] — `d79d552`
 
 **What**: trocar utilitárias por `.sv-pop` + `.sv-tooltip`.
 **Where**: `src/components/ui/tooltip.tsx`, `tests/ui-tooltip-classes.test.tsx` (novo)
@@ -642,6 +643,48 @@ T14, T16, T17, T18 ──→ T19 ──→ T20 ──→ T21 ──→ T22 ─�
 **Commit**: `chore(changeset): describe the round 2 release`
 
 ---
+
+---
+
+### T25: Dar `displayName` real aos membros derivados do Radix
+
+**What**: substituir `X.displayName = XPrimitive.Y.displayName` (que hoje atribui `undefined`) por um nome literal.
+**Where**: `src/components/ui/dialog.tsx`, `tabs.tsx`, `tooltip.tsx`, `select.tsx`, `dropdown-menu.tsx`, `alert-dialog.tsx`, testes correspondentes
+**Depends on**: T14
+**Requirement**: CLIENT-07 (torna o AC não-vacuoso)
+
+**Por que existe**: achado do worker da Fase 3, verificado por grep nos `dist` — `@radix-ui/react-tabs`, `react-tooltip` e `react-dialog` **não declaram `displayName` em lugar nenhum**, então toda a família herda `undefined` e o React DevTools mostra `ForwardRef`. Não é regressão desta rodada; é lacuna que o CLIENT-07 escrito como "idêntico ao de hoje" não alcança.
+
+**Done when**:
+- [ ] Todo membro tem `displayName` literal igual ao nome do export
+- [ ] Teste afirma o nome de cada membro das 6 famílias
+- [ ] Gate: `npm run test && npm run typecheck`
+
+**Tests**: unit · **Gate**: full
+**Commit**: `fix(client): give every Radix-derived member a real displayName`
+
+---
+
+### T26: Resolver o `.sv-tabs` órfão
+
+**What**: decidir entre emitir a classe ou remover a regra, e executar.
+**Where**: `src/components/ui/tabs.tsx` e/ou `src/css/style.css`, `tests/client-css-contract.test.ts`
+**Depends on**: T14
+**Requirement**: CLIENT-02
+
+**Por que existe**: achado do worker da Fase 3. `.sv-tabs` existe no CSS e **nenhum componente emite** — `Tabs` é re-export puro do `Root`. Pior: a regra é `display: flex; flex-direction: column` e, com `align-items` no default `stretch`, esticaria `.sv-tabs__list` para a largura toda, contradizendo o `display: inline-flex` do próprio list.
+
+**Decisão**: emitir. `Tabs` vira `forwardRef` que aplica `sv-tabs` e mescla o `className` do consumidor, e a regra ganha `align-items: flex-start`. Assim o consumidor tem um container real para estilizar, que era a intenção da tabela de seções do design.
+
+**Done when**:
+- [ ] `Tabs` emite `sv-tabs` e mescla `className`
+- [ ] `.sv-tabs` ganha `align-items: flex-start`
+- [ ] Teste prova que o list **não** estica (asserção sobre a declaração, no contrato de CSS)
+- [ ] `tests/ui-tabs.test.tsx` segue intacto
+- [ ] Gate: `npm run test && npm run typecheck`
+
+**Tests**: unit · **Gate**: full
+**Commit**: `fix(tabs): emit the sv-tabs container class`
 
 ---
 
