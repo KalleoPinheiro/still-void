@@ -32,6 +32,9 @@ const ALL_NAMES: IconName[] = [
   'moon',
   'search',
   'menu',
+  'camera',
+  'blocked',
+  'pending',
 ];
 
 export const Default: Story = {
