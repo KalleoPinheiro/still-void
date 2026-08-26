@@ -53,13 +53,18 @@ function classTokens(): string[] {
 }
 
 function renderDialog(
-  options: { showCloseButton?: boolean; className?: string; footerClose?: boolean } = {},
+  options: {
+    showCloseButton?: boolean;
+    className?: string;
+    footerClose?: boolean;
+    closeLabel?: string;
+  } = {},
 ) {
-  const { showCloseButton, className, footerClose = false } = options;
+  const { showCloseButton, className, footerClose = false, closeLabel } = options;
   render(
     <Dialog>
       <DialogTrigger>Open</DialogTrigger>
-      <DialogContent className={className} showCloseButton={showCloseButton}>
+      <DialogContent className={className} showCloseButton={showCloseButton} closeLabel={closeLabel}>
         <DialogHeader className={className}>
           <DialogTitle className={className}>Title</DialogTitle>
           <DialogDescription className={className}>Description</DialogDescription>
@@ -200,6 +205,28 @@ describe('Dialog — the default close button (CLIENT-06)', () => {
     await screen.findByRole('dialog');
     expect(screen.getByRole('button', { name: 'Close' })).not.toHaveClass('sv-dialog__close');
     expect(screen.getByRole('button', { name: 'Close dialog' })).toHaveClass('sv-dialog__close');
+  });
+});
+
+describe('Dialog — closeLabel i18n (R4-02)', () => {
+  test('without closeLabel the accessible name stays "Close dialog" (zero regression)', async () => {
+    renderDialog();
+    await screen.findByRole('dialog');
+    expect(screen.getByRole('button', { name: 'Close dialog' })).toHaveClass('sv-dialog__close');
+  });
+
+  test('closeLabel overrides the accessible name', async () => {
+    renderDialog({ closeLabel: 'Fechar' });
+    await screen.findByRole('dialog');
+    expect(screen.getByRole('button', { name: 'Fechar' })).toHaveClass('sv-dialog__close');
+    expect(screen.queryByText('Close dialog')).not.toBeInTheDocument();
+  });
+
+  test('showCloseButton={false} still wins over closeLabel — no button renders', async () => {
+    renderDialog({ showCloseButton: false, closeLabel: 'Fechar' });
+    await screen.findByRole('dialog');
+    expect(query('.sv-dialog__close')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Fechar' })).not.toBeInTheDocument();
   });
 });
 
