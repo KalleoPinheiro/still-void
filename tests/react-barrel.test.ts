@@ -39,6 +39,7 @@ const expectedExports = [
   'READING_PROGRESS_VAR',
   'RadioGroup',
   'RadioGroupItem',
+  'Separator',
   'Sidebar',
   'SidebarSection',
   'Skeleton',

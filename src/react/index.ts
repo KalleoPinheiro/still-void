@@ -20,6 +20,7 @@ export { Textarea, type TextareaProps } from '../components/ui/textarea';
 export { NativeSelect, type NativeSelectProps } from '../components/ui/native-select';
 export { FileInput, type FileInputProps } from '../components/ui/file-input';
 export { Checkbox, type CheckboxProps } from '../components/ui/checkbox';
+export { Separator, type SeparatorProps } from '../components/ui/separator';
 export {
   RadioGroup,
   RadioGroupItem,

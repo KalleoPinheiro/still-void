@@ -1442,6 +1442,23 @@ body.sv-body {
   outline-offset: 2px;
 }
 
+/* ---------- Separator ---------- */
+/* A hairline in the flat sense (Elevation section, DESIGN.md): a 1px slab of
+   the same border color the rest of the system uses, never a shadow. Sizing
+   is opposite on each axis by design — horizontal fills the inline
+   direction and is a fixed 1px tall; vertical fills the block direction
+   (the parent must give it a height) and is a fixed 1px wide. */
+.sv-separator {
+  flex-shrink: 0;
+  background: var(--sv-border);
+  height: 1px;
+  width: 100%;
+}
+.sv-separator--vertical {
+  height: 100%;
+  width: 1px;
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
