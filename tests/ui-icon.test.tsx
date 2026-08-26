@@ -40,6 +40,16 @@ describe('Icon — the rendered element (ICON-01)', () => {
     expect(svg.getAttribute('aria-hidden')).toBe('true');
   });
 
+  test('the curated set has exactly 18 names (R4-01: +camera/blocked/pending)', () => {
+    // A literal pin, not a self-referential count — the checks below compare
+    // ICON_NAMES against itself and would stay green even if a name (e.g.
+    // "pending") were silently dropped from the union.
+    expect(ICON_NAMES.length).toBe(18);
+    expect(ICON_NAMES).toContain('camera');
+    expect(ICON_NAMES).toContain('blocked');
+    expect(ICON_NAMES).toContain('pending');
+  });
+
   test('every curated name maps to a real, distinct glyph', () => {
     // A copy-pasted line in the map — two names pointing at one heroicon — is
     // invisible without this: both names still render something.
