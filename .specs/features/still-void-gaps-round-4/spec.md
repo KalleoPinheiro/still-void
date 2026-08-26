@@ -171,9 +171,9 @@ inventado, tudo lê `var(--sv-*)` existente.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| R4-01 | P1: IconName gaps | Execute | Pending |
-| R4-02 | P1: DialogContent closeLabel | Execute | Pending |
-| R4-03 | P1: Separator | Execute | Pending |
-| R4-04 | P1: Progress | Execute | Pending |
-| R4-05 | P2: Pagination | Execute | Pending |
-| R4-06 | P3: Chart primitives | Execute | Pending |
+| R4-01 | P1: IconName gaps | Execute | ✅ Verified |
+| R4-02 | P1: DialogContent closeLabel | Execute | ✅ Verified |
+| R4-03 | P1: Separator | Execute | ✅ Verified |
+| R4-04 | P1: Progress | Execute | ✅ Verified |
+| R4-05 | P2: Pagination | Execute | ✅ Verified |
+| R4-06 | P3: Chart primitives | Execute | ✅ Verified |

@@ -1,7 +1,7 @@
 # Rodada 4 — Tasks
 
 **Design**: [design.md](design.md)
-**Status**: Pending
+**Status**: Implementação concluída e verificada — T1–T7 (docs/stories inclusas). Verifier: PASS (`.specs/features/still-void-gaps-round-4/validation.md`). Único achado (severidade baixa, não funcional) já corrigido: `ICON_NAMES.length` agora pinado literalmente em `tests/ui-icon.test.tsx`.
 
 ## Test Coverage Matrix
 
@@ -90,9 +90,9 @@ Sequencial — sem dependência cruzada entre tasks, mas cada uma é um commit a
 
 | Requirement ID | Task | Status |
 | --- | --- | --- |
-| R4-01 | T1 | Pending |
-| R4-02 | T2 | Pending |
-| R4-03 | T3 | Pending |
-| R4-04 | T4 | Pending |
-| R4-05 | T5 | Pending |
-| R4-06 | T6 | Pending |
+| R4-01 | T1 | ✅ Verified |
+| R4-02 | T2 | ✅ Verified |
+| R4-03 | T3 | ✅ Verified |
+| R4-04 | T4 | ✅ Verified |
+| R4-05 | T5 | ✅ Verified |
+| R4-06 | T6 | ✅ Verified |
