@@ -1553,6 +1553,38 @@ body.sv-body {
   color: var(--sv-text-3);
 }
 
+/* ---------- Chart ---------- */
+/* Visual geometry only — no scale engine, see design.md. `overflow: visible`
+   is the one non-default here: an axis label sitting exactly at the SVG's
+   own edge (a common case — the last tick on a bottom axis) must not be
+   clipped by the viewBox the way an ordinary <svg> would clip it. Series
+   color (line stroke, bar fill) is a caller prop, not a class, because the
+   three series tokens (--sv-accent-ink/--sv-info-ink/--sv-warning-ink) are
+   assigned per-series by the consumer, not fixed by the primitive. */
+.sv-chart {
+  overflow: visible;
+  font-family: var(--sv-font-mono);
+}
+.sv-chart__grid-line {
+  stroke: var(--sv-border);
+  stroke-width: 1;
+}
+.sv-chart__axis {
+  stroke: var(--sv-text-2);
+  stroke-width: 1;
+}
+.sv-chart__axis-label {
+  fill: var(--sv-text-2);
+  font-size: var(--sv-text-xs);
+}
+.sv-chart__line {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sv-chart__bar {
+  shape-rendering: crispEdges;
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the

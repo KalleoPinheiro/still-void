@@ -39,6 +39,21 @@ export {
   type PaginationEllipsisProps,
 } from '../components/ui/pagination';
 export {
+  ChartContainer,
+  type ChartContainerProps,
+  ChartGrid,
+  type ChartGridProps,
+  ChartAxis,
+  type ChartAxisProps,
+  type ChartTick,
+  ChartLine,
+  type ChartLineProps,
+  type ChartPoint,
+  ChartBar,
+  type ChartBarProps,
+  type ChartBarDatum,
+} from '../components/ui/chart';
+export {
   RadioGroup,
   RadioGroupItem,
   type RadioGroupProps,
