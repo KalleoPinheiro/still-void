@@ -21,6 +21,7 @@ export { NativeSelect, type NativeSelectProps } from '../components/ui/native-se
 export { FileInput, type FileInputProps } from '../components/ui/file-input';
 export { Checkbox, type CheckboxProps } from '../components/ui/checkbox';
 export { Separator, type SeparatorProps } from '../components/ui/separator';
+export { Progress, type ProgressProps } from '../components/ui/progress';
 export {
   RadioGroup,
   RadioGroupItem,

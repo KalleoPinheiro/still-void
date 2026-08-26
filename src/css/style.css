@@ -1459,6 +1459,28 @@ body.sv-body {
   width: 1px;
 }
 
+/* ---------- Progress ---------- */
+/* A track and a fill, same tonal pair the rest of the system uses for a
+   surface-on-surface relationship: Surface 2 (one step up from Void) under
+   the accent fill, never a shadow to suggest depth. The indicator's width is
+   the one value in this component that cannot come from a token — it is
+   `value`/`max` at render time — so it is the sole inline `style` in the
+   server-safe catalog. */
+.sv-progress {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: var(--sv-space-2);
+  border-radius: var(--sv-radius-full);
+  background: var(--sv-surface-2);
+}
+.sv-progress__indicator {
+  height: 100%;
+  background: var(--sv-accent);
+  border-radius: var(--sv-radius-full);
+  transition: width var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
@@ -1484,7 +1506,8 @@ body.sv-body {
   .sv-badge,
   .sv-dialog__close,
   .sv-menu-item,
-  .sv-tabs__trigger {
+  .sv-tabs__trigger,
+  .sv-progress__indicator {
     transition: none;
   }
   /* AD-009 lets the portal family fade because open/closed carries state, but

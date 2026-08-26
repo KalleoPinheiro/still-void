@@ -35,6 +35,7 @@ const expectedExports = [
   'NativeSelect',
   'PostCard',
   'PostGrid',
+  'Progress',
   'Prose',
   'READING_PROGRESS_VAR',
   'RadioGroup',
