@@ -1,16 +1,20 @@
 # Rodada 4 — Design
 
 **Spec**: [spec.md](spec.md)
-**Status**: Draft
+**Status**: Implementado e verificado — mantido como registro histórico das decisões de arquitetura tomadas antes da execução (ver tasks.md para o status corrente).
 **Decisões ativas que restringem este design**: AD-001 (CSS `sv-*` real, nunca Tailwind), AD-002 (server-safe por default; hook/Radix só quando nativo não dá conta), AD-005 (foco é `outline`, nunca `box-shadow`), AD-013 (`@heroicons/react/24/outline`, import nomeado), AD-015 (nenhum módulo alcançável do entry server-safe pode conter hook real, nem "morto" — o walker do `server-safety.test.ts` varre o texto-fonte, não o que é chamado).
 
 ---
 
 ## Architecture Overview
 
-Seis lacunas, todas fecháveis sem tocar a família client (Radix): nenhuma precisa de estado, foco
-gerenciado ou portal. Tudo entra em `@still-void/ui/react` (server-safe), ao lado de `Button`/`Card`/`Table`,
-seguindo o mesmo padrão hand-rolled + `cn()` + CSS `sv-*` real.
+Seis lacunas, nenhuma precisa de estado, foco gerenciado ou portal. Quatro delas são componentes
+inteiramente novos que entram em `@still-void/ui/react` (server-safe), ao lado de `Button`/`Card`/`Table`,
+seguindo o mesmo padrão hand-rolled + `cn()` + CSS `sv-*` real: `Separator`, `Progress`, a família
+`Pagination` e os primitivos `Chart*`. As outras duas são mudanças pontuais em componentes existentes,
+não migrações de camada — `IconName` (`icon-set.ts`, já server-safe, ganha 3 valores) e `DialogContent`
+(que **continua client-only**, `'use client'` via `shadcn.ts`; `closeLabel` é só uma prop nova na mesma
+família Radix, não uma entrada no lado server).
 
 ```mermaid
 graph TD

@@ -87,4 +87,25 @@ All design-principles checks **PASS**.
 
 1. **(Low severity) R4-01 AC2 — no literal assertion pinning `ICON_NAMES.length === 18`.** The spec's own "Independent Test" line for this requirement explicitly calls for `ICON_NAMES.length === 18` as an assertion. `tests/ui-icon.test.tsx` instead asserts `drawn.size === ICON_NAMES.length` and `new Set(drawn.values()).size === ICON_NAMES.length` — both self-referential to whatever `ICON_NAMES` currently contains, not to the literal count of 18 the spec promises. Confirmed via `grep` for `18` in the test file (zero matches) and via mutation testing: swapping one new icon's glyph for a duplicate was caught (uniqueness check works), but a scenario where fewer than 3 new names were added in the first place (e.g. only `camera` and `blocked`, `pending` forgotten) would not be caught by this test — it would just make `ICON_NAMES.length` be 17 and the test would still pass at 17-of-17 unique. This is a coverage gap against the spec's stated Independent Test, not a functional defect — the actual shipped code does have all 18 names, confirmed by direct read of `icon-set.ts`.
 
+   **Status: Fixed** (commit `e87c1ae`, same day) — `tests/ui-icon.test.tsx` now asserts `ICON_NAMES.length === 18` literally, plus explicit `toContain` checks for `camera`/`blocked`/`pending`.
+
+---
+
+## Post-verification fixes (CodeRabbit review, PR #20)
+
+CodeRabbit's automated review of the PR (after this report was written) found 4 additional real correctness/a11y bugs, all fixed in a follow-up commit with regression tests. Not caught by the mutation sensor above because the sensor tested behavior against the *existing* test suite — these were gaps in what the suite asserted in the first place (spread-order guarantees the JSDoc claimed but the code didn't enforce), not mutations the suite failed to kill.
+
+| Finding | File | Fix | Regression test |
+| --- | --- | --- | --- |
+| `closeLabel=""` (or whitespace) fell through the default-parameter guard (`= 'Close dialog'` only fires on `undefined`), rendering an unnamed close button | `dialog.tsx` | Blank labels normalize to the default | `tests/ui-dialog-behavior.test.tsx` — `closeLabel=""` and whitespace-only cases |
+| `Pagination`'s `aria-label="pagination"` was spread-ordered *before* `{...props}`, so a caller's own `aria-label` silently won — contradicting the JSDoc's stated guarantee | `pagination.tsx` | Reordered to spread `props` first, matching `DialogContent`'s `aria-modal` pattern | `tests/ui-pagination.test.tsx` — caller `aria-label` override attempt |
+| `Progress`'s `max` was unnormalized: a negative/`NaN`/`Infinity` value produced an invalid ARIA range (`aria-valuemin` > `aria-valuemax`) or a nonsensical 100% indicator | `progress.tsx` | Added `normalizeMax()`; also reordered spread (same pattern as above) | `tests/ui-progress.test.tsx` — negative/NaN/Infinity `max`, plus a stray-props override attempt |
+| `Separator`'s `role`/`aria-orientation` were spread-ordered before `{...props}`, so a caller could override the `decorative`-derived accessibility semantics | `separator.tsx` | Reordered to spread `props` first | `tests/ui-separator.test.tsx` — stray `role`/`aria-orientation` override attempts |
+
+Also fixed (not a code defect, a demo bug): `Chart.stories.tsx`'s `LineWithGridAndAxis` story rendered `ChartAxis orientation="bottom"` un-transformed, landing at the SVG's top edge instead of the plot's bottom and overlapping near-top data points. Wrapped in a `<g transform>` at the plot baseline — the way any `ChartAxis` consumer is expected to position it (the primitive itself does no domain-to-pixel mapping, per design.md's Assumptions).
+
+Full gate re-run after all fixes: `npx vitest run` 1296/1296 passing, `npm run test:coverage` 100% statements/branches/functions/lines, `npm run typecheck` clean, `npm run build-storybook` succeeds.
+
+**Overall verdict after CodeRabbit fixes: PASS, no known open gaps.**
+
 No other gaps found. All 6 requirements' acceptance criteria have real, behavior-asserting tests; all 6 injected mutants were killed; all gate commands (typecheck, full suite, 100% coverage, build, lint:package, server-safety) pass; all DESIGN.md constraints (no box-shadow, token-only colors, outline-based focus, server-safety/no-hooks) verified directly against source.

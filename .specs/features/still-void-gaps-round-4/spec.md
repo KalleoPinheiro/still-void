@@ -12,12 +12,12 @@ inventado, tudo lê `var(--sv-*)` existente.
 
 ## Goals
 
-- [ ] `Separator` — divisor genérico, server-safe, com `role="separator"` disponível.
-- [ ] `Progress` — barra de progresso genérica (`value`/`max`), server-safe, distinta de `ReadingProgress`.
-- [ ] `Pagination` — família composta (nav/lista/link/prev/next/ellipsis), server-safe.
-- [ ] Primitivos de gráfico (`Chart*`) — container SVG + grid + eixo + linha + barra, tokens do sistema, server-safe. Sem motor de escalas de domínio (ver Assumptions).
-- [ ] `IconName` ganha `camera`, `blocked`, `pending`.
-- [ ] `DialogContent` ganha `closeLabel`, permitindo i18n do botão de fechar sem desabilitá-lo.
+- [x] `Separator` — divisor genérico, server-safe, com `role="separator"` disponível.
+- [x] `Progress` — barra de progresso genérica (`value`/`max`), server-safe, distinta de `ReadingProgress`.
+- [x] `Pagination` — família composta (nav/lista/link/prev/next/ellipsis), server-safe.
+- [x] Primitivos de gráfico (`Chart*`) — container SVG + grid + eixo + linha + barra, tokens do sistema, server-safe. Sem motor de escalas de domínio (ver Assumptions).
+- [x] `IconName` ganha `camera`, `blocked`, `pending`.
+- [x] `DialogContent` ganha `closeLabel`, permitindo i18n do botão de fechar sem desabilitá-lo.
 
 ## Out of Scope
 
@@ -94,8 +94,9 @@ inventado, tudo lê `var(--sv-*)` existente.
 3. WHEN `<Separator orientation="vertical" />` é renderizado THEN SHALL emitir a classe adicional `sv-separator--vertical`.
 4. WHEN um `className` de consumidor é passado THEN SHALL ser mesclado com `sv-separator`, nunca substituí-lo.
 5. WHEN a regra CSS `.sv-separator` é inspecionada THEN a cor SHALL vir de `var(--sv-border)` (mesmo hairline usado no resto do sistema), sem `box-shadow`.
+6. WHEN um `role`/`aria-orientation` de consumidor é passado via props THEN SHALL perder para o valor derivado de `decorative`/`orientation` — mesma garantia que `aria-modal` já tem em `DialogContent` (achado de review, CodeRabbit em [PR #20](https://github.com/KalleoPinheiro/still-void/pull/20)).
 
-**Independent Test**: Renderizar as 4 combinações de props, inspecionar `role`/`aria-orientation`/classList; ler `style.css` via contrato textual para a declaração de cor.
+**Independent Test**: Renderizar as 4 combinações de props, inspecionar `role`/`aria-orientation`/classList; ler `style.css` via contrato textual para a declaração de cor; renderizar com `role`/`aria-orientation` extra em props e confirmar que perdem.
 
 ---
 
@@ -103,18 +104,20 @@ inventado, tudo lê `var(--sv-*)` existente.
 
 **User Story**: Como consumidor renderizando scores PUSH (0–17), DET (0–15) e escala de dor (0–10) hoje como SVG à mão, quero um `Progress` genérico com `value`/`max`, para ter uma barra de progresso real do catálogo em vez de recalcular geometria manualmente.
 
-**Why P1**: Call site real (`healing-chart.tsx`), API pequena e bem definida (`value`/`max`, como o `<progress>` nativo do HTML).
+**Why P1**: Call site real (`healing-chart.tsx`), API pequena e bem definida (`value`/`max`).
 
 **Acceptance Criteria**:
 
 1. WHEN `<Progress value={9} max={17} />` é renderizado THEN a raiz SHALL ter `role="progressbar"`, `aria-valuenow="9"`, `aria-valuemin="0"`, `aria-valuemax="17"`.
-2. WHEN `max` é omitido THEN SHALL assumir `100` (paridade com o elemento `<progress>` nativo).
+2. WHEN `max` é omitido THEN SHALL assumir `100` — default da própria lib, **não** paridade com o `<progress>` nativo do HTML (que assume `max=1` e trata `value` omitido como indeterminado; este componente nunca é indeterminado).
 3. WHEN `value` é omitido THEN SHALL assumir `0`.
 4. WHEN `value` é renderizado THEN o indicador interno SHALL ter `width` igual a `(value / max) * 100%`, expresso via `style` inline (o único valor deste componente que não pode vir de um token — é dado em runtime).
 5. WHEN um `className` de consumidor é passado THEN SHALL ser mesclado com `sv-progress` na raiz, nunca substituí-lo.
 6. WHEN a regra CSS `.sv-progress` e `.sv-progress__indicator` são inspecionadas THEN a cor de preenchimento SHALL vir de `var(--sv-accent)` e a trilha de `var(--sv-surface-2)`, sem `box-shadow`.
+7. WHEN `max` é `0`, negativo, `NaN` ou `Infinity` THEN SHALL normalizar para `0` antes de calcular o range ARIA e a largura do indicador — nunca produzir `aria-valuemin` > `aria-valuemax` nem um indicador em `100%` para um teto inválido (achado de review, CodeRabbit em [PR #20](https://github.com/KalleoPinheiro/still-void/pull/20)).
+8. WHEN um `role`/`aria-valuenow`/`aria-valuemin`/`aria-valuemax` de consumidor é passado via props THEN SHALL perder para os valores computados pelo componente — mesma garantia que `aria-modal` já tem em `DialogContent` (achado de review).
 
-**Independent Test**: Renderizar com valores variados de `value`/`max`, ler atributos ARIA e `style.width` do indicador; contrato CSS textual para as duas classes.
+**Independent Test**: Renderizar com valores variados de `value`/`max` (incluindo negativo/`NaN`/`Infinity`), ler atributos ARIA e `style.width` do indicador; contrato CSS textual para as duas classes; renderizar com `role`/`aria-valuenow` extra em props e confirmar que perdem.
 
 ---
 
@@ -126,7 +129,7 @@ inventado, tudo lê `var(--sv-*)` existente.
 
 **Acceptance Criteria**:
 
-1. WHEN `<Pagination>` é renderizado THEN a raiz SHALL ser um elemento `<nav>` com `aria-label="pagination"` e classe `sv-pagination`.
+1. WHEN `<Pagination>` é renderizado THEN a raiz SHALL ser um elemento `<nav>` com `aria-label="pagination"` e classe `sv-pagination`; um `aria-label` de consumidor passado via props SHALL perder para `"pagination"` — mesma garantia que `aria-modal` já tem em `DialogContent` (achado de review, CodeRabbit em [PR #20](https://github.com/KalleoPinheiro/still-void/pull/20)).
 2. WHEN `<PaginationContent>` é renderizado dentro de `<Pagination>` THEN SHALL ser um `<ul>` com classe `sv-pagination__content`.
 3. WHEN `<PaginationItem>` é renderizado THEN SHALL ser um `<li>` com classe `sv-pagination__item`.
 4. WHEN `<PaginationLink href="/p/2">2</PaginationLink>` é renderizado THEN SHALL emitir um `<a href="/p/2">`; WHEN `<PaginationLink onClick={fn}>2</PaginationLink>` (sem `href`) THEN SHALL emitir um `<button type="button">`.
