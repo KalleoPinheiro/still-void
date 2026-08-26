@@ -1,18 +1,21 @@
 import type * as React from 'react';
 import {
   Bars3Icon,
+  CameraIcon,
   CheckCircleIcon,
   CheckIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
+  ClockIcon,
   DocumentDuplicateIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
   MagnifyingGlassIcon,
   MoonIcon,
+  NoSymbolIcon,
   SunIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
@@ -46,7 +49,10 @@ export type IconName =
   | 'sun'
   | 'moon'
   | 'search'
-  | 'menu';
+  | 'menu'
+  | 'camera'
+  | 'blocked'
+  | 'pending';
 
 /** A heroicon: a forwardRef <svg> that takes SVG props and no size prop. */
 type GlyphComponent = React.ForwardRefExoticComponent<
@@ -70,6 +76,9 @@ export const ICON_GLYPHS: Record<IconName, GlyphComponent> = {
   moon: MoonIcon,
   search: MagnifyingGlassIcon,
   menu: Bars3Icon,
+  camera: CameraIcon,
+  blocked: NoSymbolIcon,
+  pending: ClockIcon,
 };
 
 export const ICON_NAMES = Object.keys(ICON_GLYPHS) as IconName[];
