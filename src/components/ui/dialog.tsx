@@ -43,30 +43,37 @@ export interface DialogContentProps
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, showCloseButton = true, closeLabel = 'Close dialog', ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn("sv-dialog", className)}
-      {...props}
-      // Spread after props, not before: aria-modal is a guarantee this
-      // component makes (CLIENT-05), not a default a caller can override by
-      // passing its own aria-modal. Radix renders role="dialog" but never
-      // aria-modal, so assistive tech was told nothing about the content
-      // behind the panel being inert.
-      aria-modal="true"
-    >
-      {children}
-      {showCloseButton ? (
-        <DialogPrimitive.Close className="sv-dialog__close">
-          <Icon name="x" />
-          <span className="sv-sr-only">{closeLabel}</span>
-        </DialogPrimitive.Close>
-      ) : null}
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
+>(({ className, children, showCloseButton = true, closeLabel: closeLabelProp, ...props }, ref) => {
+  // A blank string is not "no label" — `?? '...'` only catches `undefined`,
+  // so `closeLabel=""` would otherwise render an unnamed button. Treat blank
+  // the same as omitted.
+  const closeLabel = closeLabelProp && closeLabelProp.trim().length > 0 ? closeLabelProp : 'Close dialog'
+
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn("sv-dialog", className)}
+        {...props}
+        // Spread after props, not before: aria-modal is a guarantee this
+        // component makes (CLIENT-05), not a default a caller can override by
+        // passing its own aria-modal. Radix renders role="dialog" but never
+        // aria-modal, so assistive tech was told nothing about the content
+        // behind the panel being inert.
+        aria-modal="true"
+      >
+        {children}
+        {showCloseButton ? (
+          <DialogPrimitive.Close className="sv-dialog__close">
+            <Icon name="x" />
+            <span className="sv-sr-only">{closeLabel}</span>
+          </DialogPrimitive.Close>
+        ) : null}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 DialogContent.displayName = "DialogContent"
 
 const DialogHeader = ({

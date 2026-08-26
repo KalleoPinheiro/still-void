@@ -6,12 +6,12 @@ export interface PaginationProps extends React.ComponentPropsWithoutRef<"nav"> {
 
 /**
  * The root landmark. `aria-label="pagination"` is the one static string a
- * consumer cannot override through `...props` spread order matters here the
- * same way Dialog's `aria-modal` does — the label is what tells assistive
- * tech which `<nav>` this is among possibly several on the page.
+ * consumer cannot override — spread order matters here the same way
+ * Dialog's `aria-modal` does — the label is what tells assistive tech
+ * which `<nav>` this is among possibly several on the page.
  */
 const Pagination = ({ className, ...props }: PaginationProps) => (
-  <nav aria-label="pagination" className={cn("sv-pagination", className)} {...props} />
+  <nav {...props} aria-label="pagination" className={cn("sv-pagination", className)} />
 )
 Pagination.displayName = "Pagination"
 

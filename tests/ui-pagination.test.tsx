@@ -46,6 +46,14 @@ describe('Pagination — root (R4-05 AC1)', () => {
     expect(nav.getAttribute('aria-label')).toBe('pagination');
     expect(nav.className).toContain('sv-pagination');
   });
+
+  test('a caller-supplied aria-label cannot override the "pagination" guarantee', () => {
+    // aria-label="pagination" is a contract this component makes (same
+    // reasoning as DialogContent's aria-modal), not a default the consumer's
+    // own props can quietly flip through {...props} spread order.
+    render(<Pagination data-testid="pg" aria-label="minha paginação" />);
+    expect(screen.getByTestId('pg').getAttribute('aria-label')).toBe('pagination');
+  });
 });
 
 describe('Pagination — content (R4-05 AC2)', () => {

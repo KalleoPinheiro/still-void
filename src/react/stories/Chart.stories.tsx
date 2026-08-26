@@ -28,15 +28,21 @@ export const LineWithGridAndAxis: Story = {
         ]}
         color="var(--sv-accent-ink)"
       />
-      <ChartAxis
-        orientation="bottom"
-        length={width}
-        ticks={[
-          { position: 0, label: 'Sem 1' },
-          { position: 180, label: 'Sem 3' },
-          { position: 360, label: 'Sem 5' },
-        ]}
-      />
+      {/* ChartAxis renders its own local y=0 as the baseline — the consumer
+          positions it via a <g transform>, same as any other SVG primitive
+          composed inside ChartContainer. Un-transformed, "bottom" would sit
+          at the SVG's top edge instead of the plot's actual bottom. */}
+      <g transform={`translate(0, 100)`}>
+        <ChartAxis
+          orientation="bottom"
+          length={width}
+          ticks={[
+            { position: 0, label: 'Sem 1' },
+            { position: 180, label: 'Sem 3' },
+            { position: 360, label: 'Sem 5' },
+          ]}
+        />
+      </g>
     </ChartContainer>
   ),
 };

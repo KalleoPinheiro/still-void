@@ -65,6 +65,41 @@ describe('Progress — clamping (edge cases)', () => {
   });
 });
 
+describe('Progress — invalid max (R4-04 correctness, CodeRabbit finding)', () => {
+  test('negative max normalizes to 0 — valid ARIA range, 0% indicator, not 100%', () => {
+    const { root, indicator } = renderProgress({ value: 0, max: -10 });
+    expect(root.getAttribute('aria-valuemin')).toBe('0');
+    expect(root.getAttribute('aria-valuemax')).toBe('0');
+    expect(root.getAttribute('aria-valuenow')).toBe('0');
+    expect(indicator.style.width).toBe('0%');
+  });
+
+  test('NaN max normalizes to 0', () => {
+    const { root, indicator } = renderProgress({ value: 5, max: Number.NaN });
+    expect(root.getAttribute('aria-valuemax')).toBe('0');
+    expect(indicator.style.width).toBe('0%');
+  });
+
+  test('Infinity max normalizes to 0 (non-finite is rejected, not just non-negative)', () => {
+    const { root, indicator } = renderProgress({ value: 5, max: Number.POSITIVE_INFINITY });
+    expect(root.getAttribute('aria-valuemax')).toBe('0');
+    expect(indicator.style.width).toBe('0%');
+  });
+});
+
+describe('Progress — managed ARIA cannot be overridden by consumer props', () => {
+  test('a stray role/aria-valuenow in props loses to the computed values', () => {
+    const { root } = renderProgress({
+      value: 9,
+      max: 17,
+      role: 'status',
+      'aria-valuenow': 999,
+    } as ComponentProps<typeof Progress>);
+    expect(root.getAttribute('role')).toBe('progressbar');
+    expect(root.getAttribute('aria-valuenow')).toBe('9');
+  });
+});
+
 describe('Progress — consumer className (R4-04 AC5)', () => {
   test('is merged onto sv-progress on the root, never replaces it', () => {
     const { root } = renderProgress({ className: 'mine' });

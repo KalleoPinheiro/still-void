@@ -16,7 +16,12 @@ export interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
 const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
   ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => (
     <div
+      {...props}
       ref={ref}
+      // Spread before, not after: whether this divider is announced is
+      // decided by `decorative`/`orientation`, not by a stray role/
+      // aria-orientation the caller passes through `...props` — same
+      // reasoning as DialogContent's aria-modal.
       role={decorative ? undefined : "separator"}
       aria-orientation={!decorative && orientation === "vertical" ? "vertical" : undefined}
       className={cn(
@@ -24,7 +29,6 @@ const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
         orientation === "vertical" && "sv-separator--vertical",
         className,
       )}
-      {...props}
     />
   ),
 )

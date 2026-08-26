@@ -49,6 +49,27 @@ describe('Separator — consumer className (R4-03 AC4)', () => {
   });
 });
 
+describe('Separator — managed ARIA cannot be overridden by consumer props', () => {
+  test('a stray role/aria-orientation in props loses to decorative/orientation', () => {
+    // decorative=true (default) means "no role" is the guarantee; a
+    // consumer passing its own role/aria-orientation through props must not
+    // be able to flip that guarantee, same reasoning as Pagination's
+    // aria-label and DialogContent's aria-modal.
+    const { container } = render(
+      <Separator role="separator" aria-orientation="vertical" />,
+    );
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.hasAttribute('role')).toBe(false);
+    expect(el.hasAttribute('aria-orientation')).toBe(false);
+  });
+
+  test('decorative={false} still wins over a stray role in props', () => {
+    const { container } = render(<Separator decorative={false} role="none" />);
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.getAttribute('role')).toBe('separator');
+  });
+});
+
 describe('Separator — component identity', () => {
   test('displayName is Separator', () => {
     expect(Separator.displayName).toBe('Separator');

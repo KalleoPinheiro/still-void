@@ -228,6 +228,18 @@ describe('Dialog — closeLabel i18n (R4-02)', () => {
     expect(query('.sv-dialog__close')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Fechar' })).not.toBeInTheDocument();
   });
+
+  test('closeLabel="" falls back to "Close dialog" instead of rendering an unnamed button', async () => {
+    renderDialog({ closeLabel: '' });
+    await screen.findByRole('dialog');
+    expect(screen.getByRole('button', { name: 'Close dialog' })).toHaveClass('sv-dialog__close');
+  });
+
+  test('a whitespace-only closeLabel also falls back (not just empty string)', async () => {
+    renderDialog({ closeLabel: '   ' });
+    await screen.findByRole('dialog');
+    expect(screen.getByRole('button', { name: 'Close dialog' })).toHaveClass('sv-dialog__close');
+  });
 });
 
 describe('Dialog — component identity (CLIENT-07, R3-01)', () => {
