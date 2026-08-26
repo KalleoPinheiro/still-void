@@ -1,5 +1,21 @@
 # @still-void/ui
 
+## 3.2.0
+
+### Minor Changes
+
+- [#20](https://github.com/KalleoPinheiro/still-void/pull/20) [`b08a9c9`](https://github.com/KalleoPinheiro/still-void/commit/b08a9c90d6df13a9c4e78cceeb9dc41baeb9dd9e) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add SVG chart primitives — `ChartContainer`, `ChartGrid`, `ChartAxis`, `ChartLine`, `ChartBar` — server-safe, reading `var(--sv-border)`/`var(--sv-text-2)` for grid/axis color; series color (`var(--sv-accent-ink)`, `var(--sv-info-ink)`, `var(--sv-warning-ink)`, or any CSS color) is a caller prop. All geometry (`points`, `positions`, `ticks`, `bars`) is pre-computed pixel space — there is no domain-to-pixel scale engine; mapping a clinical score or percentage to a position stays application logic. Closes the visual half of the hand-rolled-SVG-chart gap without porting domain-specific scale logic into the design system.
+
+- [#20](https://github.com/KalleoPinheiro/still-void/pull/20) [`96e438f`](https://github.com/KalleoPinheiro/still-void/commit/96e438f7ee87191ad20f81fd215c3aa73d2c43cf) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add the `Pagination` family — `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis` — server-safe markup composition (nav/ul/li/a-or-button), no client boundary. `PaginationLink` renders an `<a>` when `href` is passed and a `<button type="button">` otherwise; `isActive` sets `aria-current="page"`. Closes the gap where numbered pagination had no catalog component, only a repeated "Load more" outline button.
+
+- [#20](https://github.com/KalleoPinheiro/still-void/pull/20) [`f5e4572`](https://github.com/KalleoPinheiro/still-void/commit/f5e457256ec77cc824152d8347d61ad8efa190c4) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add `Progress`, a server-safe generic progress bar (`value`/`max`, mirroring the native `<progress>` element's default `max=100`), distinct from the existing `ReadingProgress` (client-only, scroll-driven). Renders `role="progressbar"` with the full `aria-valuenow`/`aria-valuemin`/`aria-valuemax` trio; `value` is clamped into `[0, max]`.
+
+- [#20](https://github.com/KalleoPinheiro/still-void/pull/20) [`be70d8b`](https://github.com/KalleoPinheiro/still-void/commit/be70d8b81703faf9e3d54d4bb1198a954091b0bd) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add `Separator`, a server-safe generic divider (`orientation="horizontal" | "vertical"`, `decorative` defaulting to `true` like shadcn/ui upstream). Closes a gap where consumers hand-rolled a `<span>` divider with no `role="separator"` available on request (`decorative={false}`).
+
+- [#20](https://github.com/KalleoPinheiro/still-void/pull/20) [`8df637c`](https://github.com/KalleoPinheiro/still-void/commit/8df637ca7546d093eafca1bf3b230c37010119ee) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - `DialogContent` gains a `closeLabel?: string` prop for the native close button's accessible name, defaulting to the existing hardcoded `"Close dialog"` (zero behavior change when omitted). Lets a consumer translate the button (e.g. `closeLabel="Fechar"`) instead of disabling it via `showCloseButton={false}` just to avoid shipping untranslated UI.
+
+- [#20](https://github.com/KalleoPinheiro/still-void/pull/20) [`ec26604`](https://github.com/KalleoPinheiro/still-void/commit/ec266045e9617639c82e3e265811de8ce035e235) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - `IconName` gains three values: `camera`, `blocked`, and `pending` (backed by heroicons' `CameraIcon`, `NoSymbolIcon`, and `ClockIcon`, same as every other entry in the curated set). Closes a gap where consumers rendering "camera", "blocked lot" or "pending lot" indicators had no matching icon and fell back to raw Unicode glyphs as text.
+
 ## 3.1.0
 
 ### Minor Changes
