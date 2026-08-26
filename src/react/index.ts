@@ -23,6 +23,22 @@ export { Checkbox, type CheckboxProps } from '../components/ui/checkbox';
 export { Separator, type SeparatorProps } from '../components/ui/separator';
 export { Progress, type ProgressProps } from '../components/ui/progress';
 export {
+  Pagination,
+  type PaginationProps,
+  PaginationContent,
+  type PaginationContentProps,
+  PaginationItem,
+  type PaginationItemProps,
+  PaginationLink,
+  type PaginationLinkProps,
+  PaginationPrevious,
+  type PaginationPreviousProps,
+  PaginationNext,
+  type PaginationNextProps,
+  PaginationEllipsis,
+  type PaginationEllipsisProps,
+} from '../components/ui/pagination';
+export {
   RadioGroup,
   RadioGroupItem,
   type RadioGroupProps,
