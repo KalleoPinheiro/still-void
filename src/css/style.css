@@ -1442,6 +1442,149 @@ body.sv-body {
   outline-offset: 2px;
 }
 
+/* ---------- Separator ---------- */
+/* A hairline in the flat sense (Elevation section, DESIGN.md): a 1px slab of
+   the same border color the rest of the system uses, never a shadow. Sizing
+   is opposite on each axis by design — horizontal fills the inline
+   direction and is a fixed 1px tall; vertical fills the block direction
+   (the parent must give it a height) and is a fixed 1px wide. */
+.sv-separator {
+  flex-shrink: 0;
+  background: var(--sv-border);
+  height: 1px;
+  width: 100%;
+}
+.sv-separator--vertical {
+  height: 100%;
+  width: 1px;
+}
+
+/* ---------- Progress ---------- */
+/* A track and a fill, same tonal pair the rest of the system uses for a
+   surface-on-surface relationship: Surface 2 (one step up from Void) under
+   the accent fill, never a shadow to suggest depth. The indicator's width is
+   the one value in this component that cannot come from a token — it is
+   `value`/`max` at render time — so it is the sole inline `style` in the
+   server-safe catalog. */
+.sv-progress {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: var(--sv-space-2);
+  border-radius: var(--sv-radius-full);
+  background: var(--sv-surface-2);
+}
+.sv-progress__indicator {
+  height: 100%;
+  background: var(--sv-accent);
+  border-radius: var(--sv-radius-full);
+  transition: width var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+/* ---------- Pagination ---------- */
+/* A row of pill-shaped controls, same border/radius/surface vocabulary as
+   the rest of the catalog — no shadow, one active state (Accent), one hover
+   state (Surface 2). PaginationLink is deliberately NOT built on `.sv-btn`:
+   it needs the active/current styling `.sv-btn` has no variant for, and
+   reusing it would drag button-specific states (disabled opacity, size
+   scale) into a control this system's own doc doesn't ask for. */
+.sv-pagination {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+.sv-pagination__content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sv-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sv-pagination__item {
+  display: flex;
+}
+.sv-pagination__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sv-space-1);
+  min-width: var(--sv-space-10);
+  height: var(--sv-space-10);
+  padding: 0 var(--sv-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-sm);
+  background: transparent;
+  color: var(--sv-text-2);
+  font-family: var(--sv-font-body);
+  font-size: var(--sv-text-base);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover),
+    border-color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-pagination__link:hover {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+.sv-pagination__link:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+.sv-pagination__link--active {
+  border-color: var(--sv-border);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+}
+.sv-pagination__link--previous,
+.sv-pagination__link--next {
+  padding: 0 var(--sv-space-4);
+}
+
+.sv-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--sv-space-10);
+  height: var(--sv-space-10);
+  color: var(--sv-text-3);
+}
+
+/* ---------- Chart ---------- */
+/* Visual geometry only — no scale engine, see design.md. `overflow: visible`
+   is the one non-default here: an axis label sitting exactly at the SVG's
+   own edge (a common case — the last tick on a bottom axis) must not be
+   clipped by the viewBox the way an ordinary <svg> would clip it. Series
+   color (line stroke, bar fill) is a caller prop, not a class, because the
+   three series tokens (--sv-accent-ink/--sv-info-ink/--sv-warning-ink) are
+   assigned per-series by the consumer, not fixed by the primitive. */
+.sv-chart {
+  overflow: visible;
+  font-family: var(--sv-font-mono);
+}
+.sv-chart__grid-line {
+  stroke: var(--sv-border);
+  stroke-width: 1;
+}
+.sv-chart__axis {
+  stroke: var(--sv-text-2);
+  stroke-width: 1;
+}
+.sv-chart__axis-label {
+  fill: var(--sv-text-2);
+  font-size: var(--sv-text-xs);
+}
+.sv-chart__line {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sv-chart__bar {
+  shape-rendering: crispEdges;
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
@@ -1467,7 +1610,9 @@ body.sv-body {
   .sv-badge,
   .sv-dialog__close,
   .sv-menu-item,
-  .sv-tabs__trigger {
+  .sv-tabs__trigger,
+  .sv-progress__indicator,
+  .sv-pagination__link {
     transition: none;
   }
   /* AD-009 lets the portal family fade because open/closed carries state, but

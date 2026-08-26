@@ -31,35 +31,49 @@ export interface DialogContentProps
    * the deliberate case — a flow that must be resolved by an explicit choice.
    */
   showCloseButton?: boolean
+  /**
+   * The close button's accessible name. Defaults to the pre-existing hardcoded
+   * English string so omitting it is a zero-behavior-change no-op; pass a
+   * translated string (e.g. `"Fechar"`) instead of disabling the button
+   * entirely just to avoid shipping untranslated UI.
+   */
+  closeLabel?: string
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, showCloseButton = true, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn("sv-dialog", className)}
-      {...props}
-      // Spread after props, not before: aria-modal is a guarantee this
-      // component makes (CLIENT-05), not a default a caller can override by
-      // passing its own aria-modal. Radix renders role="dialog" but never
-      // aria-modal, so assistive tech was told nothing about the content
-      // behind the panel being inert.
-      aria-modal="true"
-    >
-      {children}
-      {showCloseButton ? (
-        <DialogPrimitive.Close className="sv-dialog__close">
-          <Icon name="x" />
-          <span className="sv-sr-only">Close dialog</span>
-        </DialogPrimitive.Close>
-      ) : null}
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
+>(({ className, children, showCloseButton = true, closeLabel: closeLabelProp, ...props }, ref) => {
+  // A blank string is not "no label" — `?? '...'` only catches `undefined`,
+  // so `closeLabel=""` would otherwise render an unnamed button. Treat blank
+  // the same as omitted.
+  const closeLabel = closeLabelProp && closeLabelProp.trim().length > 0 ? closeLabelProp : 'Close dialog'
+
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn("sv-dialog", className)}
+        {...props}
+        // Spread after props, not before: aria-modal is a guarantee this
+        // component makes (CLIENT-05), not a default a caller can override by
+        // passing its own aria-modal. Radix renders role="dialog" but never
+        // aria-modal, so assistive tech was told nothing about the content
+        // behind the panel being inert.
+        aria-modal="true"
+      >
+        {children}
+        {showCloseButton ? (
+          <DialogPrimitive.Close className="sv-dialog__close">
+            <Icon name="x" />
+            <span className="sv-sr-only">{closeLabel}</span>
+          </DialogPrimitive.Close>
+        ) : null}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 DialogContent.displayName = "DialogContent"
 
 const DialogHeader = ({

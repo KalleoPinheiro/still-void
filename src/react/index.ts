@@ -20,6 +20,39 @@ export { Textarea, type TextareaProps } from '../components/ui/textarea';
 export { NativeSelect, type NativeSelectProps } from '../components/ui/native-select';
 export { FileInput, type FileInputProps } from '../components/ui/file-input';
 export { Checkbox, type CheckboxProps } from '../components/ui/checkbox';
+export { Separator, type SeparatorProps } from '../components/ui/separator';
+export { Progress, type ProgressProps } from '../components/ui/progress';
+export {
+  Pagination,
+  type PaginationProps,
+  PaginationContent,
+  type PaginationContentProps,
+  PaginationItem,
+  type PaginationItemProps,
+  PaginationLink,
+  type PaginationLinkProps,
+  PaginationPrevious,
+  type PaginationPreviousProps,
+  PaginationNext,
+  type PaginationNextProps,
+  PaginationEllipsis,
+  type PaginationEllipsisProps,
+} from '../components/ui/pagination';
+export {
+  ChartContainer,
+  type ChartContainerProps,
+  ChartGrid,
+  type ChartGridProps,
+  ChartAxis,
+  type ChartAxisProps,
+  type ChartTick,
+  ChartLine,
+  type ChartLineProps,
+  type ChartPoint,
+  ChartBar,
+  type ChartBarProps,
+  type ChartBarDatum,
+} from '../components/ui/chart';
 export {
   RadioGroup,
   RadioGroupItem,
