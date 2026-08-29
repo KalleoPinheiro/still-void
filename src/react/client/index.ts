@@ -17,6 +17,10 @@ export * from './shadcn';
 export * from '../../behaviors/themeManager';
 export * from '../../behaviors/scrollSpy';
 export {
+  createMediaQuery,
+  type MediaQueryController,
+} from '../../behaviors/mediaQuery';
+export {
   createReadingProgress,
   type ReadingProgressOptions,
   type ReadingProgress as ReadingProgressController,
