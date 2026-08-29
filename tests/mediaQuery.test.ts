@@ -276,4 +276,43 @@ describe('createMediaQuery', () => {
     expect(listenerA).not.toHaveBeenCalled();
     expect(listenerB).toHaveBeenCalledTimes(1);
   });
+
+  // Cover the fully-inert environment: neither the modern nor the deprecated
+  // listener API is available at all (branch 5's false arm — the previous
+  // addListener-fallback test only covers the case where addListener IS
+  // present).
+  test('subscribing is a silent no-op when neither addEventListener nor addListener exist', () => {
+    const mockMQL = {
+      matches: false,
+      addEventListener: undefined,
+      addListener: undefined,
+      removeEventListener: undefined,
+      removeListener: undefined,
+    };
+
+    vi.unstubAllGlobals();
+    vi.stubGlobal('matchMedia', () => mockMQL);
+
+    const mq = createMediaQuery('(min-width: 1024px)');
+    const listener = vi.fn();
+
+    const unsubscribe = mq.subscribe(listener);
+    expect(() => unsubscribe()).not.toThrow();
+    expect(mq.getSnapshot()).toBe(false);
+  });
+
+  // Cover detachListener's `if (!attached) return` early-exit for real: the
+  // "double unsubscribe" test above never triggers it, because a second
+  // listener (B) stays subscribed the whole time, so `listeners.length`
+  // never reaches 0 and detachListener is never called a second time. This
+  // one unsubscribes the ONLY listener (attached flips to false), then
+  // unsubscribes again to hit the guard while already detached.
+  test('unsubscribing the last listener twice does not re-detach or throw', () => {
+    const mq = createMediaQuery('(min-width: 1024px)');
+    const listener = vi.fn();
+
+    const unsubscribe = mq.subscribe(listener);
+    unsubscribe(); // listeners.length -> 0, detachListener runs, attached -> false
+    expect(() => unsubscribe()).not.toThrow(); // detachListener runs again, already !attached
+  });
 });

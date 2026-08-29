@@ -79,7 +79,7 @@ export const IconRail: Story = {
                 }}
               >
                 <span>{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="sv-app-sidebar__label">{item.label}</span>
               </a>
             ))}
           </nav>
@@ -87,7 +87,11 @@ export const IconRail: Story = {
       </SidebarPanel>
       <SidebarInset>
         <div style={{ padding: '16px' }}>
-          <p>Icon rail mode: sidebar collapses to icons on desktop, drawer on mobile.</p>
+          <p>
+            Icon rail mode: labels carry the <code>sv-app-sidebar__label</code> class, so they
+            visually hide (but stay in the accessibility tree) while the rail is collapsed to
+            icon width on desktop, and reappear as a normal drawer on mobile.
+          </p>
         </div>
       </SidebarInset>
     </SidebarProvider>

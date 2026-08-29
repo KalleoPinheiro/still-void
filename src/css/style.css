@@ -1641,12 +1641,22 @@ body.sv-body {
    (offcanvas/icon/none), and data-mobile (true/false). The panel (.sv-app-sidebar)
    is static in-flow above the breakpoint, drawer in portal below. No box-shadow
    per Flat-By-Default Rule. Focus is outline (AD-005). Fade animation is driven
-   by data-state with var(--sv-duration-fast) and var(--sv-ease-hover). */
+   by data-state with var(--sv-duration-fast) and var(--sv-ease-hover).
+
+   .sv-app-shell is the flex container that lays SidebarPanel (the <aside>)
+   and SidebarInset (the <main>) side by side above the breakpoint — both are
+   rendered as direct children of it (SidebarProvider wraps `children` in this
+   one div). Below the breakpoint SidebarPanel renders into a portal instead
+   (it's not a flex child at all in that mode), so the inset alone fills the
+   row — AC R5-04.3 ("full width below the breakpoint") falls out of the flex
+   layout for free, no separate rule needed. */
 .sv-app-shell {
-  display: contents;
+  display: flex;
+  align-items: stretch;
 }
 
 .sv-app-sidebar {
+  flex-shrink: 0;
   background: var(--sv-surface);
   color: var(--sv-text);
   border-right: 1px solid var(--sv-border);
@@ -1685,6 +1695,10 @@ body.sv-body {
 
 .sv-app-sidebar-inset {
   flex: 1;
+  /* Without this a flex item's default `min-width: auto` lets its content
+     (e.g. a wide table) push it wider than the row, shrinking the sidebar
+     instead of scrolling internally. */
+  min-width: 0;
   overflow: auto;
 }
 

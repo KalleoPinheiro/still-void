@@ -96,6 +96,34 @@ describe('Sidebar collapsible modes', () => {
       fireEvent.click(toggleBtn)
       expect(openState).toHaveTextContent('closed')
     })
+
+    // `setOpen` is a separate code path from `toggle` (SidebarProvider
+    // manages its own open state directly rather than routing toggle
+    // through setOpen), so it needs its own no-op guard and its own test —
+    // exercising only `toggle` never calls `setOpen` at all.
+    it('setOpen should also be a no-op in none mode', () => {
+      const TestComponent = () => {
+        const { setOpen, open } = useSidebar()
+        return (
+          <div>
+            <button onClick={() => setOpen(true)} data-testid="open-btn">
+              Open
+            </button>
+            <div data-testid="open-state">{open ? 'open' : 'closed'}</div>
+          </div>
+        )
+      }
+
+      render(
+        <SidebarProvider collapsible="none" defaultOpen={false}>
+          <TestComponent />
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByTestId('open-state')).toHaveTextContent('closed')
+      fireEvent.click(screen.getByTestId('open-btn'))
+      expect(screen.getByTestId('open-state')).toHaveTextContent('closed')
+    })
   })
 
   describe('default collapsible value', () => {

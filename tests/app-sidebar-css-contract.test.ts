@@ -111,10 +111,30 @@ describe('App Sidebar CSS Contract', () => {
     expect(triggerMatch![0]).toContain('transition')
   })
 
+  // R5-02/R5-04: .sv-app-shell must be a real flex container, not
+  // `display: contents` — SidebarPanel and SidebarInset are both rendered
+  // as its direct children, and side-by-side layout falls out of this rule
+  // alone (no per-child positioning needed).
+  it('should lay out .sv-app-shell as flex so the panel and inset sit side by side', () => {
+    const shellMatch = styleContent.match(/\.sv-app-shell\s*\{[^}]*\}/s)
+    expect(shellMatch).toBeTruthy()
+    expect(shellMatch![0]).toMatch(/display:\s*flex/)
+    expect(shellMatch![0]).not.toMatch(/display:\s*contents/)
+  })
+
   // Inset styling
   it('should define .sv-app-sidebar-inset', () => {
     const insetMatch = styleContent.match(/\.sv-app-sidebar-inset\s*\{[^}]*\}/s)
     expect(insetMatch).toBeTruthy()
+  })
+
+  // R5-04 AC-2: the inset must not let wide content push the sidebar off
+  // its rail/full width — a flex item's implicit `min-width: auto` would
+  // otherwise let overflow content grow the row instead of scrolling
+  // internally.
+  it('should define min-width: 0 on .sv-app-sidebar-inset so it never pushes the sidebar', () => {
+    const insetMatch = styleContent.match(/\.sv-app-sidebar-inset\s*\{[^}]*\}/s)
+    expect(insetMatch![0]).toMatch(/min-width:\s*0/)
   })
 
   // R5-03: Icon mode CSS
