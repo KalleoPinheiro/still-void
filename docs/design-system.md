@@ -130,6 +130,20 @@ different problems:
 | Interaction in tests | `userEvent.selectOptions` | Radix's own trigger/listbox interaction |
 | Use it when | You want a plain form field that works in a Server Component and needs zero JS to submit | You want custom-styled options, search, or rich option content, and are already in a Client Component |
 
+### `Sidebar` vs. `SidebarPanel` (app shell)
+
+Both ship from the package and **neither is deprecated in favor of the other** — they solve
+different problems:
+
+| | `Sidebar` / `SidebarSection` (`@still-void/ui/react`) | `SidebarProvider`, `SidebarPanel`, `SidebarTrigger`, `SidebarInset` (`@still-void/ui/react/client`) |
+| --- | --- | --- |
+| Purpose | Content navigation (blog, docs TOC) — a static rail or sidebar | Application shell (admin panels, dashboards) — a responsive panel with a toggle |
+| Server-safe | Yes — no `'use client'`, no hooks, no state | No — client boundary, manages `open`/`close` state, reads viewport |
+| Responsive | Not built-in; you manage it (e.g., `display: none` below breakpoint) | Built-in: drawer below a breakpoint, static panel above it |
+| Breakpoint | You control via `@media` or CSS class | Configurable (default 1024px); read via `useMediaQuery` and `matchMedia` |
+| Interaction in tests | Renders as static `<aside>` / `<section>` | Radix `Dialog` machinery: portal, focus trap, overlay, `Escape` to close |
+| Use it when | Content is part of the page structure (TOC, sidebar nav for a blog post) | Toggling navigation is needed (app drawer, responsive admin panel) |
+
 ### `RadioGroup`: `name` propagation is direct-children only
 
 `RadioGroup` uses neither `useId` (a Hook) nor `createContext` (a React API, not a Hook) —
@@ -147,12 +161,63 @@ declare its own. A `RadioGroupItem`'s own `name` always wins over the group's.
 | `CopyButton` | Wraps `copyToClipboard` |
 | `TableOfContents` | Wraps scroll-spy behavior for active-heading tracking |
 | `ReadingProgress` | Wraps `createReadingProgress` |
-| `useScrollSpy`, `useReadingProgress` | Raw hooks, if you want to build custom UI around the behaviors |
+| `useScrollSpy`, `useReadingProgress`, `useMediaQuery` | Raw hooks, if you want to build custom UI around the behaviors |
+| `createMediaQuery` | Behavior over `window.matchMedia` with `getSnapshot()`, `subscribe()`, `destroy()` — used by `useMediaQuery` and `SidebarProvider`. Returns an inert controller when `matchMedia` is unavailable (e.g., in jsdom without a stub) |
+| `SidebarProvider`, `useSidebar`, `SidebarPanel`, `SidebarTrigger`, `SidebarInset` | Responsive app shell: sidebar becomes a drawer below a breakpoint. **Coexists with `Sidebar`/`SidebarSection`** (the content-rail family) — see "Sidebar vs. SidebarPanel" below |
+| `ToastProvider`, `useToast` | Notification queue: up to 3 toasts (configurable), auto-dismiss (5s default), pauses on hover/focus. Four severities map to semantic `aria-live` announcements. |
 | shadcn/ui: `Dialog` family, `AlertDialog` family, `DropdownMenu` family, `Select` family, `Tabs` family, `Tooltip` family | Radix-backed, require client state. `DialogContent` renders a close button by default (`<Icon name="x" />`, opt out with `showCloseButton={false}`); `AlertDialogContent` never does — a destructive confirmation resolves through explicit `AlertDialogAction`/`AlertDialogCancel`, not an escape-hatch X |
 
 Every shadcn component (server-safe or client) follows the Still Void CSS rules —
 no box-shadow, tokens for spacing/radii, one accent at a time. See CONTRIBUTING.md if
 you're adding a new one.
+
+### Alert: semantic variants and zero-regression default
+
+`Alert` (`@still-void/ui/react`) now accepts an optional `variant` prop with four severities:
+`'info'`, `'success'`, `'warning'`, `'danger'`. When a variant is present, the component
+automatically derives the correct `role` (`status` for info/success, `alert` for warning/danger)
+and renders a default icon — a behavior that **changes from its neutral default** (`role="alert"`,
+no icon). **To preserve backward compatibility**: `Alert` without a `variant` prop renders
+**identically to its current behavior** — `role="alert"`, no icon — so existing code never breaks.
+
+The `icon` prop lets you override or suppress the default: `icon={<CustomIcon/>}` renders your
+icon; `icon={null}` suppresses it entirely. The `action` prop adds an optional action button slot
+(e.g. "Undo", "Retry").
+
+| Severity | Token | Icon | Alert `role` |
+| --- | --- | --- | --- |
+| info | `--sv-info-ink` | `info` | `status` |
+| success | `--sv-success-ink` | `check-circle` | `status` |
+| warning | `--sv-warning-ink` | `alert-triangle` | `alert` |
+| danger | `--sv-danger-ink` | `alert-circle` | `alert` |
+| *(omitted)* | — | none | `alert` *(current behavior)* |
+
+### Toast: transient notifications with semantic announcements
+
+`ToastProvider` and `useToast` (`@still-void/ui/react/client`) manage a queue of notifications.
+Up to three are shown at once (configurable via `max`); older ones are removed (FIFO). Each
+toast auto-dismisses after 5 seconds (configurable per toast or at the provider level) and
+pauses on hover or focus.
+
+The four severities map to the **same semantic table as `Alert`** (info/success/warning/danger).
+The critical difference from a simple `Alert` alert box is that **toast announces itself via
+`aria-live`, not by being read when it appears**: it uses Radix's region (`role="region"`)
+with `aria-live` set to `assertive` for warning/danger (interrupts screen reader speech) and
+`polite` for info/success (waits for a pause). **`role="alert"` is not emitted**, because the
+Radix primitive fixes `role="status"` on the toast item itself — overlaying `role="alert"` would
+duplicate the announcement to assistive technology. The `aria-live` attribute is what conveys
+urgency, not the role.
+
+| Severity | Radix type | `aria-live` |
+| --- | --- | --- |
+| info | `background` | `polite` |
+| success | `background` | `polite` |
+| warning | `foreground` | `assertive` |
+| danger | `foreground` | `assertive` |
+
+Use `action?: { label, altText, onClick }` to add a button (the `altText` is mandatory — it
+gives screen readers a description when the toast auto-dismisses before the user reaches the
+button, e.g. "Undo (Ctrl+Z)").
 
 ## Accessibility
 

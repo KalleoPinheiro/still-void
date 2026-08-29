@@ -21,7 +21,7 @@ changes (Tailwind v4 is now required, and the v3 preset is gone).
 | **Component CSS** | `@still-void/ui/style.css` | browser | All component classes (`sv-*`) — every component this package ships needs only this, never Tailwind |
 | **Tailwind theme (optional)** | `@still-void/ui/tailwind.css` | browser (Tailwind v4 build) | `@theme inline` mapping `--color-sv-*`/`--font-sv-*`/`--spacing`/`--radius-sv-*` to `var(--sv-*)`, for `bg-sv-surface`-style utilities in **your own** markup |
 | **React (server-safe)** | `@still-void/ui/react` | server or client | Tokens, recipes, and components without hooks — render inside Server Components |
-| **React (client)** | `@still-void/ui/react/client` | client | `'use client'` bundle: DOM behaviors (`createThemeManager`, `createScrollSpy`, `createReadingProgress`, `copyToClipboard`), `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, hooks |
+| **React (client)** | `@still-void/ui/react/client` | client | `'use client'` bundle: DOM behaviors (`createThemeManager`, `createScrollSpy`, `createReadingProgress`, `createMediaQuery`, `copyToClipboard`), `ThemeProvider`, `ThemeToggle`, `CopyButton`, `TableOfContents`, `ReadingProgress`, app shell (`SidebarProvider`, `SidebarPanel`, `SidebarTrigger`, `SidebarInset`), toast (`ToastProvider`), hooks |
 
 ## Install
 
@@ -158,7 +158,7 @@ A selection of **shadcn/ui** components has been ported to Still Void with the d
 - `Card` — with header, title, description, content, footer; renders as `<div>` by default, or any of `section`/`article`/`li`/`aside` via `as`, or merges onto a single child via `asChild`
 - `Icon` — a curated set of icons (`@heroicons/react` under the hood) with `size` (`sm`/`md`/`lg`) and an accessible `label`
 - `Input` — text input with placeholder, disabled, and focus states
-- `Alert` — with optional title and description
+- `Alert` — with optional semantic `variant` (info/success/warning/danger), automatic icon and role derivation, and an optional `action` slot; zero-regression default when variant is omitted
 - `Badge` — with variants (default, secondary, destructive, outline)
 - `Textarea` — multi-line text field sharing `Input`'s frame, plus `rows`
 - `NativeSelect` — a real `<select>`, serializable via `FormData`; coexists with the client-only `Select` combobox (see [docs/design-system.md](docs/design-system.md))
@@ -166,11 +166,14 @@ A selection of **shadcn/ui** components has been ported to Still Void with the d
 - `Checkbox` — `<input type="checkbox">`, no wrapper
 - `RadioGroup` / `RadioGroupItem` — `<fieldset>`/`<legend>` group of native radios
 - `Table` family — `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`, a presentational data table with a scrolling container
+- `Sidebar` / `SidebarSection` — content sidebar (blog table of contents, article navigation); static rail at all viewport widths. **Coexists with the client-only `SidebarPanel`** for responsive app shells — see [docs/design-system.md](docs/design-system.md)
 
 All of the above style themselves through real `sv-*` CSS classes — **no Tailwind required**,
 for any component this package ships, in any version.
 
 **Client-only components** (import from `@still-void/ui/react/client`):
+- `SidebarProvider` / `SidebarPanel` / `SidebarTrigger` / `SidebarInset` / `useSidebar` — responsive app shell with toggleable sidebar (drawer below breakpoint, static panel above); read/control state via context
+- `ToastProvider` / `useToast` — notification queue (up to 3 by default, configurable), auto-dismiss (5s default), pause on hover/focus; four severities with semantic `aria-live` announcements
 - `Dialog` — modal with trigger, content, header, footer, title, description; renders a close button by default (`showCloseButton={false}` to opt out)
 - `AlertDialog` — the same modal mechanics as `Dialog`, without a close button, for destructive confirmations that must be resolved through explicit `Action`/`Cancel`
 - `Select` — dropdown with groups, labels, and scroll
