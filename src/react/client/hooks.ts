@@ -78,7 +78,8 @@ export function useMediaQuery(query: string): boolean {
       return matches;
     },
     // getServerSnapshot: return initial state during SSR (desktop/false)
-    /* v8 ignore next */ () => false,
+    // R5-01 AC-4: SSR returns false without error
+    () => false,
   );
 
   return mq;

@@ -251,4 +251,29 @@ describe('createMediaQuery', () => {
 
     expect(mockMQL.removeListener).toHaveBeenCalled();
   });
+
+  // Double unsubscribe is safe: calling unsubscribe twice should not error
+  test('double unsubscribe is safe and does not affect other listeners', () => {
+    const mq = createMediaQuery('(min-width: 1024px)');
+    const listenerA = vi.fn();
+    const listenerB = vi.fn();
+
+    const unsubscribeA = mq.subscribe(listenerA);
+    mq.subscribe(listenerB);
+
+    // Call unsubscribe on A twice
+    unsubscribeA();
+    expect(() => unsubscribeA()).not.toThrow();
+
+    // Simulate a media query change
+    mockMediaQueryList.matches = true;
+    const callback = mediaQueryCallbacks[0];
+    if (callback) {
+      callback(mockMediaQueryList);
+    }
+
+    // A should not be called, but B should still work
+    expect(listenerA).not.toHaveBeenCalled();
+    expect(listenerB).toHaveBeenCalledTimes(1);
+  });
 });

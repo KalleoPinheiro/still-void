@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { useSyncExternalStore } from 'react';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { useMediaQuery, createMediaQuery } from '../src/react/client/index';
 
@@ -150,5 +151,22 @@ describe('useMediaQuery', () => {
 
     // Clean up
     unmount2();
+  });
+});
+
+describe('useMediaQuery SSR', () => {
+  // R5-01 AC-4: Server-side rendering returns false without error
+  test('renders on server without error and uses false as default', () => {
+    const TestComponent = () => {
+      const isMobile = useMediaQuery('(min-width: 1024px)');
+      return <div>{isMobile ? 'mobile' : 'desktop'}</div>;
+    };
+
+    // renderToString simulates SSR; it should not throw and should render the false case
+    expect(() => {
+      const html = renderToString(<TestComponent />);
+      // Should contain 'desktop' text (the false case)
+      expect(html).toContain('desktop');
+    }).not.toThrow();
   });
 });

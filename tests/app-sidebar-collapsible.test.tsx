@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { type ReactNode } from 'react'
 import { describe, it, expect } from 'vitest'
 import {
@@ -85,9 +85,16 @@ describe('Sidebar collapsible modes', () => {
       const toggleBtn = screen.getByTestId('toggle-btn')
       const openState = screen.getByTestId('open-state')
 
+      // Initial state: closed
       expect(openState).toHaveTextContent('closed')
-      // In none mode, toggle is no-op (implementation detail)
-      // But the state can still be changed via other means
+
+      // Click toggle button — should have no effect in "none" mode
+      fireEvent.click(toggleBtn)
+      expect(openState).toHaveTextContent('closed')
+
+      // Click again — still no effect
+      fireEvent.click(toggleBtn)
+      expect(openState).toHaveTextContent('closed')
     })
   })
 

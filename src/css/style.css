@@ -1712,6 +1712,21 @@ body.sv-body {
   outline-offset: 2px;
 }
 
+/* R5-03: collapsible="icon" mode — sidebar collapses to icon rail width */
+.sv-app-shell[data-collapsible='icon'] .sv-app-sidebar:not(.sv-app-sidebar__drawer) {
+  width: var(--sv-space-14);
+}
+
+/* Hide text labels in icon mode while keeping them accessible to screen readers */
+.sv-app-shell[data-collapsible='icon'] .sv-app-sidebar__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 /* ---------- Toast ---------- */
 /* Toast viewport container (region role). The Radix primitive renders the
    list here; our wrapper manages the queue. */
