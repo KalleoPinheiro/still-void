@@ -215,6 +215,13 @@ function ToastViewportRenderer({
       {toasts.map((entry) => {
         const { id, title, description, variant = 'info', action } = entry;
         const config = variantConfig[variant];
+        // entry.duration is always resolved to a number by toast() before
+        // dispatch (see the `toast` callback above), so the `?? duration`
+        // fallback is unreachable via the only current call path — but
+        // ToastOptions.duration is typed optional, so this stays as a
+        // defensive guard against a future direct `dispatch({type:'ADD'})`
+        // caller that skips that resolution. Same rationale as the
+        // addListener/removeListener fallbacks in src/behaviors/mediaQuery.ts.
         /* v8 ignore next */ const toastDuration = entry.duration ?? duration;
 
         const handleActionClick = () => {

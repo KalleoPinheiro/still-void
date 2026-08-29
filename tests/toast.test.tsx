@@ -1069,4 +1069,39 @@ describe('Toast Edge Cases & Coverage', () => {
     expect(toastEl).toHaveClass('sv-toast--success');
     expect(screen.getByText('Retry')).toBeInTheDocument();
   });
+
+  // AC: a toast without an explicit `duration` falls back to the provider's
+  // default (entry.duration ?? duration). Every other test in this file passes
+  // `duration` explicitly (usually Infinity) to keep assertions deterministic,
+  // which left this fallback branch itself unexercised — this test covers it
+  // directly via Radix's own `duration={Infinity}` no-auto-dismiss contract
+  // instead of racing a real/faked timer.
+  test('falls back to the provider duration when the toast omits one', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast } = useToast();
+      return (
+        <button onClick={() => toast({ title: 'Uses provider default' })}>
+          Show
+        </button>
+      );
+    }
+
+    render(
+      <ToastProvider duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show'));
+
+    // No `duration` was passed to toast(), so it must have inherited the
+    // provider's Infinity default (never becomes unmountable on its own) —
+    // if the fallback were broken (e.g. resolving to `undefined`), Radix
+    // would use its own built-in default duration instead, which is finite.
+    expect(screen.getByText('Uses provider default')).toBeInTheDocument();
+    const toastEl = screen.getByText('Uses provider default').closest('[data-variant]');
+    expect(toastEl).toHaveAttribute('data-variant', 'info');
+  });
 });

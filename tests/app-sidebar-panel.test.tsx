@@ -318,9 +318,45 @@ describe('SidebarPanel and SidebarTrigger', () => {
       expect(inset).toBeInTheDocument()
     })
 
-    // Note: The SidebarPanel aside rendering path (line 173) cannot be fully
-    // tested in jsdom because the matchMedia stub is global and fixed at test setup.
-    // It always returns false (mobile mode), so the desktop path is never exercised.
-    // This is a limitation of the jsdom environment, not the component.
+    // Desktop path (line ~173): above breakpoint, SidebarPanel renders a plain
+    // <aside> in flow instead of the Dialog-based drawer. The global matchMedia
+    // stub (tests/setup.ts) always resolves `matches: false`, so this branch
+    // needs a local override to exercise it — it is a real, user-facing render
+    // path (the default desktop layout), not a legacy-browser fallback, so it
+    // must be covered by a real test rather than a coverage-ignore pragma.
+    it('should render a plain <aside> in flow above the breakpoint (desktop)', () => {
+      const originalMatchMedia = window.matchMedia
+      window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }))
+
+      try {
+        const { container } = render(
+          <SidebarProvider defaultOpen={true}>
+            <SidebarPanel className="custom-class">
+              <div data-testid="desktop-panel-content">Desktop Content</div>
+            </SidebarPanel>
+          </SidebarProvider>,
+        )
+
+        const aside = container.querySelector('aside.sv-app-sidebar')
+        expect(aside).toBeInTheDocument()
+        expect(aside).toHaveClass('custom-class')
+        expect(aside?.getAttribute('role')).not.toBe('dialog')
+        expect(screen.getByTestId('desktop-panel-content')).toBeInTheDocument()
+        // No drawer chrome (overlay/close button) in the in-flow desktop render
+        expect(container.querySelector('.sv-overlay')).not.toBeInTheDocument()
+        expect(screen.queryByLabelText('Close sidebar')).not.toBeInTheDocument()
+      } finally {
+        window.matchMedia = originalMatchMedia
+      }
+    })
   })
 })
