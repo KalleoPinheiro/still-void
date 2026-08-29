@@ -10,6 +10,9 @@ export * from './TableOfContents';
 export * from './ReadingProgress';
 export * from './hooks';
 
+// App shell components
+export * from './SidebarProvider';
+
 // Client-only shadcn/ui components (require state, browser APIs, Radix UI interactivity)
 export * from './shadcn';
 

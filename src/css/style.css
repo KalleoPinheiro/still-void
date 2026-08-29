@@ -1635,6 +1635,83 @@ body.sv-body {
   shape-rendering: crispEdges;
 }
 
+/* ---------- App Sidebar ---------- */
+/* R5-02, R5-03, R5-04: Sidebar de aplicação responsiva.
+   The wrapper (.sv-app-shell) carries data-state (open/closed), data-collapsible
+   (offcanvas/icon/none), and data-mobile (true/false). The panel (.sv-app-sidebar)
+   is static in-flow above the breakpoint, drawer in portal below. No box-shadow
+   per Flat-By-Default Rule. Focus is outline (AD-005). Fade animation is driven
+   by data-state with var(--sv-duration-fast) and var(--sv-ease-hover). */
+.sv-app-shell {
+  display: contents;
+}
+
+.sv-app-sidebar {
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  border-right: 1px solid var(--sv-border);
+}
+
+.sv-app-sidebar__drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sv-z-modal);
+}
+
+/* Dialog.Content animates via data-state=[open|closed] */
+.sv-app-sidebar[data-state='open'] {
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar[data-state='closed'] {
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-6);
+  padding: var(--sv-space-6);
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.sv-app-sidebar__label {
+  font-family: var(--sv-font-display);
+  font-size: var(--sv-text-lg);
+  font-weight: 600;
+  color: var(--sv-text);
+}
+
+.sv-app-sidebar-inset {
+  flex: 1;
+  overflow: auto;
+}
+
+.sv-app-sidebar-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sv-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-sm);
+  background: none;
+  color: var(--sv-text-2);
+  cursor: pointer;
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar-trigger:hover {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+
+.sv-app-sidebar-trigger:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
@@ -1674,7 +1751,11 @@ body.sv-body {
      all — the closed panel never has a chance to snap into view. */
   .sv-overlay,
   .sv-dialog,
-  .sv-pop {
+  .sv-pop,
+  .sv-app-sidebar {
     animation: none;
+  }
+  .sv-app-sidebar-trigger {
+    transition: none;
   }
 }
