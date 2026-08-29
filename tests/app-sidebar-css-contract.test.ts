@@ -116,6 +116,33 @@ describe('App Sidebar CSS Contract', () => {
     const insetMatch = styleContent.match(/\.sv-app-sidebar-inset\s*\{[^}]*\}/s)
     expect(insetMatch).toBeTruthy()
   })
+
+  // R5-03: Icon mode CSS
+  it('should define width constraint for icon mode', () => {
+    // Look for [data-collapsible="icon"] rule that affects .sv-app-sidebar width
+    const iconModeMatch = styleContent.match(
+      /\.sv-app-shell\[data-collapsible=['"]icon['\"]\].*\.sv-app-sidebar(?:.*)\{[^}]*width[^}]*\}/s,
+    )
+    expect(iconModeMatch).toBeTruthy()
+    // Should use a space token for consistency
+    const match = iconModeMatch?.[0]
+    expect(match).toContain('var(--sv-space-')
+  })
+
+  // R5-03: Icon mode hides text labels visually but keeps SR access
+  it('should visually hide label text in icon mode', () => {
+    const iconLabelMatch = styleContent.match(
+      /\.sv-app-shell\[data-collapsible=['"]icon['\"]\].*\.sv-app-sidebar__label\s*\{[^}]*\}/s,
+    )
+    expect(iconLabelMatch).toBeTruthy()
+    const match = iconLabelMatch?.[0]
+    // Should use sr-only pattern: position absolute + width/height 1px + overflow hidden + clip
+    expect(match).toContain('position')
+    expect(match).toContain('width')
+    expect(match).toContain('height')
+    expect(match).toContain('overflow')
+    expect(match).toContain('clip')
+  })
 })
 
 /**
