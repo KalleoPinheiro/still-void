@@ -1658,6 +1658,15 @@ body.sv-body {
   z-index: var(--sv-z-modal);
 }
 
+/* Dialog.Content animates via data-state=[open|closed] */
+.sv-app-sidebar[data-state='open'] {
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar[data-state='closed'] {
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
 .sv-app-sidebar__body {
   display: flex;
   flex-direction: column;
@@ -1703,19 +1712,6 @@ body.sv-body {
   outline-offset: 2px;
 }
 
-/* Overlay for drawer mode (reuses .sv-overlay from Overlays section) */
-.sv-app-sidebar__drawer .sv-overlay {
-  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
-}
-
-.sv-app-shell[data-state='open'] .sv-app-sidebar__drawer .sv-overlay {
-  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
-}
-
-.sv-app-shell[data-state='closed'] .sv-app-sidebar__drawer .sv-overlay {
-  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
-}
-
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
@@ -1755,7 +1751,11 @@ body.sv-body {
      all — the closed panel never has a chance to snap into view. */
   .sv-overlay,
   .sv-dialog,
-  .sv-pop {
+  .sv-pop,
+  .sv-app-sidebar {
     animation: none;
+  }
+  .sv-app-sidebar-trigger {
+    transition: none;
   }
 }

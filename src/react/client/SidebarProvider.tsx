@@ -7,8 +7,12 @@ import {
   useState,
   useCallback,
   type ReactNode,
+  type ComponentPropsWithoutRef,
+  forwardRef,
 } from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
 import { useMediaQuery } from './hooks'
+import { Icon } from '../../components/ui/icon'
 import { cn } from '../../lib/utils'
 
 /**
@@ -126,3 +130,107 @@ export function useSidebar(): SidebarContextValue {
   }
   return context
 }
+
+/**
+ * R5-02: Sidebar panel that is static in-flow above breakpoint,
+ * drawer in portal below breakpoint.
+ */
+export interface SidebarPanelProps extends ComponentPropsWithoutRef<'aside'> {
+  title?: string
+}
+
+export const SidebarPanel = forwardRef<HTMLDivElement, SidebarPanelProps>(
+  function SidebarPanel({ className, title = 'Navigation', children, ...props }, ref) {
+    const { open, setOpen, isMobile, panelId } = useSidebar()
+
+    if (isMobile) {
+      // Below breakpoint: drawer in portal
+      return (
+        <Dialog.Root open={open} onOpenChange={setOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="sv-overlay" />
+            <Dialog.Content
+              className={cn('sv-app-sidebar sv-app-sidebar__drawer', className)}
+              role="dialog"
+              aria-modal="true"
+              id={panelId}
+              {...props}
+            >
+              <Dialog.Title className="sv-sr-only">{title}</Dialog.Title>
+              <div className="sv-app-sidebar__body">{children}</div>
+              <Dialog.Close className="sv-dialog__close" asChild>
+                <button aria-label="Close sidebar">
+                  <Icon name="x" />
+                </button>
+              </Dialog.Close>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      )
+    }
+
+    // Above breakpoint: in flow
+    return (
+      <aside
+        ref={ref}
+        className={cn('sv-app-sidebar', className)}
+        id={panelId}
+        {...props}
+      >
+        <div className="sv-app-sidebar__body">{children}</div>
+      </aside>
+    )
+  },
+)
+SidebarPanel.displayName = 'SidebarPanel'
+
+/**
+ * R5-02: Trigger button to open/close sidebar.
+ * Renders as menu icon by default, or custom children.
+ * aria-expanded and aria-controls are derived and override props.
+ */
+export interface SidebarTriggerProps extends ComponentPropsWithoutRef<'button'> {
+  label?: string
+}
+
+export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>(
+  function SidebarTrigger({ className, label, children, ...props }, ref) {
+    const { open, toggle, collapsible, panelId } = useSidebar()
+
+    // collapsible="none" → render nothing
+    if (collapsible === 'none') {
+      return null
+    }
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        {...props}
+        className={cn('sv-app-sidebar-trigger', className)}
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={label || 'Toggle sidebar'}
+        onClick={toggle}
+      >
+        {children || <Icon name="menu" />}
+      </button>
+    )
+  },
+)
+SidebarTrigger.displayName = 'SidebarTrigger'
+
+/**
+ * R5-04: Inset container that adjusts to sidebar state via CSS.
+ * Does not read context — state is read by CSS selectors on the wrapper.
+ */
+export interface SidebarInsetProps extends ComponentPropsWithoutRef<'main'> {}
+
+export const SidebarInset = forwardRef<HTMLElement, SidebarInsetProps>(
+  function SidebarInset({ className, ...props }, ref) {
+    return (
+      <main ref={ref} className={cn('sv-app-sidebar-inset', className)} {...props} />
+    )
+  },
+)
+SidebarInset.displayName = 'SidebarInset'
