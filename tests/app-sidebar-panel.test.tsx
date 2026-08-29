@@ -74,6 +74,22 @@ describe('SidebarPanel and SidebarTrigger', () => {
   })
 
   describe('SidebarTrigger', () => {
+    // SidebarTrigger merges the consumer's forwarded ref with the internal
+    // triggerRef used to restore focus on close — covers the callback-ref
+    // arm of that merge (a `useRef()` object ref exercises the other arm
+    // via every other test that queries the trigger through the DOM).
+    it('should call a consumer-provided callback ref with the button element', () => {
+      const callbackRef = vi.fn()
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger ref={callbackRef} data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(callbackRef).toHaveBeenCalledWith(screen.getByTestId('trigger'))
+    })
+
     // AC-7: Trigger toggles open state
     it('should toggle open on click', () => {
       const { container } = render(
@@ -411,6 +427,41 @@ describe('SidebarPanel and SidebarTrigger', () => {
       await vi.waitFor(() => {
         const panel = document.querySelector('[data-testid="panel"]')
         expect(panel).toContainElement(document.activeElement as HTMLElement)
+      })
+    })
+
+    // AC-5: focus returns to SidebarTrigger after the drawer closes.
+    // SidebarTrigger is a plain button, not Radix's own Dialog.Trigger (it
+    // structurally can't be — Dialog.Root only exists inside SidebarPanel's
+    // conditional render, and SidebarTrigger is a sibling of SidebarPanel,
+    // not a descendant of it), so Radix's built-in restore-focus-to-trigger
+    // behavior has no ref to work with on its own; SidebarProvider passes
+    // its own triggerRef through context and SidebarPanel's Dialog.Content
+    // uses it directly via onCloseAutoFocus.
+    it('should return focus to the trigger after the drawer closes', async () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel data-testid="panel">
+            <button data-testid="first-focusable">First</button>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      await vi.waitFor(() => {
+        const panel = document.querySelector('[data-testid="panel"]')
+        expect(panel).toContainElement(document.activeElement as HTMLElement)
+      })
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      await vi.waitFor(() => {
+        expect(document.activeElement).toBe(trigger)
       })
     })
 

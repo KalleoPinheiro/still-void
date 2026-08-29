@@ -6,8 +6,12 @@ import {
   useId,
   useState,
   useCallback,
+  useRef,
   type ReactNode,
   type ComponentPropsWithoutRef,
+  type Ref,
+  type RefObject,
+  type MutableRefObject,
   forwardRef,
 } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -19,6 +23,26 @@ import { cn } from '../../lib/utils'
  * R5-02, R5-03: Sidebar state provider and context
  */
 
+/**
+ * Same ref-merge as `src/components/ui/slot.tsx`'s `composeRefs`, inlined
+ * here rather than imported: that file's version is a *local*, unexported
+ * helper (its own docstring explains why — a server-safety concern that
+ * doesn't apply to this already-`'use client'` module), and this component
+ * needs to merge SidebarTrigger's own forwarded ref with the internal
+ * `triggerRef` the provider uses to restore focus after the drawer closes.
+ */
+function composeRefs<T>(...refs: (Ref<T> | null | undefined)[]) {
+  return (node: T) => {
+    for (const ref of refs) {
+      if (typeof ref === 'function') {
+        ref(node)
+      } else if (ref !== null && ref !== undefined) {
+        ;(ref as MutableRefObject<T | null>).current = node
+      }
+    }
+  }
+}
+
 export type SidebarCollapsible = 'offcanvas' | 'icon' | 'none'
 
 export interface SidebarContextValue {
@@ -28,6 +52,16 @@ export interface SidebarContextValue {
   isMobile: boolean
   collapsible: SidebarCollapsible
   panelId: string
+  /**
+   * R5-02 AC-5: SidebarTrigger is a plain button, not Radix's own
+   * `Dialog.Trigger` (structurally it can't be — Dialog.Root only exists
+   * inside SidebarPanel's conditional drawer render, and SidebarTrigger is
+   * that component's sibling, not its child) — so Radix's built-in
+   * "restore focus to the trigger that opened the dialog" behavior has no
+   * trigger ref to restore to. SidebarPanel's Dialog.Content reads this ref
+   * directly in its own `onCloseAutoFocus` to do that restoration itself.
+   */
+  triggerRef: RefObject<HTMLButtonElement | null>
 }
 
 const SidebarContext = createContext<SidebarContextValue | null>(null)
@@ -55,6 +89,7 @@ export function SidebarProvider({
 }: SidebarProviderProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen)
   const panelId = useId()
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
   // Normalize breakpoint: invalid values (0, negative, NaN, Infinity) fall back to 1024
   const breakpoint = (() => {
@@ -109,6 +144,7 @@ export function SidebarProvider({
     isMobile,
     collapsible: collapsibleProp,
     panelId,
+    triggerRef,
   }
 
   return (
@@ -147,7 +183,7 @@ export interface SidebarPanelProps extends ComponentPropsWithoutRef<'aside'> {
 
 export const SidebarPanel = forwardRef<HTMLDivElement, SidebarPanelProps>(
   function SidebarPanel({ className, title = 'Navigation', children, ...props }, ref) {
-    const { open, setOpen, isMobile, panelId } = useSidebar()
+    const { open, setOpen, isMobile, panelId, triggerRef } = useSidebar()
 
     if (isMobile) {
       // Below breakpoint: drawer in portal
@@ -160,6 +196,16 @@ export const SidebarPanel = forwardRef<HTMLDivElement, SidebarPanelProps>(
               role="dialog"
               aria-modal="true"
               id={panelId}
+              // R5-02 AC-5: restore focus to SidebarTrigger on close. Radix's
+              // own default tries `context.triggerRef.current?.focus()`, but
+              // that's Radix's *own* Dialog.Trigger ref — SidebarTrigger
+              // isn't one (see the SidebarContextValue.triggerRef docstring
+              // for why it structurally can't be), so that ref is always
+              // null and focus would otherwise fall back to <body>.
+              onCloseAutoFocus={(event) => {
+                event.preventDefault()
+                triggerRef.current?.focus()
+              }}
               {...props}
             >
               <Dialog.Title className="sv-sr-only">{title}</Dialog.Title>
@@ -201,7 +247,7 @@ export interface SidebarTriggerProps extends ComponentPropsWithoutRef<'button'> 
 
 export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>(
   function SidebarTrigger({ className, label, children, ...props }, ref) {
-    const { open, toggle, collapsible, panelId } = useSidebar()
+    const { open, toggle, collapsible, panelId, triggerRef } = useSidebar()
 
     // collapsible="none" → render nothing
     if (collapsible === 'none') {
@@ -210,7 +256,7 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
 
     return (
       <button
-        ref={ref}
+        ref={composeRefs(ref, triggerRef)}
         type="button"
         {...props}
         className={cn('sv-app-sidebar-trigger', className)}
