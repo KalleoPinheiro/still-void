@@ -233,6 +233,73 @@ describe('Toast (T10)', () => {
     expect(screen.getByText('Toast 4')).toBeInTheDocument();
   });
 
+  // F2 (R5-06 AC-3): a provider-level `max` below the library default of 3
+  // must be honored, not clamped back up to 3. The two existing max tests
+  // only ever use `max={3}` (== the default) or `max={0}` (the invalid-input
+  // fallback path), so neither could catch a `Math.max(3, …)` floor.
+  test('honors a provider max below the default of 3', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast, toasts } = useToast();
+      return (
+        <div>
+          <button
+            onClick={() => {
+              toast({ title: 'Toast A' });
+              toast({ title: 'Toast B' });
+            }}
+          >
+            Show 2
+          </button>
+          <div data-testid="count">{toasts.length}</div>
+        </div>
+      );
+    }
+
+    render(
+      <ToastProvider max={1} duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show 2'));
+
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+    expect(screen.queryByText('Toast A')).not.toBeInTheDocument();
+    expect(screen.getByText('Toast B')).toBeInTheDocument();
+  });
+
+  test('honors a provider max above the default of 3', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast, toasts } = useToast();
+      return (
+        <div>
+          <button
+            onClick={() => {
+              for (let i = 1; i <= 6; i++) toast({ title: `Toast ${i}` });
+            }}
+          >
+            Show 6
+          </button>
+          <div data-testid="count">{toasts.length}</div>
+        </div>
+      );
+    }
+
+    render(
+      <ToastProvider max={5} duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show 6'));
+
+    expect(screen.getByTestId('count')).toHaveTextContent('5');
+  });
+
   // toast() returns handle
   test('toast() returns handle with id, dismiss, and update methods', async () => {
     const user = userEvent.setup();
@@ -1251,6 +1318,46 @@ describe('Toast Timer Lifecycle (F7 — real timer verification)', () => {
     // Complete the new 2000ms window measured from the update() call (500ms more).
     await act(async () => { await vi.advanceTimersByTimeAsync(500); });
     expect(screen.queryByText('Updated')).not.toBeInTheDocument();
+  });
+});
+
+// F1 (R5-05 AC-3): the whole point of passing `type` to Toast.Root is that
+// Radix maps it to `aria-live` — info/success ("background") must announce
+// politely, warning/danger ("foreground") must interrupt. No prior test in
+// this file asserted the `aria-live` value itself.
+describe('Toast Announcement Severity (F1 — aria-live matches variant)', () => {
+  test.each([
+    ['info', 'polite'],
+    ['success', 'polite'],
+    ['warning', 'assertive'],
+    ['danger', 'assertive'],
+  ] as const)('variant=%s announces with aria-live=%s', async (variant, expectedAriaLive) => {
+    function TestComponent() {
+      const { toast } = useToast();
+      return (
+        <button onClick={() => toast({ title: `${variant} toast`, variant, duration: Infinity })}>
+          Show
+        </button>
+      );
+    }
+
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show'));
+    // Make sure the toast actually rendered before inspecting the announcer.
+    expect(screen.getByText(`${variant} toast`)).toBeInTheDocument();
+
+    // Radix's `type` prop drives a dedicated, visually-hidden announcer
+    // element (a `role="status"` span appended at the end of the document)
+    // that receives a text copy of the toast for assistive tech — it is a
+    // sibling of the visible toast markup, not an ancestor of the title, so
+    // it has to be found independently rather than via `.closest()`.
+    const announceEl = document.body.querySelector('[role="status"][aria-live]');
+    expect(announceEl).toHaveAttribute('aria-live', expectedAriaLive);
   });
 });
 
