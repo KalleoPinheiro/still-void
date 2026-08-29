@@ -23,8 +23,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     // Validate variant: only use if it's a known variant
     const config = variant && variant in variantConfig ? variantConfig[variant] : null
     const derivedRole = config?.role ?? 'alert'
-    // Derived role wins over prop role
-    const effectiveRole = config ? derivedRole : propRole ?? 'alert'
+    // Derived role wins over prop role; without variant, force 'alert' unconditionally
+    const effectiveRole = config ? derivedRole : 'alert'
 
     // Determine if icon should be rendered
     let iconElement: React.ReactNode = null
