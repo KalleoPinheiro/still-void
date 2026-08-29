@@ -1029,6 +1029,51 @@ body.sv-body {
   line-height: 1.625;
 }
 
+/* Semantic variants (T1, R5-09) */
+.sv-alert--info {
+  --sv-alert-color: var(--sv-info-ink);
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--info > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--info .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+.sv-alert--success {
+  --sv-alert-color: var(--sv-success-ink);
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--success > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--success .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+.sv-alert--warning {
+  --sv-alert-color: var(--sv-warning-ink);
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--warning > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--warning .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+.sv-alert--danger {
+  --sv-alert-color: var(--sv-danger-ink);
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--danger > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--danger .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
 /* ---------- Badge ---------- */
 /* Default variant uses var(--sv-accent) rather than a fixed hue, so the
    badge follows [data-accent] instead of locking to cyan (One-Accent Rule —
