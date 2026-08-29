@@ -7,6 +7,7 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'danger'
 interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: AlertVariant
   icon?: React.ReactNode | null
+  action?: React.ReactNode
 }
 
 // Map variant to derived role and default icon
@@ -18,7 +19,7 @@ const variantConfig: Record<AlertVariant, { role: 'alert' | 'status'; icon: Icon
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant, icon, role: propRole, ...props }, ref) => {
+  ({ className, variant, icon, action, role: propRole, ...props }, ref) => {
     // Validate variant: only use if it's a known variant
     const config = variant && variant in variantConfig ? variantConfig[variant] : null
     const derivedRole = config?.role ?? 'alert'
@@ -45,6 +46,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       >
         {iconElement}
         {props.children}
+        {action && <div className="sv-alert__action">{action}</div>}
       </div>
     )
   },

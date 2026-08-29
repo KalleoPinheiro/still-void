@@ -1074,6 +1074,11 @@ body.sv-body {
   color: var(--sv-alert-color);
 }
 
+/* Action slot (T2, R5-10) */
+.sv-alert__action {
+  margin-top: var(--sv-space-3);
+}
+
 /* ---------- Badge ---------- */
 /* Default variant uses var(--sv-accent) rather than a fixed hue, so the
    badge follows [data-accent] instead of locking to cyan (One-Accent Rule —

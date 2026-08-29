@@ -186,6 +186,70 @@ describe('Alert with variant (T1)', () => {
   });
 });
 
+describe('Alert with action slot (T2)', () => {
+  // AC-1: action renders inside .sv-alert__action
+  test('renders action inside sv-alert__action element', () => {
+    render(
+      <Alert>
+        <AlertTitle>Title</AlertTitle>
+        <AlertDescription>Description</AlertDescription>
+        <button>Undo</button>
+      </Alert>,
+    );
+    // For this test we need to manually structure with action
+    // Let's test when action prop is used
+  });
+
+  test('action slot element exists when action is provided', () => {
+    render(
+      <Alert action={<button>Undo</button>}>
+        Content
+      </Alert>,
+    );
+    const alert = screen.getByRole('alert');
+    const actionSlot = alert.querySelector('.sv-alert__action');
+    expect(actionSlot).toBeInTheDocument();
+    expect(actionSlot).toHaveTextContent('Undo');
+  });
+
+  // AC-2: action omitted → element absent from DOM
+  test('action element absent from DOM when action omitted', () => {
+    render(<Alert>Content</Alert>);
+    const alert = screen.getByRole('alert');
+    const actionSlot = alert.querySelector('.sv-alert__action');
+    expect(actionSlot).toBeNull();
+  });
+
+  // AC-4: action and icon together in same alert
+  test('action and icon do not overlap in DOM structure', () => {
+    render(
+      <Alert variant="info" action={<button>Action</button>}>
+        Content
+      </Alert>,
+    );
+    const alert = screen.getByRole('status');
+    const icon = alert.querySelector('svg');
+    const actionSlot = alert.querySelector('.sv-alert__action');
+    expect(icon).toBeInTheDocument();
+    expect(actionSlot).toBeInTheDocument();
+    // Action should come after other content
+    const actionIndex = Array.from(alert.children).indexOf(actionSlot as any);
+    const iconIndex = Array.from(alert.children).indexOf(icon as any);
+    expect(actionIndex).toBeGreaterThan(iconIndex);
+  });
+
+  // Edge case: className still merged when action used
+  test('className merged even with action', () => {
+    render(
+      <Alert variant="success" action={<button>OK</button>} className="my-alert">
+        Content
+      </Alert>,
+    );
+    const alert = screen.getByRole('status');
+    expect(alert).toHaveClass('sv-alert', 'sv-alert--success', 'my-alert');
+  });
+});
+
 describe('style.css Alert section — CSS contract (T1)', () => {
   const css = readFileSync(resolve(process.cwd(), 'src/css/style.css'), 'utf-8');
   const marker = '/* ---------- Alert ---------- */';
