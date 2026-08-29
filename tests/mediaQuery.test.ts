@@ -133,32 +133,43 @@ describe('createMediaQuery', () => {
 
   // AC-6: No matchMedia available → inert controller
   test('without matchMedia, returns inert controller', () => {
-    vi.unstubAllGlobals();
-    // matchMedia is now unavailable
+    const originalMatchMedia = window.matchMedia;
+    delete (window as any).matchMedia;
+    try {
+      const mq = createMediaQuery('(min-width: 1024px)');
 
-    const mq = createMediaQuery('(min-width: 1024px)');
+      // getSnapshot() returns false (desktop/no-match fallback)
+      expect(mq.getSnapshot()).toBe(false);
 
-    // getSnapshot() returns false (desktop/no-match fallback)
-    expect(mq.getSnapshot()).toBe(false);
+      // subscribe() is no-op
+      const listener = vi.fn();
+      const unsubscribe = mq.subscribe(listener);
+      expect(typeof unsubscribe).toBe('function');
+      expect(listener).not.toHaveBeenCalled();
 
-    // subscribe() is no-op
-    const listener = vi.fn();
-    const unsubscribe = mq.subscribe(listener);
-    expect(typeof unsubscribe).toBe('function');
-    expect(listener).not.toHaveBeenCalled();
-
-    // destroy() is no-op
-    expect(() => mq.destroy()).not.toThrow();
+      // destroy() is no-op
+      expect(() => mq.destroy()).not.toThrow();
+    } finally {
+      if (originalMatchMedia) {
+        (window as any).matchMedia = originalMatchMedia;
+      }
+    }
   });
 
   // AC-6: No matchMedia, then try to call unsubscribe
   test('unsubscribe is safe even in inert mode', () => {
-    vi.unstubAllGlobals();
+    const originalMatchMedia = window.matchMedia;
+    delete (window as any).matchMedia;
+    try {
+      const mq = createMediaQuery('(min-width: 1024px)');
+      const unsubscribe = mq.subscribe(() => {});
 
-    const mq = createMediaQuery('(min-width: 1024px)');
-    const unsubscribe = mq.subscribe(() => {});
-
-    expect(() => unsubscribe()).not.toThrow();
+      expect(() => unsubscribe()).not.toThrow();
+    } finally {
+      if (originalMatchMedia) {
+        (window as any).matchMedia = originalMatchMedia;
+      }
+    }
   });
 
   // Multiple listeners can be subscribed
@@ -199,5 +210,45 @@ describe('createMediaQuery', () => {
 
     expect(listener1).not.toHaveBeenCalled();
     expect(listener2).toHaveBeenCalledTimes(1);
+  });
+
+  // Cover deprecated addListener fallback (for older browsers)
+  test('uses addListener fallback when addEventListener is not available', () => {
+    const mockMQL = {
+      matches: false,
+      addEventListener: undefined,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    };
+
+    vi.unstubAllGlobals();
+    vi.stubGlobal('matchMedia', () => mockMQL);
+
+    const mq = createMediaQuery('(min-width: 1024px)');
+    const listener = vi.fn();
+    mq.subscribe(listener);
+
+    expect(mockMQL.addListener).toHaveBeenCalled();
+  });
+
+  // Cover deprecated removeListener fallback (for older browsers)
+  test('uses removeListener fallback when removeEventListener is not available', () => {
+    const mockMQL = {
+      matches: false,
+      addEventListener: undefined,
+      addListener: vi.fn(),
+      removeEventListener: undefined,
+      removeListener: vi.fn(),
+    };
+
+    vi.unstubAllGlobals();
+    vi.stubGlobal('matchMedia', () => mockMQL);
+
+    const mq = createMediaQuery('(min-width: 1024px)');
+    const listener = vi.fn();
+    const unsubscribe = mq.subscribe(listener);
+    unsubscribe();
+
+    expect(mockMQL.removeListener).toHaveBeenCalled();
   });
 });

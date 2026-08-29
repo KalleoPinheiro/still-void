@@ -151,16 +151,18 @@ describe('Alert with variant (T1)', () => {
     expect(icon).toBeInTheDocument();
   });
 
-  // AC-6: Custom icon replaces default
-  test('icon prop overrides default icon', () => {
-    const CustomIcon = () => <span data-testid="custom-icon">X</span>;
+  // AC-6: Custom icon replaces default (AC-6)
+  test('icon prop with React element renders custom icon', () => {
+    const customIconElement = <span data-testid="custom-icon">✓</span>;
     render(
-      <Alert variant="info">
-        <AlertTitle title="Test" />
+      <Alert variant="info" icon={customIconElement}>
+        Content
       </Alert>,
     );
-    // Still has default icon
-    expect(screen.getByRole('status').querySelector('svg')).toBeInTheDocument();
+    // Custom icon is rendered
+    expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
+    // Default icon is NOT rendered (SVG)
+    expect(screen.getByRole('status').querySelector('svg')).toBeNull();
   });
 
   // AC-6: icon={null} suppresses icon

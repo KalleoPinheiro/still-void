@@ -1712,6 +1712,178 @@ body.sv-body {
   outline-offset: 2px;
 }
 
+/* ---------- Toast ---------- */
+/* Toast viewport container (region role). The Radix primitive renders the
+   list here; our wrapper manages the queue. */
+.sv-toast__viewport {
+  position: fixed;
+  bottom: var(--sv-space-4);
+  right: var(--sv-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-3);
+  pointer-events: none;
+  z-index: var(--sv-z-toast);
+  max-width: calc(100vw - var(--sv-space-8));
+}
+
+/* Individual toast item */
+.sv-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sv-space-3);
+  padding: var(--sv-space-3) var(--sv-space-4);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  pointer-events: auto;
+  animation: sv-toast-enter var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-toast[data-state="closed"] {
+  animation: sv-toast-exit var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+@keyframes sv-toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sv-space-2));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sv-toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(var(--sv-space-2));
+  }
+}
+
+/* Icon */
+.sv-toast__icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Content wrapper */
+.sv-toast__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Title */
+.sv-toast__title {
+  margin: 0 0 var(--sv-space-1);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--sv-text);
+}
+
+/* Description */
+.sv-toast__description {
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text-2);
+  line-height: 1.5;
+}
+
+/* Variant colors (info, success, warning, danger) */
+.sv-toast--info .sv-toast__icon {
+  color: var(--sv-info-ink);
+}
+.sv-toast--info .sv-toast__title {
+  color: var(--sv-info-ink);
+}
+.sv-toast--info {
+  border-color: var(--sv-info-ink);
+}
+
+.sv-toast--success .sv-toast__icon {
+  color: var(--sv-success-ink);
+}
+.sv-toast--success .sv-toast__title {
+  color: var(--sv-success-ink);
+}
+.sv-toast--success {
+  border-color: var(--sv-success-ink);
+}
+
+.sv-toast--warning .sv-toast__icon {
+  color: var(--sv-warning-ink);
+}
+.sv-toast--warning .sv-toast__title {
+  color: var(--sv-warning-ink);
+}
+.sv-toast--warning {
+  border-color: var(--sv-warning-ink);
+}
+
+.sv-toast--danger .sv-toast__icon {
+  color: var(--sv-danger-ink);
+}
+.sv-toast--danger .sv-toast__title {
+  color: var(--sv-danger-ink);
+}
+.sv-toast--danger {
+  border-color: var(--sv-danger-ink);
+}
+
+/* Actions container */
+.sv-toast__actions {
+  display: flex;
+  gap: var(--sv-space-2);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Action button */
+.sv-toast__action {
+  padding: var(--sv-space-2) var(--sv-space-3);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+  font-size: var(--sv-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-toast__action:hover {
+  background: var(--sv-surface-3);
+}
+.sv-toast__action:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+/* Close button */
+.sv-toast__close {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--sv-text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-toast__close:hover {
+  color: var(--sv-text);
+}
+.sv-toast__close:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
@@ -1752,7 +1924,8 @@ body.sv-body {
   .sv-overlay,
   .sv-dialog,
   .sv-pop,
-  .sv-app-sidebar {
+  .sv-app-sidebar,
+  .sv-toast {
     animation: none;
   }
   .sv-app-sidebar-trigger {

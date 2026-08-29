@@ -9,6 +9,7 @@ export * from './CopyButton';
 export * from './TableOfContents';
 export * from './ReadingProgress';
 export * from './hooks';
+export * from './ToastProvider';
 
 // App shell components
 export * from './SidebarProvider';
