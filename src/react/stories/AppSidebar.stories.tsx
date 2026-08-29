@@ -59,7 +59,11 @@ export const Offcanvas: Story = {
 
 export const IconRail: Story = {
   render: () => (
-    <SidebarProvider collapsible="icon" defaultOpen={true}>
+    // defaultOpen={false}: in "icon" mode, `open` toggles rail width vs.
+    // full width (the same way it toggles visible vs. hidden in
+    // "offcanvas") — closed is the collapsed rail this story demonstrates
+    // by default. Use the trigger below to expand it.
+    <SidebarProvider collapsible="icon" defaultOpen={false}>
       <SidebarPanel>
         <SidebarSection title="Main">
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -87,10 +91,13 @@ export const IconRail: Story = {
       </SidebarPanel>
       <SidebarInset>
         <div style={{ padding: '16px' }}>
+          <SidebarTrigger />
           <p>
             Icon rail mode: labels carry the <code>sv-app-sidebar__label</code> class, so they
             visually hide (but stay in the accessibility tree) while the rail is collapsed to
-            icon width on desktop, and reappear as a normal drawer on mobile.
+            icon width — the default here. Click the trigger above to expand it to full width
+            with labels visible, and collapse it again. Below the breakpoint it behaves like a
+            normal drawer regardless of this state.
           </p>
         </div>
       </SidebarInset>

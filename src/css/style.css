@@ -1726,13 +1726,20 @@ body.sv-body {
   outline-offset: 2px;
 }
 
-/* R5-03: collapsible="icon" mode — sidebar collapses to icon rail width */
-.sv-app-shell[data-collapsible='icon'] .sv-app-sidebar:not(.sv-app-sidebar__drawer) {
+/* R5-03: collapsible="icon" mode — `open` toggles rail width vs. full width,
+   the same way `offcanvas` toggles visible vs. hidden. Both rules below key
+   off data-state="closed" *together with* data-collapsible="icon" — without
+   that, a collapsed-width rail would also apply while `open` (the expanded,
+   labels-visible state), which is the opposite of what "collapsible" means
+   here. .sv-app-shell carries data-state from SidebarProvider's own `open`. */
+.sv-app-shell[data-collapsible='icon'][data-state='closed'] .sv-app-sidebar:not(.sv-app-sidebar__drawer) {
   width: var(--sv-space-14);
 }
 
-/* Hide text labels in icon mode while keeping them accessible to screen readers */
-.sv-app-shell[data-collapsible='icon'] .sv-app-sidebar__label {
+/* Hide text labels only in the collapsed (closed) state; keep them
+   accessible to screen readers via the sr-only pattern rather than
+   removing them, since the icon alone is not a reliable label. */
+.sv-app-shell[data-collapsible='icon'][data-state='closed'] .sv-app-sidebar__label {
   position: absolute;
   width: 1px;
   height: 1px;

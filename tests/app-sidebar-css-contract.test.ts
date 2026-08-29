@@ -137,22 +137,26 @@ describe('App Sidebar CSS Contract', () => {
     expect(insetMatch![0]).toMatch(/min-width:\s*0/)
   })
 
-  // R5-03: Icon mode CSS
-  it('should define width constraint for icon mode', () => {
-    // Look for [data-collapsible="icon"] rule that affects .sv-app-sidebar width
+  // R5-03: Icon mode CSS. The selector is matched exactly (anchored at
+  // `.sv-app-sidebar:not(` and stopping at the first `}`) rather than with a
+  // greedy `.*` up to *any* later `.sv-app-sidebar…{…width…}` — a greedy
+  // version here previously matched the label-hiding rule below instead
+  // (it also contains a `width` declaration, `width: 1px`), so deleting the
+  // real width rule entirely still passed this test.
+  it('should define width constraint for icon mode, scoped to the closed state', () => {
     const iconModeMatch = styleContent.match(
-      /\.sv-app-shell\[data-collapsible=['"]icon['\"]\].*\.sv-app-sidebar(?:.*)\{[^}]*width[^}]*\}/s,
+      /\.sv-app-shell\[data-collapsible=['"]icon['"]\]\[data-state=['"]closed['"]\] \.sv-app-sidebar:not\([^)]*\)\s*\{[^}]*\}/,
     )
     expect(iconModeMatch).toBeTruthy()
-    // Should use a space token for consistency
-    const match = iconModeMatch?.[0]
-    expect(match).toContain('var(--sv-space-')
+    const match = iconModeMatch![0]
+    expect(match).toMatch(/width:\s*var\(--sv-space-/)
   })
 
-  // R5-03: Icon mode hides text labels visually but keeps SR access
-  it('should visually hide label text in icon mode', () => {
+  // R5-03: Icon mode hides text labels visually but keeps SR access — same
+  // exact-anchor reasoning as the width test above.
+  it('should visually hide label text in icon mode, scoped to the closed state', () => {
     const iconLabelMatch = styleContent.match(
-      /\.sv-app-shell\[data-collapsible=['"]icon['\"]\].*\.sv-app-sidebar__label\s*\{[^}]*\}/s,
+      /\.sv-app-shell\[data-collapsible=['"]icon['"]\]\[data-state=['"]closed['"]\] \.sv-app-sidebar__label\s*\{[^}]*\}/,
     )
     expect(iconLabelMatch).toBeTruthy()
     const match = iconLabelMatch?.[0]
