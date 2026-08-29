@@ -13,3 +13,39 @@ import '@testing-library/jest-dom/vitest';
 if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = function scrollIntoView() {};
 }
+
+// jsdom does not implement matchMedia. Stub it globally for tests.
+// Default behavior: matches = false (desktop/no-query-match).
+// Tests can override via vi.stubGlobal or local mocks as needed.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  window.matchMedia = (query: string): MediaQueryList => {
+    const listeners: ((mql: MediaQueryList) => void)[] = [];
+
+    const mql = {
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: (listener: (mql: MediaQueryList) => void) => {
+        listeners.push(listener);
+      },
+      removeListener: (listener: (mql: MediaQueryList) => void) => {
+        const idx = listeners.indexOf(listener);
+        if (idx >= 0) listeners.splice(idx, 1);
+      },
+      addEventListener: (type: string, listener: (mql: MediaQueryList) => void) => {
+        if (type === 'change') {
+          listeners.push(listener);
+        }
+      },
+      removeEventListener: (type: string, listener: (mql: MediaQueryList) => void) => {
+        if (type === 'change') {
+          const idx = listeners.indexOf(listener);
+          if (idx >= 0) listeners.splice(idx, 1);
+        }
+      },
+      dispatchEvent: () => false,
+    } as unknown as MediaQueryList;
+
+    return mql;
+  };
+}
