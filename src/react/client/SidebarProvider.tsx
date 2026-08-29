@@ -79,22 +79,28 @@ export function SidebarProvider({
 
   const setOpen = useCallback(
     (newOpen: boolean) => {
+      // R5-03 AC-4: collapsible="none" means always expanded, setOpen is no-op
+      if (collapsibleProp === 'none') return
+
       if (isControlled) {
         onOpenChange?.(newOpen)
       } else {
         setUncontrolledOpen(newOpen)
       }
     },
-    [isControlled, onOpenChange],
+    [collapsibleProp, isControlled, onOpenChange],
   )
 
   const toggle = useCallback(() => {
+    // R5-03 AC-4: collapsible="none" means always expanded, toggle is no-op
+    if (collapsibleProp === 'none') return
+
     if (isControlled) {
       onOpenChange?.(!controlledOpen)
     } else {
       setUncontrolledOpen((prev) => !prev)
     }
-  }, [isControlled, controlledOpen, onOpenChange])
+  }, [collapsibleProp, isControlled, controlledOpen, onOpenChange])
 
   const contextValue: SidebarContextValue = {
     open,
