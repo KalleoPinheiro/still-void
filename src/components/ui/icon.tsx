@@ -34,6 +34,7 @@ const Icon = React.forwardRef<SVGSVGElement, IconProps>(
       <Glyph
         {...props}
         ref={ref}
+        data-icon-name={name}
         className={cn(
           'sv-icon',
           size === 'sm' && 'sv-icon--sm',
