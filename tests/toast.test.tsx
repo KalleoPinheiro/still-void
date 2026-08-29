@@ -849,4 +849,71 @@ describe('Toast Handles (T12)', () => {
     // Should still have 0 toasts
     expect(screen.getByTestId('count')).toHaveTextContent('0');
   });
+
+  // Multiple sequential toasts and interactions
+  test('handles multiple sequential operations correctly', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast, dismiss, dismissAll, toasts } = useToast();
+      const [handle, setHandle] = React.useState<any>(null);
+
+      return (
+        <div>
+          <button
+            onClick={() => {
+              const h = toast({ title: 'Sequential 1' });
+              setHandle(h);
+            }}
+          >
+            Toast 1
+          </button>
+          <button
+            onClick={() => {
+              const h = toast({ title: 'Sequential 2' });
+              setHandle(h);
+            }}
+          >
+            Toast 2
+          </button>
+          {handle && (
+            <>
+              <button onClick={() => handle.dismiss()}>Dismiss Handle</button>
+              <button onClick={() => handle.update({ title: 'Updated' })}>
+                Update
+              </button>
+            </>
+          )}
+          <button onClick={() => dismissAll()}>Clear All</button>
+          <div data-testid="count">{toasts.length}</div>
+        </div>
+      );
+    }
+
+    render(
+      <ToastProvider duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    // Create first toast
+    await user.click(screen.getByText('Toast 1'));
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+
+    // Create second toast
+    await user.click(screen.getByText('Toast 2'));
+    expect(screen.getByTestId('count')).toHaveTextContent('2');
+
+    // Update via handle
+    await user.click(screen.getByText('Update'));
+    expect(screen.getByText('Updated')).toBeInTheDocument();
+
+    // Dismiss via handle
+    await user.click(screen.getByText('Dismiss Handle'));
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+
+    // Clear all
+    await user.click(screen.getByText('Clear All'));
+    expect(screen.getByTestId('count')).toHaveTextContent('0');
+  });
 });
