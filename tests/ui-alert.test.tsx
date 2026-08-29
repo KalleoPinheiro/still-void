@@ -23,6 +23,16 @@ describe('Alert', () => {
     render(<Alert className="custom">X</Alert>);
     expect(screen.getByRole('alert')).toHaveClass('custom');
   });
+
+  // F4: Regression test — without variant, role="alert" is non-overridable
+  test('forces role=alert without variant, even if role prop is passed (F4)', () => {
+    render(<Alert role="banner">Body</Alert>);
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('role', 'alert');
+    // Ensure "banner" role was not applied
+    expect(screen.queryByRole('banner')).toBeNull();
+  });
 });
 
 describe('AlertTitle', () => {
@@ -125,30 +135,34 @@ describe('Alert with variant (T1)', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  // AC-5: Default icon by variant, aria-hidden
+  // AC-5: Default icon by variant, aria-hidden (F8: verify icon identity, not just presence)
   test('renders default info icon for variant=info', () => {
     render(<Alert variant="info" />);
     const icon = screen.getByRole('status').querySelector('svg');
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(icon).toHaveAttribute('data-icon-name', 'info');
   });
 
   test('renders default check-circle icon for variant=success', () => {
     render(<Alert variant="success" />);
     const icon = screen.getByRole('status').querySelector('svg');
     expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('data-icon-name', 'check-circle');
   });
 
   test('renders default alert-triangle icon for variant=warning', () => {
     render(<Alert variant="warning" />);
     const icon = screen.getByRole('alert').querySelector('svg');
     expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('data-icon-name', 'alert-triangle');
   });
 
   test('renders default alert-circle icon for variant=danger', () => {
     render(<Alert variant="danger" />);
     const icon = screen.getByRole('alert').querySelector('svg');
     expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('data-icon-name', 'alert-circle');
   });
 
   // AC-6: Custom icon replaces default (AC-6)
