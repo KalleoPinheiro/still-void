@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import {
@@ -1106,135 +1106,32 @@ describe('Toast Edge Cases & Coverage', () => {
   });
 });
 
-describe('Toast Timer Lifecycle (F7 — Duration & Update Implementation)', () => {
-  // AC: Default duration is passed to Radix Toast
-  test('passes default duration to Toast.Root', async () => {
-    const user = userEvent.setup();
-
-    function TestComponent() {
-      const { toast } = useToast();
-
-      return (
-        <button
-          onClick={() => {
-            toast({ title: 'Duration Test' });
-          }}
-        >
-          Show
-        </button>
-      );
-    }
-
-    render(
-      <ToastProvider duration={5000}>
-        <TestComponent />
-      </ToastProvider>
-    );
-
-    await user.click(screen.getByText('Show'));
-
-    // Verify the toast rendered (meaning Toast.Root accepted the duration prop and rendered)
-    expect(screen.getByText('Duration Test')).toBeInTheDocument();
+// F7 — real timer verification. Radix's Toast.Root schedules dismissal with
+// a plain `window.setTimeout(handleClose, duration)` (see
+// node_modules/@radix-ui/react-toast/dist/index.mjs) and tracks pause/resume
+// via `new Date().getTime()` deltas — both are exactly what
+// vi.useFakeTimers() intercepts, so we drive time explicitly instead of
+// asserting "still in the document right after the event fires", which is
+// true whether or not the underlying timer logic works at all.
+//
+// Radix's pause/resume is wired to `pointermove`/`pointerleave` on the
+// viewport's wrapper (the element with role="region"), NOT `pointerenter` —
+// see the VIEWPORT_PAUSE/VIEWPORT_RESUME listeners in the Radix source.
+describe('Toast Timer Lifecycle (F7 — real timer verification)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
   });
 
-  // AC: Custom duration is passed correctly
-  test('passes custom duration to Toast.Root', async () => {
-    const user = userEvent.setup();
-
-    function TestComponent() {
-      const { toast } = useToast();
-      return (
-        <button
-          onClick={() => {
-            toast({ title: 'Custom Duration Toast', duration: 2000 });
-          }}
-        >
-          Show
-        </button>
-      );
-    }
-
-    render(
-      <ToastProvider duration={5000}>
-        <TestComponent />
-      </ToastProvider>
-    );
-
-    await user.click(screen.getByText('Show'));
-    expect(screen.getByText('Custom Duration Toast')).toBeInTheDocument();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
-  // AC: update() causes Toast.Root remount (forces timer restart via key change)
-  test('update() remounts Toast.Root to restart timer', async () => {
-    const user = userEvent.setup();
-
-    function TestComponent() {
-      const { toast, toasts } = useToast();
-      const [handle, setHandle] = React.useState<any>(null);
-
-      return (
-        <div>
-          <button
-            onClick={() => {
-              const h = toast({
-                title: 'Update Test',
-                duration: Infinity,
-              });
-              setHandle(h);
-            }}
-          >
-            Show
-          </button>
-          {handle && (
-            <button
-              onClick={() => {
-                handle.update({ title: 'Updated Title' });
-              }}
-              data-testid="update-btn"
-            >
-              Update
-            </button>
-          )}
-          <div data-testid="count">{toasts.length}</div>
-        </div>
-      );
-    }
-
-    render(
-      <ToastProvider duration={Infinity}>
-        <TestComponent />
-      </ToastProvider>
-    );
-
-    await user.click(screen.getByText('Show'));
-    expect(screen.getByTestId('count')).toHaveTextContent('1');
-    expect(screen.getByText('Update Test')).toBeInTheDocument();
-
-    // Call update (which increments the version, causing Toast.Root to remount)
-    await user.click(screen.getByTestId('update-btn'));
-
-    // The toast should now show updated content
-    expect(screen.getByText('Updated Title')).toBeInTheDocument();
-
-    // Verify the toast still exists (not dismissed)
-    expect(screen.getByTestId('count')).toHaveTextContent('1');
-  });
-
-  // AC: Radix Toast pauses on pointer enter (native Radix behavior)
-  test('Radix Toast pauses timer on pointerEnter', async () => {
-    const user = userEvent.setup();
-
+  test('default duration is 5000ms: alive at 4999ms, gone at 5000ms, and removed from toasts', async () => {
     function TestComponent() {
       const { toast, toasts } = useToast();
       return (
         <div>
-          <button
-            onClick={() => {
-              toast({ title: 'Hover Test', duration: 1000 });
-            }}
-          >
-            Show
-          </button>
+          <button onClick={() => toast({ title: 'Default Duration' })}>Show</button>
           <div data-testid="count">{toasts.length}</div>
         </div>
       );
@@ -1246,17 +1143,114 @@ describe('Toast Timer Lifecycle (F7 — Duration & Update Implementation)', () =
       </ToastProvider>
     );
 
-    await user.click(screen.getByText('Show'));
+    fireEvent.click(screen.getByText('Show'));
+    expect(screen.getByText('Default Duration')).toBeInTheDocument();
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(4999); });
+    expect(screen.getByText('Default Duration')).toBeInTheDocument();
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+    expect(screen.queryByText('Default Duration')).not.toBeInTheDocument();
+    expect(screen.getByTestId('count')).toHaveTextContent('0');
+  });
+
+  test('a per-toast duration overrides the provider default', async () => {
+    function TestComponent() {
+      const { toast } = useToast();
+      return <button onClick={() => toast({ title: 'Short-lived', duration: 1000 })}>Show</button>;
+    }
+
+    render(
+      <ToastProvider duration={5000}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show'));
+    expect(screen.getByText('Short-lived')).toBeInTheDocument();
+
+    // If the per-toast duration did not win, this toast would still be
+    // alive here (it would need the full 5000ms provider default).
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(screen.queryByText('Short-lived')).not.toBeInTheDocument();
+  });
+
+  test('hovering the toast region (pointermove) pauses the countdown; leaving resumes it', async () => {
+    function TestComponent() {
+      const { toast } = useToast();
+      return <button onClick={() => toast({ title: 'Hover Test', duration: 1000 })}>Show</button>;
+    }
+
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show'));
+    const region = screen.getByRole('region');
+
+    // Consume most of the window, then pause with time to spare.
+    await act(async () => { await vi.advanceTimersByTimeAsync(800); });
+    expect(screen.getByText('Hover Test')).toBeInTheDocument();
+    fireEvent.pointerMove(region);
+
+    // While paused, advancing well past the original 1000ms must NOT
+    // dismiss the toast — if pause were a no-op, this would fail.
+    await act(async () => { await vi.advanceTimersByTimeAsync(2000); });
     expect(screen.getByText('Hover Test')).toBeInTheDocument();
 
-    // Simulate hover - should pause the Radix timer
-    const toastRoot = screen.getByText('Hover Test').closest('[role="status"]');
-    if (toastRoot) {
-      fireEvent.pointerEnter(toastRoot);
-      // After pointerEnter, Radix should pause its timer
-      // We can verify this by checking that the toast is still there
-      expect(screen.getByText('Hover Test')).toBeInTheDocument();
+    // Resume: only ~200ms of the original budget was left when we paused.
+    fireEvent.pointerLeave(region);
+    await act(async () => { await vi.advanceTimersByTimeAsync(199); });
+    expect(screen.getByText('Hover Test')).toBeInTheDocument();
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+    expect(screen.queryByText('Hover Test')).not.toBeInTheDocument();
+  });
+
+  test('update() restarts the auto-dismiss countdown from the moment it is called', async () => {
+    function TestComponent() {
+      const { toast, toasts } = useToast();
+      const [handle, setHandle] = React.useState<any>(null);
+      return (
+        <div>
+          <button onClick={() => setHandle(toast({ title: 'Original', duration: 2000 }))}>Show</button>
+          {handle && (
+            <button data-testid="update-btn" onClick={() => handle.update({ title: 'Updated' })}>
+              Update
+            </button>
+          )}
+          <div data-testid="count">{toasts.length}</div>
+        </div>
+      );
     }
+
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    fireEvent.click(screen.getByText('Show'));
+
+    // Consume most of the original 2000ms window.
+    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    expect(screen.getByText('Original')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('update-btn'));
+    expect(screen.getByText('Updated')).toBeInTheDocument();
+
+    // The original countdown would have expired 500ms from here. If update()
+    // did not restart it, the toast would be gone by this point.
+    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    expect(screen.getByText('Updated')).toBeInTheDocument();
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+
+    // Complete the new 2000ms window measured from the update() call (500ms more).
+    await act(async () => { await vi.advanceTimersByTimeAsync(500); });
+    expect(screen.queryByText('Updated')).not.toBeInTheDocument();
   });
 });
 
@@ -1281,6 +1275,13 @@ describe('Toast Mutation Coverage (F8 — M3, M9)', () => {
             }}
           >
             Show 4
+          </button>
+          <button
+            onClick={() => {
+              toasts.forEach((t) => dismiss(t.id));
+            }}
+          >
+            Dismiss all visible
           </button>
           <div data-testid="count">{toasts.length}</div>
           <div data-testid="toast-ids">
@@ -1311,6 +1312,19 @@ describe('Toast Mutation Coverage (F8 — M3, M9)', () => {
     const ids = screen.getByTestId('toast-ids').textContent;
     expect(ids).toBeTruthy();
     expect(ids?.split(',')).toHaveLength(3);
+
+    // Discriminating check for M3: `toasts` is `allToasts.slice(-max)`, so a
+    // length-3-with-Toast-1-absent result above would hold true even if the
+    // FIFO effect's `dismiss(toRemove.id)` call were deleted entirely — the
+    // slice alone produces that view. The only way to tell "Toast 1 was
+    // actually dismissed" from "Toast 1 is merely off the visible slice"
+    // apart is to shrink the visible set below its size and see whether the
+    // evicted item resurfaces. If the eviction dismiss() never fired,
+    // Toast 1 is still sitting in the underlying (un-sliced) state, and
+    // dismissing everything currently visible will make it reappear.
+    await user.click(screen.getByText('Dismiss all visible'));
+    expect(screen.getByTestId('count')).toHaveTextContent('0');
+    expect(screen.queryByText('Toast 1')).not.toBeInTheDocument();
   });
 
   // M9: Icon identity must match per variant (info→info, success→check-circle, etc)
