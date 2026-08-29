@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Alert, AlertTitle, AlertDescription } from '../../components/ui/alert';
-import { Icon } from '../../components/ui/icon';
+import { Button } from '../../components/ui/button';
 
 const meta: Meta<typeof Alert> = {
   title: 'shadcn/Alert',
@@ -11,24 +11,23 @@ export default meta;
 
 type Story = StoryObj<typeof Alert>;
 
-export const Default: Story = {
+export const Neutral: Story = {
   render: () => (
     <Alert>
       <AlertTitle>Heads up</AlertTitle>
       <AlertDescription>
-        This is an alert message. It can contain important information.
+        This is an alert message without a variant. It remains neutral and displays the original behavior.
       </AlertDescription>
     </Alert>
   ),
 };
 
-export const WithIcon: Story = {
+export const Info: Story = {
   render: () => (
-    <Alert>
-      <Icon name="info" />
+    <Alert variant="info">
       <AlertTitle>Information</AlertTitle>
       <AlertDescription>
-        This alert contains an icon to draw attention.
+        This is an info alert with derived role and default icon.
       </AlertDescription>
     </Alert>
   ),
@@ -36,8 +35,7 @@ export const WithIcon: Story = {
 
 export const Success: Story = {
   render: () => (
-    <Alert>
-      <Icon name="check-circle" />
+    <Alert variant="success">
       <AlertTitle>Success</AlertTitle>
       <AlertDescription>
         Your operation completed successfully.
@@ -48,8 +46,7 @@ export const Success: Story = {
 
 export const Warning: Story = {
   render: () => (
-    <Alert>
-      <Icon name="alert-triangle" />
+    <Alert variant="warning">
       <AlertTitle>Warning</AlertTitle>
       <AlertDescription>
         Please review this warning before proceeding.
@@ -58,10 +55,9 @@ export const Warning: Story = {
   ),
 };
 
-export const Error: Story = {
+export const Danger: Story = {
   render: () => (
-    <Alert>
-      <Icon name="alert-circle" />
+    <Alert variant="danger">
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
         An error occurred. Please try again later.
@@ -70,24 +66,28 @@ export const Error: Story = {
   ),
 };
 
-export const WithLongDescription: Story = {
+export const WithAction: Story = {
   render: () => (
-    <Alert>
-      <AlertTitle>Important Notice</AlertTitle>
+    <Alert variant="info">
+      <AlertTitle>Update Available</AlertTitle>
       <AlertDescription>
-        This is a longer alert description that spans multiple lines. It provides more context
-        and detail about the alert message. Alerts are useful for communicating important
-        information to users.
+        A new version is available. Review and install the latest features.
       </AlertDescription>
+      <div className="sv-alert__action">
+        <Button size="sm" variant="ghost">
+          Install now
+        </Button>
+      </div>
     </Alert>
   ),
 };
 
-export const Minimal: Story = {
+export const NoIcon: Story = {
   render: () => (
-    <Alert>
+    <Alert variant="success" icon={null}>
+      <AlertTitle>Success</AlertTitle>
       <AlertDescription>
-        Simple alert without title
+        This alert has no icon, even though a variant with a default icon is applied.
       </AlertDescription>
     </Alert>
   ),
