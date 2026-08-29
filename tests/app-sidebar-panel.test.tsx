@@ -8,6 +8,7 @@ import {
   SidebarInset,
   useSidebar,
 } from '../src/react/client/SidebarProvider'
+import { SidebarSection } from '../src/react/index'
 
 /**
  * T6: SidebarPanel + SidebarTrigger (off-canvas drawer mode)
@@ -318,18 +319,32 @@ describe('SidebarPanel and SidebarTrigger', () => {
       expect(overlay).toBeInTheDocument()
     })
 
-    // AC-4: Overlay is present and interactable (Radix Dialog handles close via overlay)
-    it('should have overlay that Radix Dialog uses for interaction', () => {
+    // AC-6: clicking the overlay actually closes the drawer (not just "overlay exists").
+    // Radix's DismissableLayer attaches its document-level `pointerdown`
+    // listener inside a `setTimeout(0)` (to avoid catching the very click
+    // that opened the dialog) — a real 0ms macrotask has to elapse before
+    // it's listening.
+    it('should close the drawer when the overlay is clicked', async () => {
       render(
         <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
           <SidebarPanel>Content</SidebarPanel>
         </SidebarProvider>,
       )
 
-      // Verify overlay element exists (Radix Dialog uses this for backdrop close)
+      expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'true')
+
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
       const overlay = document.querySelector('.sv-overlay')
       expect(overlay).toBeInTheDocument()
-      // Overlay is a Dialog.Overlay from Radix, which handles click-to-close internally
+      fireEvent.pointerDown(overlay as Element)
+      fireEvent.pointerUp(overlay as Element)
+      fireEvent.click(overlay as Element)
+
+      await vi.waitFor(() => {
+        expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'false')
+      })
     })
 
     // AC-4: Escape key closes the drawer
@@ -353,18 +368,66 @@ describe('SidebarPanel and SidebarTrigger', () => {
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
     })
 
-    // AC-4: Body scroll is locked while drawer open (via Radix Dialog)
-    it('should render drawer and Radix Dialog applies scroll lock', () => {
-      render(
+    // AC-4/AC-10: body scroll is locked while the drawer is open, and released
+    // after it closes. Radix's Dialog uses `react-remove-scroll` under the
+    // hood, which marks the lock with a `data-scroll-locked` attribute on
+    // `<body>` (a simple counter-based setAttribute/removeAttribute, not
+    // dependent on ResizeObserver, so it works under jsdom) — see
+    // react-remove-scroll-bar's `lockAttribute`.
+    it('should lock body scroll while open and release it after closing', () => {
+      const { unmount } = render(
         <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
           <SidebarPanel>Content</SidebarPanel>
         </SidebarProvider>,
       )
 
-      // Radix applies mechanisms via the Dialog.Content; verify it renders
-      const dialogContent = document.querySelector('[role="dialog"]')
-      expect(dialogContent).toBeInTheDocument()
-      expect(dialogContent).toHaveAttribute('aria-modal', 'true')
+      expect(document.body).toHaveAttribute('data-scroll-locked')
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'false')
+      expect(document.body).not.toHaveAttribute('data-scroll-locked')
+
+      unmount()
+    })
+
+    // AC-4: focus moves inside the panel when the drawer opens
+    it('should move focus into the panel when the drawer opens', async () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel data-testid="panel">
+            <button data-testid="first-focusable">First</button>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      // Radix moves focus asynchronously (via a rAF-scheduled effect); wait
+      // for it instead of asserting immediately after the click.
+      await vi.waitFor(() => {
+        const panel = document.querySelector('[data-testid="panel"]')
+        expect(panel).toContainElement(document.activeElement as HTMLElement)
+      })
+    })
+
+    // AC-9: SidebarSection composes unchanged as a child of the drawer panel
+    it('should render SidebarSection unchanged as a child', () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel>
+            <SidebarSection title="Main" data-testid="section">
+              <a href="/home">Home</a>
+            </SidebarSection>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByText('Main')).toBeInTheDocument()
+      expect(screen.getByText('Home')).toBeInTheDocument()
     })
 
     // AC-4: Panel works with simple content
