@@ -1762,22 +1762,18 @@ body.sv-body {
 @keyframes sv-toast-enter {
   from {
     opacity: 0;
-    transform: translateY(var(--sv-space-2));
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @keyframes sv-toast-exit {
   from {
     opacity: 1;
-    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(var(--sv-space-2));
   }
 }
 

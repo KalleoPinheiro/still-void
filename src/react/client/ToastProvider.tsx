@@ -25,6 +25,8 @@ export interface ToastOptions {
 
 export interface ToastEntry extends ToastOptions {
   id: string;
+  /** Incremented on update to force Toast.Root remount and timer restart */
+  version: number;
 }
 
 export interface ToastHandle {
@@ -80,7 +82,7 @@ function toastReducer(
     }
     case 'UPDATE': {
       return state.map((t) =>
-        t.id === action.id ? { ...t, ...action.patch } : t,
+        t.id === action.id ? { ...t, ...action.patch, version: t.version + 1 } : t,
       );
     }
     case 'REMOVE_ALL': {
@@ -120,7 +122,7 @@ export function ToastProvider({
   }, []);
 
   // Ensure max is valid
-  const validatedMax = Math.max(3, typeof max === 'number' && max > 0 ? max : 3);
+  const validatedMax = typeof max === 'number' && Number.isFinite(max) && max > 0 ? Math.floor(max) : 3;
 
   // If toasts exceed max, remove oldest (FIFO)
   const displayedToasts = allToasts.slice(-validatedMax);
@@ -141,6 +143,7 @@ export function ToastProvider({
         variant,
         duration: duration_val,
         id,
+        version: 0,
       };
 
       dispatch({ type: 'ADD', entry });
@@ -233,7 +236,7 @@ function ToastViewportRenderer({
 
         return (
           <Toast.Root
-            key={id}
+            key={`${id}-${entry.version}`}
             open={true}
             onOpenChange={(open) => {
               /* v8 ignore next */ if (!open) {
@@ -241,10 +244,12 @@ function ToastViewportRenderer({
               }
             }}
             duration={toastDuration}
+            type={config.type}
             data-variant={variant}
+            className={cn('sv-toast', `sv-toast--${variant}`)}
           >
-            <div className={cn('sv-toast', `sv-toast--${variant}`)}>
-              <Icon name={config.icon} className="sv-toast__icon" aria-hidden="true" />
+            <div>
+              <Icon name={config.icon} className="sv-toast__icon" aria-hidden="true" data-name={config.icon} />
               <div className="sv-toast__content">
                 {title && <Toast.Title className="sv-toast__title">{title}</Toast.Title>}
                 {description && (
