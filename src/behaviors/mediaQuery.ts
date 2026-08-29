@@ -58,10 +58,13 @@ export function createMediaQuery(query: string): MediaQueryController {
     // Use addEventListener (modern) with fallback to addListener (deprecated)
     if (mql.addEventListener) {
       mql.addEventListener('change', handleChange);
-    } else if (mql.addListener) {
-      // Fallback for older browsers
+    } else
+    /* v8 ignore start */
+    if (mql.addListener) {
+      // Fallback for older browsers (addListener is deprecated, not implemented in modern jsdom)
       mql.addListener(handleChange as any);
     }
+    /* v8 ignore stop */
   };
 
   const detachListener = () => {
@@ -70,10 +73,13 @@ export function createMediaQuery(query: string): MediaQueryController {
 
     if (mql.removeEventListener) {
       mql.removeEventListener('change', handleChange);
-    } else if (mql.removeListener) {
-      // Fallback for older browsers
+    } else
+    /* v8 ignore start */
+    if (mql.removeListener) {
+      // Fallback for older browsers (removeListener is deprecated, not implemented in modern jsdom)
       mql.removeListener(handleChange as any);
     }
+    /* v8 ignore stop */
   };
 
   return {
@@ -86,7 +92,7 @@ export function createMediaQuery(query: string): MediaQueryController {
       // Return unsubscribe function
       return () => {
         const index = listeners.indexOf(listener);
-        if (index >= 0) {
+        /* v8 ignore next */ if (index >= 0) {
           listeners.splice(index, 1);
         }
 

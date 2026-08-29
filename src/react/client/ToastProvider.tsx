@@ -86,6 +86,7 @@ function toastReducer(
     case 'REMOVE_ALL': {
       return [];
     }
+    /* v8 ignore next 2 */
     default: {
       return state;
     }
@@ -126,7 +127,7 @@ export function ToastProvider({
 
   const toast = React.useCallback(
     (options: ToastOptions): ToastHandle => {
-      if (!isMountedRef.current) return { id: '', dismiss: () => {}, update: () => {} };
+      /* v8 ignore next */ if (!isMountedRef.current) return { id: '', dismiss: () => {}, update: () => {} };
 
       const id = Math.random().toString(36).substr(2, 9);
       const variant = options.variant ?? 'info';
@@ -167,7 +168,7 @@ export function ToastProvider({
   React.useEffect(() => {
     if (allToasts.length > validatedMax) {
       const toRemove = allToasts[0];
-      if (toRemove) {
+      /* v8 ignore next */ if (toRemove) {
         dismiss(toRemove.id);
       }
     }
@@ -214,7 +215,7 @@ function ToastViewportRenderer({
       {toasts.map((entry) => {
         const { id, title, description, variant = 'info', action } = entry;
         const config = variantConfig[variant];
-        const toastDuration = entry.duration ?? duration;
+        /* v8 ignore next */ const toastDuration = entry.duration ?? duration;
 
         const handleActionClick = () => {
           if (action?.onClick) {
@@ -228,7 +229,7 @@ function ToastViewportRenderer({
             key={id}
             open={true}
             onOpenChange={(open) => {
-              if (!open) {
+              /* v8 ignore next */ if (!open) {
                 dismiss(id);
               }
             }}

@@ -917,3 +917,156 @@ describe('Toast Handles (T12)', () => {
     expect(screen.getByTestId('count')).toHaveTextContent('0');
   });
 });
+
+describe('Toast Edge Cases & Coverage', () => {
+  // AC: Toast with custom duration (entry.duration ?? duration branch)
+  test('uses entry.duration when provided', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast, toasts } = useToast();
+      return (
+        <div>
+          <button
+            onClick={() => {
+              toast({ title: 'Custom Duration', duration: 2000 });
+            }}
+          >
+            Show
+          </button>
+          <div data-testid="count">{toasts.length}</div>
+        </div>
+      );
+    }
+
+    render(
+      <ToastProvider duration={5000}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show'));
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+    expect(screen.getByText('Custom Duration')).toBeInTheDocument();
+  });
+
+  // AC: Close button dismisses toast via onOpenChange
+  test('close button dismisses toast via onOpenChange', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast, toasts } = useToast();
+      return (
+        <div>
+          <button
+            onClick={() => {
+              toast({ title: 'Close Test', duration: Infinity });
+            }}
+          >
+            Show
+          </button>
+          <div data-testid="count">{toasts.length}</div>
+        </div>
+      );
+    }
+
+    render(
+      <ToastProvider duration={Infinity} closeLabel="Dismiss">
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show'));
+    expect(screen.getByTestId('count')).toHaveTextContent('1');
+
+    // Click close button
+    const closeButton = screen.getByLabelText('Dismiss');
+    await user.click(closeButton);
+
+    // Toast should be dismissed
+    expect(screen.getByTestId('count')).toHaveTextContent('0');
+  });
+
+  // AC: Action without onClick (optional callback)
+  test('action without onClick does not error', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast } = useToast();
+      return (
+        <button
+          onClick={() => {
+            toast({
+              title: 'No Action Handler',
+              duration: Infinity,
+              action: {
+                label: 'Button',
+                altText: 'Action without handler',
+                onClick: undefined as any, // Intentionally undefined to test defensive code
+              },
+            });
+          }}
+        >
+          Show
+        </button>
+      );
+    }
+
+    render(
+      <ToastProvider duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show'));
+    expect(screen.getByText('Button')).toBeInTheDocument();
+
+    // Click action (should not error even without handler)
+    await user.click(screen.getByText('Button'));
+    // Toast should be dismissed regardless
+    expect(screen.queryByText('No Action Handler')).not.toBeInTheDocument();
+  });
+
+  // AC: Toast rendering with multiple variants and content combinations
+  test('renders toast with all content combinations', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast } = useToast();
+      return (
+        <button
+          onClick={() => {
+            toast({
+              title: 'Full Toast',
+              description: 'With description',
+              variant: 'success',
+              duration: 3000,
+              action: {
+                label: 'Retry',
+                altText: 'Retry action',
+                onClick: () => {},
+              },
+            });
+          }}
+        >
+          Show Full
+        </button>
+      );
+    }
+
+    render(
+      <ToastProvider duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show Full'));
+
+    // Verify all elements rendered
+    expect(screen.getByText('Full Toast')).toBeInTheDocument();
+    expect(screen.getByText('With description')).toBeInTheDocument();
+    const toastEl = screen.getByText('Full Toast').closest('.sv-toast');
+    expect(toastEl).toHaveClass('sv-toast--success');
+    expect(screen.getByText('Retry')).toBeInTheDocument();
+  });
+});

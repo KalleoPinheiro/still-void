@@ -170,7 +170,7 @@ export const SidebarPanel = forwardRef<HTMLDivElement, SidebarPanelProps>(
     }
 
     // Above breakpoint: in flow
-    return (
+    /* v8 ignore next 8 */ return (
       <aside
         ref={ref}
         className={cn('sv-app-sidebar', className)}

@@ -131,4 +131,24 @@ describe('useMediaQuery', () => {
     expect(typeof result1.current).toBe('boolean');
     expect(typeof result2.current).toBe('boolean');
   });
+
+  // Selective unsubscription among multiple active subscriptions
+  test('selectively unsubscribes from multiple media queries', () => {
+    mockMediaQueryList.matches = false;
+    const { unmount: unmount1 } = renderHook(() => useMediaQuery('(min-width: 1024px)'));
+    const { unmount: unmount2 } = renderHook(() => useMediaQuery('(min-width: 768px)'));
+
+    const callbacksBefore = mediaQueryCallbacks.length;
+    expect(callbacksBefore).toBeGreaterThan(0);
+
+    // Unmount first hook
+    unmount1();
+    const callbacksAfter = mediaQueryCallbacks.length;
+
+    // Should have fewer callbacks after unsubscribe
+    expect(callbacksAfter).toBeLessThan(callbacksBefore);
+
+    // Clean up
+    unmount2();
+  });
 });
