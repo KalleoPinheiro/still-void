@@ -1,6 +1,6 @@
 {
   "name": "@still-void/ui",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Still Void design system — React/Next.js design system with a server-safe entry and a client-only entry, built on shadcn/ui.",
   "license": "MIT",
   "author": "Kalleo Pinheiro",
