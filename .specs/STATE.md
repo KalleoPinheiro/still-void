@@ -117,9 +117,25 @@
 ### AD-015
 - **Decision**: `Card` **não** importa `@radix-ui/react-slot` nem `@radix-ui/react-compose-refs`. `asChild` é servido por um `Slot` **vendorizado** em `src/components/ui/slot.tsx`, portando só a lógica de merge de ref/className/style/handlers do Slot real — sem `Slottable`, sem suporte a componente lazy — porque `Card` só compõe um único filho de verdade. O ref combinado usa a função pura `composeRefs`, reimplementada localmente, chamada direto como callback ref, nunca memoizada por `useCallback`.
 - **Reason**: Decisão do usuário em 2026-08-25, depois de um achado que invalida a premissa técnica do AD-006. Verificado por leitura direta de `node_modules/@radix-ui/react-slot/dist` e `node_modules/@radix-ui/react-compose-refs/dist`: `Slot` chama `useComposedRefs`, que chama `React.useCallback` — hook de verdade, `'use client'` ou não. Um hook sem dispatcher lança em Server Component real; importar o pacote teria quebrado exatamente a propriedade que `tests/server-safety.test.ts` existe para proteger, do mesmo jeito que quase aconteceu com o `lucide-react` (AD-013). Um import nomeado só de `composeRefs` (a metade sem hook) ainda falha o walker do `server-safety` — ele varre o **conteúdo** do módulo resolvido, não qual export foi de fato chamado, e não tem como provar que o hook não utilizado é inalcançável. Vendorizar torna a propriedade de segurança mecanicamente verdadeira, não argumentada.
-- **Trade-off**: `Card` não acompanha automaticamente correções futuras do `Slot` real do Radix (ex.: suporte a `Slottable` para composição aninhada) — se um caso de uso genuíno precisar disso, é um novo componente a portar, não um bump de dependência. Sem memoização do ref composto, o callback tem identidade nova a cada render (custo real, mas pequeno: um `<a>`/`<button>` sendo re-anexado ao invés de reaproveitado — irrelevante no padrão de uso de `Card`).
+- **Trade-off**: `Card` não acompanha automaticamente correções futuras do `Slot` real do Radix (ex.; suporte a `Slottable` para composição aninhada) — se um caso de uso genuíno precisar disso, é um novo componente a portar, não um bump de dependência. Sem memoização do ref composto, o callback tem identidade nova a cada render (custo real, mas pequeno: um `<a>`/`<button>` sendo re-anexado ao invés de reaproveitado — irrelevante no padrão de uso de `Card`).
 - **Scope**: `Card`; precedente para qualquer futuro `asChild` no catálogo server-safe.
 - **Date**: 2026-08-25
+- **Status**: active
+
+### AD-016
+- **Decision**: `@radix-ui/react-toast@^1.2.23` entra como **dependência direta** para implementação da família `ToastProvider`/`useToast`, não como implementação própria. O pacote é **client-only** (`'use client'` no dist) e inalcançável a partir do entry server-safe (`src/react/index.ts`), conforme verificado por inspeção do tarball publicado.
+- **Reason**: Decisão confirmada pelo usuário em 2026-08-29. Verificado por `npm pack`: (1) todas as 12 dependências transitivas já estão instaladas na versão exata exigida; (2) `dist/index.mjs` marca `'use client'` e não pode ser alcançado pelo walker de `server-safety.test.ts`; (3) entrega completa de a11y (região, hotkey F8, pausa em hover, swipe-to-dismiss); (4) emite `data-state` para fade com tokens existentes. Sob threshold de 100% de coverage, implementação própria custaria mais teste.
+- **Trade-off**: Adiciona ~340 KB (comprimido, com transitivas) ao install. A alternativa (implementação à mão) quebraria a restrição de cobertura 100%.
+- **Scope**: Família Toast (client-only, exportada de `@still-void/ui/react/client`).
+- **Date**: 2026-08-29
+- **Status**: active
+
+### AD-017
+- **Decision**: Sidebar de aplicação responsiva é uma **família nova e distinta** da `Sidebar` existente, nomeada: `SidebarProvider`, `SidebarPanel`, `SidebarTrigger`, `SidebarInset`, `useSidebar`, todas em `@still-void/ui/react/client`. Nenhum export server-safe muda (A-01, especificado em spec.md).
+- **Reason**: Decisão confirmada pelo usuário em 2026-08-29. Estender a `Sidebar` existente (server-safe) para incluir estado quebra AD-002 e força `'use client'` para todos consumidores, remoção de export = `major`. Coexistência é precedente literal do AD-003 (NativeSelect × Select). Os nomes escolhidos não colidem com a lista pinada em `tests/react-barrel.test.ts`.
+- **Trade-off**: Dois componentes com nome parecido no catálogo, mitigado por documentação explícita de propósitos e entry points.
+- **Scope**: Família de app shell (Fase 3, independente de Fase 4).
+- **Date**: 2026-08-29
 - **Status**: active
 
 ## Handoff

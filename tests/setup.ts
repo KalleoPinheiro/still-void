@@ -13,3 +13,60 @@ import '@testing-library/jest-dom/vitest';
 if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = function scrollIntoView() {};
 }
+
+// jsdom does not implement hasPointerCapture. Stub it globally for Radix UI toast.
+if (typeof Element !== 'undefined' && !Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = function hasPointerCapture() {
+    return false;
+  };
+}
+if (typeof Element !== 'undefined' && !Element.prototype.setPointerCapture) {
+  Element.prototype.setPointerCapture = function setPointerCapture() {};
+}
+if (typeof Element !== 'undefined' && !Element.prototype.releasePointerCapture) {
+  Element.prototype.releasePointerCapture = function releasePointerCapture() {};
+}
+
+// jsdom does not implement matchMedia. Stub it globally for tests.
+// Default behavior: matches = false — for the `(min-width: …px)` query
+// SidebarProvider uses, that's the below-breakpoint *mobile* path.
+// Tests can override via vi.stubGlobal or local mocks as needed.
+if (typeof window !== 'undefined' && !window.matchMedia) {
+  window.matchMedia = (query: string): MediaQueryList => {
+    const listeners: ((mql: MediaQueryList) => void)[] = [];
+
+    const mql = {
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: (listener: (mql: MediaQueryList) => void) => {
+        listeners.push(listener);
+      },
+      removeListener: (listener: (mql: MediaQueryList) => void) => {
+        const idx = listeners.indexOf(listener);
+        if (idx >= 0) listeners.splice(idx, 1);
+      },
+      addEventListener: (type: string, listener: (mql: MediaQueryList) => void) => {
+        if (type === 'change') {
+          listeners.push(listener);
+        }
+      },
+      removeEventListener: (type: string, listener: (mql: MediaQueryList) => void) => {
+        if (type === 'change') {
+          const idx = listeners.indexOf(listener);
+          if (idx >= 0) listeners.splice(idx, 1);
+        }
+      },
+      dispatchEvent: (event: Event) => {
+        if (event.type === 'change') {
+          for (const listener of [...listeners]) {
+            listener(mql);
+          }
+        }
+        return !event.defaultPrevented;
+      },
+    } as unknown as MediaQueryList;
+
+    return mql;
+  };
+}

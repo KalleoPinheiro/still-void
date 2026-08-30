@@ -1,0 +1,587 @@
+import { render, screen, fireEvent } from '@testing-library/react'
+import { type ReactNode, useState } from 'react'
+import { describe, it, expect, vi } from 'vitest'
+import {
+  SidebarProvider,
+  SidebarPanel,
+  SidebarTrigger,
+  SidebarInset,
+  useSidebar,
+} from '../src/react/client/SidebarProvider'
+import { SidebarSection } from '../src/react/index'
+
+/**
+ * T6: SidebarPanel + SidebarTrigger (off-canvas drawer mode)
+ * Spec: R5-02
+ * Test focus: trigger behavior, context binding, component composition
+ * (drawer/dialog rendering behavior tested via CSS contract and integration tests)
+ */
+
+describe('SidebarPanel and SidebarTrigger', () => {
+  describe('SidebarPanel', () => {
+    // AC-9: SidebarPanel renders and accepts children
+    it('should render with children', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel>
+            <div data-testid="panel-content">Panel Content</div>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByTestId('panel-content')).toBeInTheDocument()
+    })
+
+    // Edge case: SidebarPanel outside provider throws error
+    it('should throw error when rendered outside provider', () => {
+      expect(() => {
+        render(
+          <SidebarPanel>
+            <div>Content</div>
+          </SidebarPanel>,
+        )
+      }).toThrow(/useSidebar.*provider/i)
+    })
+
+    // AC-9: Panel can accept title prop
+    it('should accept title prop (for Dialog title)', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel title="Custom Title">
+            <div>Content</div>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      // Title is rendered in sr-only when in drawer mode
+      // For now, just check it doesn't error
+      expect(screen.getByText('Content')).toBeInTheDocument()
+    })
+
+    // AC-9: Panel renders content (in body wrapper or Dialog Content)
+    it('should render content inside panel', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel>
+            <div data-testid="panel-content">Content</div>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      // Content should be rendered (either in .sv-app-sidebar__body or in Dialog)
+      expect(screen.getByTestId('panel-content')).toBeInTheDocument()
+    })
+  })
+
+  describe('SidebarTrigger', () => {
+    // SidebarTrigger merges the consumer's forwarded ref with the internal
+    // triggerRef used to restore focus on close — covers the callback-ref
+    // arm of that merge (a `useRef()` object ref exercises the other arm
+    // via every other test that queries the trigger through the DOM).
+    it('should call a consumer-provided callback ref with the button element', () => {
+      const callbackRef = vi.fn()
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger ref={callbackRef} data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(callbackRef).toHaveBeenCalledWith(screen.getByTestId('trigger'))
+    })
+
+    // AC-7: Trigger toggles open state
+    it('should toggle open on click', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    // AC-7: aria-expanded reflects open state
+    it('should expose aria-expanded reflecting open state', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    // AC-7: aria-controls points to panel ID
+    // AC-7: aria-controls must resolve to the actual panel element (its
+    // `id`), not merely be present and non-empty — the previous version of
+    // this test only checked `toBeTruthy()` + a "not all whitespace" regex,
+    // which would still pass even if SidebarPanel's `id={panelId}` were
+    // deleted entirely, since `panelId` (a React useId() value) is truthy
+    // and non-whitespace regardless of whether anything in the DOM uses it.
+    it('should expose aria-controls that resolves to the panel element by id', () => {
+      // defaultOpen: Radix's Dialog.Content (the drawer, the default mode
+      // under the global matchMedia stub) isn't mounted into the DOM at
+      // all while closed, so resolving the id needs it open.
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel data-testid="panel">Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      const ariaControls = trigger.getAttribute('aria-controls')
+      expect(ariaControls).toBeTruthy()
+
+      const resolved = document.getElementById(ariaControls!)
+      expect(resolved).not.toBeNull()
+      expect(resolved).toBe(document.querySelector('[data-testid="panel"]'))
+    })
+
+    // AC-7: aria-expanded and aria-controls are derived (derived === override props)
+    it('should derive aria-expanded and aria-controls even when passed as props', () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" aria-expanded="true" aria-controls="ignored" />
+          <SidebarPanel data-testid="panel">Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      // aria-expanded should come from provider state (false), not from props
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      // aria-controls should NOT be 'ignored', it should be derived
+      expect(trigger.getAttribute('aria-controls')).not.toBe('ignored')
+    })
+
+    // AC-8: Trigger without children renders Icon menu
+    it('should render Icon menu when no children provided', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      const svg = trigger.querySelector('svg')
+      expect(svg).toBeInTheDocument()
+    })
+
+    // AC-8: Default aria-label is set
+    it('should have default aria-label when no label prop', () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      expect(trigger).toHaveAttribute('aria-label')
+      // Default should mention sidebar/toggle
+      const label = trigger.getAttribute('aria-label')
+      expect(label?.toLowerCase()).toMatch(/sidebar|toggle|menu/)
+    })
+
+    // AC-8: Label prop sets custom aria-label
+    it('should accept label prop and set custom aria-label', () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" label="Custom Label" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      expect(trigger).toHaveAttribute('aria-label', 'Custom Label')
+    })
+
+    // AC-8: Trigger with custom children
+    it('should render custom children when provided', () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger">Custom Button</SidebarTrigger>
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByText('Custom Button')).toBeInTheDocument()
+    })
+
+    // Edge case: SidebarTrigger without panel doesn't throw
+    it('should render and toggle without error even without panel mounted', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          {/* No SidebarPanel */}
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      expect(() => {
+        fireEvent.click(trigger)
+      }).not.toThrow()
+
+      // State should still change
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    // Edge case: collapsible="none" → trigger renders null
+    it('should render null when collapsible is "none"', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={false} collapsible="none">
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = container.querySelector('[data-testid="trigger"]')
+      expect(trigger).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Controlled sidebar', () => {
+    // AC-2: Controlled mode respects open prop
+    it('should work with controlled open state', () => {
+      const TestComponent = () => {
+        const [open, setOpen] = useState(false)
+        return (
+          <>
+            <button onClick={() => setOpen(!open)} data-testid="external-toggle">
+              External Toggle
+            </button>
+            <SidebarProvider open={open} onOpenChange={setOpen}>
+              <SidebarTrigger data-testid="trigger" />
+              <SidebarPanel>Content</SidebarPanel>
+            </SidebarProvider>
+          </>
+        )
+      }
+
+      render(<TestComponent />)
+
+      const trigger = screen.getByTestId('trigger')
+      const externalToggle = screen.getByTestId('external-toggle')
+
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      // Toggle via external control
+      fireEvent.click(externalToggle)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      // Toggle back
+      fireEvent.click(externalToggle)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      // Trigger also works
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    })
+  })
+
+  describe('useSidebar hook in panel/trigger context', () => {
+    // Ensure useSidebar exposes all expected properties
+    it('useSidebar should expose panelId usable by trigger', () => {
+      const TestComponent = () => {
+        const { panelId } = useSidebar()
+        return <div data-testid="panel-id">{panelId}</div>
+      }
+
+      const { container } = render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <TestComponent />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const panelIdElement = screen.getByTestId('panel-id')
+      const panelId = panelIdElement.textContent
+
+      const trigger = screen.getByTestId('trigger')
+      expect(trigger).toHaveAttribute('aria-controls', panelId)
+    })
+  })
+
+  describe('Drawer behavior (mobile, below breakpoint)', () => {
+    // AC-4: Dialog role and aria-modal when mobile (drawer mode)
+    // Note: Dialog renders in a portal, so we check document-wide, not just container
+    it('should render as dialog with aria-modal=true when in drawer mode', () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel data-testid="panel">
+            <div>Content</div>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      // Dialog.Content renders in a portal; search from document
+      const panel = document.querySelector('[data-testid="panel"]')
+      expect(panel).toHaveAttribute('role', 'dialog')
+      expect(panel).toHaveAttribute('aria-modal', 'true')
+      // Both halves of `cn('sv-app-sidebar sv-app-sidebar__drawer', …)` —
+      // the CSS contract tests fix what each selector declares, and other
+      // component tests fix role/aria-modal, but nothing previously joined
+      // the two: deleting either class from this element passed every
+      // existing test.
+      expect(panel).toHaveClass('sv-app-sidebar', 'sv-app-sidebar__drawer')
+    })
+
+    // AC-4: Overlay element exists in drawer mode
+    it('should render overlay in drawer mode', () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      // Overlay is in portal too
+      const overlay = document.querySelector('.sv-overlay')
+      expect(overlay).toBeInTheDocument()
+    })
+
+    // AC-6: clicking the overlay actually closes the drawer (not just "overlay exists").
+    // Radix's DismissableLayer attaches its document-level `pointerdown`
+    // listener inside a `setTimeout(0)` (to avoid catching the very click
+    // that opened the dialog) — a real 0ms macrotask has to elapse before
+    // it's listening.
+    it('should close the drawer when the overlay is clicked', async () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'true')
+
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      const overlay = document.querySelector('.sv-overlay')
+      expect(overlay).toBeInTheDocument()
+      fireEvent.pointerDown(overlay as Element)
+      fireEvent.pointerUp(overlay as Element)
+      fireEvent.click(overlay as Element)
+
+      await vi.waitFor(() => {
+        expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'false')
+      })
+    })
+
+    // AC-4: Escape key closes the drawer
+    it('should close drawer when Escape is pressed', () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+
+      // Initially open
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      // Simulate Escape key
+      fireEvent.keyDown(document, { key: 'Escape' })
+
+      // Should close
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    // AC-4/AC-10: body scroll is locked while the drawer is open, and released
+    // after it closes. Radix's Dialog uses `react-remove-scroll` under the
+    // hood, which marks the lock with a `data-scroll-locked` attribute on
+    // `<body>` (a simple counter-based setAttribute/removeAttribute, not
+    // dependent on ResizeObserver, so it works under jsdom) — see
+    // react-remove-scroll-bar's `lockAttribute`.
+    it('should lock body scroll while open and release it after closing', () => {
+      const { unmount } = render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel>Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(document.body).toHaveAttribute('data-scroll-locked')
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'false')
+      expect(document.body).not.toHaveAttribute('data-scroll-locked')
+
+      unmount()
+    })
+
+    // AC-4: focus moves inside the panel when the drawer opens
+    it('should move focus into the panel when the drawer opens', async () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel data-testid="panel">
+            <button data-testid="first-focusable">First</button>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      // Radix moves focus asynchronously (via a rAF-scheduled effect); wait
+      // for it instead of asserting immediately after the click.
+      await vi.waitFor(() => {
+        const panel = document.querySelector('[data-testid="panel"]')
+        expect(panel).toContainElement(document.activeElement as HTMLElement)
+      })
+    })
+
+    // AC-5: focus returns to SidebarTrigger after the drawer closes.
+    // SidebarTrigger is a plain button, not Radix's own Dialog.Trigger (it
+    // structurally can't be — Dialog.Root only exists inside SidebarPanel's
+    // conditional render, and SidebarTrigger is a sibling of SidebarPanel,
+    // not a descendant of it), so Radix's built-in restore-focus-to-trigger
+    // behavior has no ref to work with on its own; SidebarProvider passes
+    // its own triggerRef through context and SidebarPanel's Dialog.Content
+    // uses it directly via onCloseAutoFocus.
+    it('should return focus to the trigger after the drawer closes', async () => {
+      render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarTrigger data-testid="trigger" />
+          <SidebarPanel data-testid="panel">
+            <button data-testid="first-focusable">First</button>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const trigger = screen.getByTestId('trigger')
+      fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      await vi.waitFor(() => {
+        const panel = document.querySelector('[data-testid="panel"]')
+        expect(panel).toContainElement(document.activeElement as HTMLElement)
+      })
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+      await vi.waitFor(() => {
+        expect(document.activeElement).toBe(trigger)
+      })
+    })
+
+    // AC-9: SidebarSection composes unchanged as a child of the drawer panel
+    it('should render SidebarSection unchanged as a child', () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel>
+            <SidebarSection title="Main" data-testid="section">
+              <a href="/home">Home</a>
+            </SidebarSection>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByText('Main')).toBeInTheDocument()
+      expect(screen.getByText('Home')).toBeInTheDocument()
+    })
+
+    // AC-4: Panel works with simple content
+    it('should render content inside drawer panel', () => {
+      render(
+        <SidebarProvider defaultOpen={true}>
+          <SidebarPanel>
+            <div data-testid="panel-body-content">Nav content</div>
+          </SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByTestId('panel-body-content')).toBeInTheDocument()
+    })
+  })
+
+  describe('Coverage: additional paths', () => {
+    // Test SidebarInset rendering (line 231)
+    it('should render SidebarInset element with main tag', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarInset>
+            <p>Content</p>
+          </SidebarInset>
+        </SidebarProvider>,
+      )
+
+      const inset = container.querySelector('main.sv-app-sidebar-inset')
+      expect(inset).toBeInTheDocument()
+      expect(inset?.tagName).toBe('MAIN')
+      expect(screen.getByText('Content')).toBeInTheDocument()
+    })
+
+    // Test SidebarInset with custom className
+    it('should merge custom className on SidebarInset', () => {
+      const { container } = render(
+        <SidebarProvider defaultOpen={false}>
+          <SidebarInset className="custom-class">
+            <p>Content</p>
+          </SidebarInset>
+        </SidebarProvider>,
+      )
+
+      const inset = container.querySelector('main.sv-app-sidebar-inset.custom-class')
+      expect(inset).toBeInTheDocument()
+    })
+
+    // Desktop path (line ~173): above breakpoint, SidebarPanel renders a plain
+    // <aside> in flow instead of the Dialog-based drawer. The global matchMedia
+    // stub (tests/setup.ts) always resolves `matches: false`, so this branch
+    // needs a local override to exercise it — it is a real, user-facing render
+    // path (the default desktop layout), not a legacy-browser fallback, so it
+    // must be covered by a real test rather than a coverage-ignore pragma.
+    it('should render a plain <aside> in flow above the breakpoint (desktop)', () => {
+      const originalMatchMedia = window.matchMedia
+      window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }))
+
+      try {
+        const { container } = render(
+          <SidebarProvider defaultOpen={true}>
+            <SidebarPanel className="custom-class">
+              <div data-testid="desktop-panel-content">Desktop Content</div>
+            </SidebarPanel>
+          </SidebarProvider>,
+        )
+
+        const aside = container.querySelector('aside.sv-app-sidebar')
+        expect(aside).toBeInTheDocument()
+        expect(aside).toHaveClass('custom-class')
+        expect(aside?.getAttribute('role')).not.toBe('dialog')
+        expect(screen.getByTestId('desktop-panel-content')).toBeInTheDocument()
+        // No drawer chrome (overlay/close button) in the in-flow desktop render
+        expect(container.querySelector('.sv-overlay')).not.toBeInTheDocument()
+        expect(screen.queryByLabelText('Close sidebar')).not.toBeInTheDocument()
+      } finally {
+        window.matchMedia = originalMatchMedia
+      }
+    })
+  })
+})

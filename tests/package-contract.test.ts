@@ -153,3 +153,23 @@ describe('Card does not depend on @radix-ui/react-slot or react-compose-refs (AD
     expect(packageJson.dependencies['@radix-ui/react-compose-refs']).toBeUndefined();
   });
 });
+
+/**
+ * AD-016: `@radix-ui/react-toast@^1.2.23` is the foundation of the Toast family
+ * (`ToastProvider`, `useToast`, viewport rendering). The package carries `'use client'`
+ * in its dist and is rendered exclusively from `src/react/client/ToastProvider.tsx`,
+ * so it never reaches `src/react/index.ts` (the server-safe entry). Verified by
+ * `npm pack` inspection: all 12 transitive dependencies are already installed,
+ * the dist marks client-only, and `dist/index.mjs` contains `'use client'` directives.
+ */
+
+describe('@radix-ui/react-toast ships as a direct runtime dependency (AD-016)', () => {
+  test('dependencies["@radix-ui/react-toast"] is a caret-1 range', () => {
+    expect(packageJson.dependencies['@radix-ui/react-toast']).toMatch(/^\^1(?:\.|$)/);
+  });
+
+  test('it is declared in neither devDependencies nor peerDependencies', () => {
+    expect(packageJson.devDependencies['@radix-ui/react-toast']).toBeUndefined();
+    expect(packageJson.peerDependencies['@radix-ui/react-toast']).toBeUndefined();
+  });
+});

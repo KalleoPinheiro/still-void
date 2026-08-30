@@ -9,6 +9,10 @@ export * from './CopyButton';
 export * from './TableOfContents';
 export * from './ReadingProgress';
 export * from './hooks';
+export * from './ToastProvider';
+
+// App shell components
+export * from './SidebarProvider';
 
 // Client-only shadcn/ui components (require state, browser APIs, Radix UI interactivity)
 export * from './shadcn';
@@ -16,6 +20,10 @@ export * from './shadcn';
 // DOM/localStorage behaviors — client-only.
 export * from '../../behaviors/themeManager';
 export * from '../../behaviors/scrollSpy';
+export {
+  createMediaQuery,
+  type MediaQueryController,
+} from '../../behaviors/mediaQuery';
 export {
   createReadingProgress,
   type ReadingProgressOptions,

@@ -1029,6 +1029,60 @@ body.sv-body {
   line-height: 1.625;
 }
 
+/* Semantic variants (T1, R5-09) */
+.sv-alert--info {
+  --sv-alert-color: var(--sv-info-ink);
+
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--info > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--info .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+.sv-alert--success {
+  --sv-alert-color: var(--sv-success-ink);
+
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--success > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--success .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+.sv-alert--warning {
+  --sv-alert-color: var(--sv-warning-ink);
+
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--warning > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--warning .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+.sv-alert--danger {
+  --sv-alert-color: var(--sv-danger-ink);
+
+  border-color: var(--sv-alert-color);
+}
+.sv-alert--danger > svg {
+  color: var(--sv-alert-color);
+}
+.sv-alert--danger .sv-alert__title {
+  color: var(--sv-alert-color);
+}
+
+/* Action slot (T2, R5-10) */
+.sv-alert__action {
+  margin-top: var(--sv-space-3);
+}
+
 /* ---------- Badge ---------- */
 /* Default variant uses var(--sv-accent) rather than a fixed hue, so the
    badge follows [data-accent] instead of locking to cyan (One-Accent Rule —
@@ -1585,6 +1639,289 @@ body.sv-body {
   shape-rendering: crispEdges;
 }
 
+/* ---------- App Sidebar ---------- */
+/* R5-02, R5-03, R5-04: Sidebar de aplicação responsiva.
+   The wrapper (.sv-app-shell) carries data-state (open/closed), data-collapsible
+   (offcanvas/icon/none), and data-mobile (true/false). The panel (.sv-app-sidebar)
+   is static in-flow above the breakpoint, drawer in portal below. No box-shadow
+   per Flat-By-Default Rule. Focus is outline (AD-005). Fade animation is driven
+   by data-state with var(--sv-duration-fast) and var(--sv-ease-hover).
+
+   .sv-app-shell is the flex container that lays SidebarPanel (the <aside>)
+   and SidebarInset (the <main>) side by side above the breakpoint — both are
+   rendered as direct children of it (SidebarProvider wraps `children` in this
+   one div). Below the breakpoint SidebarPanel renders into a portal instead
+   (it's not a flex child at all in that mode), so the inset alone fills the
+   row — AC R5-04.3 ("full width below the breakpoint") falls out of the flex
+   layout for free, no separate rule needed. */
+.sv-app-shell {
+  display: flex;
+  align-items: stretch;
+}
+
+.sv-app-sidebar {
+  flex-shrink: 0;
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  border-right: 1px solid var(--sv-border);
+}
+
+.sv-app-sidebar__drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sv-z-modal);
+}
+
+/* Dialog.Content animates via data-state=[open|closed] */
+.sv-app-sidebar[data-state='open'] {
+  animation: sv-fade-in var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar[data-state='closed'] {
+  animation: sv-fade-out var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-6);
+  padding: var(--sv-space-6);
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.sv-app-sidebar__label {
+  font-family: var(--sv-font-display);
+  font-size: var(--sv-text-lg);
+  font-weight: 600;
+  color: var(--sv-text);
+}
+
+.sv-app-sidebar-inset {
+  flex: 1;
+  /* Without this a flex item's default `min-width: auto` lets its content
+     (e.g. a wide table) push it wider than the row, shrinking the sidebar
+     instead of scrolling internally. */
+  min-width: 0;
+  overflow: auto;
+}
+
+.sv-app-sidebar-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sv-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--sv-radius-sm);
+  background: none;
+  color: var(--sv-text-2);
+  cursor: pointer;
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover),
+    color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+.sv-app-sidebar-trigger:hover {
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+}
+
+.sv-app-sidebar-trigger:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+/* R5-03: collapsible="icon" mode — `open` toggles rail width vs. full width,
+   the same way `offcanvas` toggles visible vs. hidden. Both rules below key
+   off data-state="closed" *together with* data-collapsible="icon" — without
+   that, a collapsed-width rail would also apply while `open` (the expanded,
+   labels-visible state), which is the opposite of what "collapsible" means
+   here. .sv-app-shell carries data-state from SidebarProvider's own `open`. */
+.sv-app-shell[data-collapsible='icon'][data-state='closed'] .sv-app-sidebar:not(.sv-app-sidebar__drawer) {
+  width: var(--sv-space-14);
+}
+
+/* Hide text labels only in the collapsed (closed) state; keep them
+   accessible to screen readers via the sr-only pattern rather than
+   removing them, since the icon alone is not a reliable label. */
+.sv-app-shell[data-collapsible='icon'][data-state='closed'] .sv-app-sidebar__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Toast ---------- */
+/* Toast viewport container (region role). The Radix primitive renders the
+   list here; our wrapper manages the queue. */
+.sv-toast__viewport {
+  position: fixed;
+  bottom: var(--sv-space-4);
+  right: var(--sv-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-3);
+  pointer-events: none;
+  z-index: var(--sv-z-toast);
+  max-width: calc(100vw - var(--sv-space-8));
+}
+
+/* Individual toast item */
+.sv-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sv-space-3);
+  padding: var(--sv-space-3) var(--sv-space-4);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  pointer-events: auto;
+  animation: sv-toast-enter var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-toast[data-state="closed"] {
+  animation: sv-toast-exit var(--sv-duration-fast) var(--sv-ease-hover);
+}
+
+@keyframes sv-toast-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sv-toast-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Icon */
+.sv-toast__icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Content wrapper */
+.sv-toast__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Title */
+.sv-toast__title {
+  margin: 0 0 var(--sv-space-1);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--sv-text);
+}
+
+/* Description */
+.sv-toast__description {
+  font-size: var(--sv-text-sm);
+  color: var(--sv-text-2);
+  line-height: 1.5;
+}
+
+/* Variant colors (info, success, warning, danger) */
+.sv-toast--info .sv-toast__icon {
+  color: var(--sv-info-ink);
+}
+.sv-toast--info .sv-toast__title {
+  color: var(--sv-info-ink);
+}
+.sv-toast--info {
+  border-color: var(--sv-info-ink);
+}
+
+.sv-toast--success .sv-toast__icon {
+  color: var(--sv-success-ink);
+}
+.sv-toast--success .sv-toast__title {
+  color: var(--sv-success-ink);
+}
+.sv-toast--success {
+  border-color: var(--sv-success-ink);
+}
+
+.sv-toast--warning .sv-toast__icon {
+  color: var(--sv-warning-ink);
+}
+.sv-toast--warning .sv-toast__title {
+  color: var(--sv-warning-ink);
+}
+.sv-toast--warning {
+  border-color: var(--sv-warning-ink);
+}
+
+.sv-toast--danger .sv-toast__icon {
+  color: var(--sv-danger-ink);
+}
+.sv-toast--danger .sv-toast__title {
+  color: var(--sv-danger-ink);
+}
+.sv-toast--danger {
+  border-color: var(--sv-danger-ink);
+}
+
+/* Actions container */
+.sv-toast__actions {
+  display: flex;
+  gap: var(--sv-space-2);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Action button */
+.sv-toast__action {
+  padding: var(--sv-space-2) var(--sv-space-3);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-md);
+  background: var(--sv-surface-2);
+  color: var(--sv-text);
+  font-size: var(--sv-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-toast__action:hover {
+  /* --sv-surface-3 does not exist (2-tier system only). Same base/hover
+     pair as .sv-btn--secondary, which shares this button's surface-2 base. */
+  background: var(--sv-surface);
+}
+.sv-toast__action:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
+/* Close button */
+.sv-toast__close {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--sv-text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color var(--sv-duration-fast) var(--sv-ease-hover);
+}
+.sv-toast__close:hover {
+  color: var(--sv-text);
+}
+.sv-toast__close:focus-visible {
+  outline: 2px solid var(--sv-accent-ink);
+  outline-offset: 2px;
+}
+
 /* ---------- Reduced motion ---------- */
 /* This block lives here, at the end of style.css, and not in theme.css, for a
    cascade reason: `@media` adds no specificity, and README documents the
@@ -1624,7 +1961,12 @@ body.sv-body {
      all — the closed panel never has a chance to snap into view. */
   .sv-overlay,
   .sv-dialog,
-  .sv-pop {
+  .sv-pop,
+  .sv-app-sidebar,
+  .sv-toast {
     animation: none;
+  }
+  .sv-app-sidebar-trigger {
+    transition: none;
   }
 }

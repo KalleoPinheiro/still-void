@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore, useState } from 'react';
+import { createMediaQuery } from '../../behaviors/mediaQuery';
 import { createReadingProgress } from '../../behaviors/readingProgress';
 import { createScrollSpy } from '../../behaviors/scrollSpy';
 
@@ -43,4 +44,43 @@ export function useReadingProgress(target?: HTMLElement | null, step = 1): numbe
   }, [target, step]);
 
   return percent;
+}
+
+/**
+ * Check if a media query matches, with safe SSR hydration.
+ *
+ * Uses `useSyncExternalStore` to provide a server snapshot (desktop/false) that
+ * matches during hydration without warnings. After hydration, reflects the true
+ * client-side media query state.
+ *
+ * @param query - Media query string, e.g. `'(min-width: 1024px)'`
+ * @returns boolean indicating if the media query matches
+ *
+ * @example
+ * const isMobile = !useMediaQuery('(min-width: 1024px)');
+ */
+export function useMediaQuery(query: string): boolean {
+  const mq = useSyncExternalStore(
+    // subscribe: attach listener and return unsubscribe
+    (onStoreChange) => {
+      const mediaQuery = createMediaQuery(query);
+      const unsubscribe = mediaQuery.subscribe(onStoreChange);
+      return () => {
+        unsubscribe();
+        mediaQuery.destroy();
+      };
+    },
+    // getSnapshot: return current state (after hydration)
+    () => {
+      const mediaQuery = createMediaQuery(query);
+      const matches = mediaQuery.getSnapshot();
+      mediaQuery.destroy();
+      return matches;
+    },
+    // getServerSnapshot: return initial state during SSR (desktop/false)
+    // R5-01 AC-4: SSR returns false without error
+    () => false,
+  );
+
+  return mq;
 }
