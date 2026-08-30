@@ -1,5 +1,70 @@
 # @still-void/ui
 
+## 3.3.0
+
+### Minor Changes
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`7e3ec95`](https://github.com/KalleoPinheiro/still-void/commit/7e3ec95bca55850496e663c855811efbfbb97bda) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add action slot to Alert component.
+
+  The Alert component now accepts an `action` prop (a ReactNode) that renders inside a `.sv-alert__action` element. The action slot is not rendered if the prop is omitted, keeping the DOM clean. Works seamlessly with variant classes and icons from T1.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`31e8ea2`](https://github.com/KalleoPinheiro/still-void/commit/31e8ea27c290cb0f7c44b61ee465bd79b9d96685) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add semantic variant to Alert component with derived role and default icon.
+
+  The Alert component now accepts a `variant` prop ('info', 'success', 'warning', 'danger') that automatically derives the appropriate `role` ('alert' for danger/warning, 'status' for info/success) and renders a semantic icon. The icon can be customized via the `icon` prop or hidden with `icon={null}`. Alerts without a variant maintain their current behavior unchanged.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`ca4b68e`](https://github.com/KalleoPinheiro/still-void/commit/ca4b68efa588c88ba9cfad0f56d479c938ebb5a9) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add createMediaQuery behavior for responsive breakpoint detection.
+
+  Introduces `createMediaQuery(query: string)` as a framework-agnostic controllable media query source with `getSnapshot()`, `subscribe()`, and `destroy()` methods. Complements `useMediaQuery` hook for safe hydration in Server Components. Gracefully degrades when `matchMedia` is unavailable (e.g., jsdom without stub).
+
+  Also adds a global `matchMedia` stub to `tests/setup.ts` with default `matches: false` (mobile, below-breakpoint, for the `(min-width: …px)` query used by `SidebarProvider`) for consistent test behavior across the suite.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`18274db`](https://github.com/KalleoPinheiro/still-void/commit/18274db39916bcd16b052a20a9db1b982f76cdda) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add SidebarInset component for responsive content area.
+
+  Introduces `SidebarInset` as the main content container that adjusts responsively to sidebar state via CSS selectors reading `data-state` and `data-collapsible` attributes from the wrapper. Renders as `<main class="sv-app-sidebar-inset">` and supports custom className merging. Allows layout to adapt without JavaScript calculations, following Flat-By-Default Rule.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`e1101a0`](https://github.com/KalleoPinheiro/still-void/commit/e1101a0da6989c2ec35929c1c84edd049fb56205) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add @radix-ui/react-toast as a direct runtime dependency for Toast components.
+
+  The `@radix-ui/react-toast` primitive is now available as a direct dependency, enabling the `ToastProvider` and `useToast` implementation. The package is client-only and does not affect the server-safe entry point. This represents a new capability for the design system.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`b85481f`](https://github.com/KalleoPinheiro/still-void/commit/b85481f15d2af981dbd5b7b5b958210e78ac9c41) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add icon and none collapsible modes to the app sidebar.
+
+  Extends `SidebarProvider` with `collapsible` prop supporting `'icon'` (displays rail of icons when closed on desktop, drawer on mobile), `'offcanvas'` (default, drawer on mobile), and `'none'` (always expanded, no trigger rendered). `SidebarTrigger` returns `null` when `collapsible="none"`. All modes render `data-collapsible` attribute for CSS-driven styling.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`3b61541`](https://github.com/KalleoPinheiro/still-void/commit/3b6154102772c8e92761d8722703bf6abff9661e) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add SidebarProvider and useSidebar for responsive app shell.
+
+  Introduces `SidebarProvider` component providing state management for application sidebar with breakpoint detection via `useMediaQuery`. Includes `useSidebar()` hook exposing `{ open, setOpen, toggle, isMobile, collapsible, panelId }`. Supports both controlled and uncontrolled modes. Default `collapsible` mode is `'offcanvas'`. Invalid breakpoint values fall back to 1024px. Wrapper element (`.sv-app-shell`) emits `data-state`, `data-collapsible`, and `data-mobile` attributes for CSS-driven responsive layout. Exported from `@still-void/ui/react/client`.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`62a60e7`](https://github.com/KalleoPinheiro/still-void/commit/62a60e731e776fd5fc50745c94fc819a1002c92f) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add SidebarPanel, SidebarTrigger and SidebarInset components for app shell.
+
+  Introduces responsive sidebar components: `SidebarPanel` renders statically in-flow above breakpoint or as off-canvas drawer below, `SidebarTrigger` provides menu button with toggle functionality, and `SidebarInset` is the content container that adjusts via CSS. Exports from `@still-void/ui/react/client`. Depends on `useMediaQuery` for breakpoint detection and `@radix-ui/react-dialog` for drawer modal behavior (already installed). Focus management and scroll-lock handled by Radix Dialog.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`15ea2b0`](https://github.com/KalleoPinheiro/still-void/commit/15ea2b0fb6d42161f33bcd51ae5ebe42639aec66) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add action support to toasts.
+
+  Extends `ToastOptions` with optional `action` parameter containing label, required altText, and onClick callback. Renders as a button within the toast with accompanying close button. Action click dismisses the toast after executing callback. AltText requirement enforced by types.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`2150d78`](https://github.com/KalleoPinheiro/still-void/commit/2150d78c42b0e40a2cbac8e419bb387b006bb8a4) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add dismiss, dismissAll and update handles to useToast.
+
+  `toast()` returns `{ id, dismiss, update }` handle. `dismiss(id)` removes specific toast; `dismissAll()` empties queue. `update(patch)` modifies toast content in-place without remounting. Non-existent dismisses are no-op; double-dismiss on same handle is no-op.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`3a16b4a`](https://github.com/KalleoPinheiro/still-void/commit/3a16b4a628ac908d5e631c4c69264758cc8f0c9c) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add ToastProvider and useToast for transient notifications.
+
+  Introduces `ToastProvider` + `useToast()` hook for dismissible, auto-dismissing toast notifications with four semantic variants (info, success, warning, danger), automatic stacking (default max 3), pause-on-hover, and optional action buttons. Replaces manual toast implementations across multiple screens. Wraps `@radix-ui/react-toast` (new dependency, already verified for marginal install cost and `'use client'` boundary isolation) with a queue management layer. Exported from `@still-void/ui/react/client`.
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`6020c3e`](https://github.com/KalleoPinheiro/still-void/commit/6020c3ef3e3c66342dae1d2bedfa84f002c3e8a3) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Add useMediaQuery hook for responsive breakpoint detection.
+
+  Introduces `useMediaQuery(query: string)` hook built on `createMediaQuery` and `useSyncExternalStore` for safe SSR hydration. Provides a server snapshot (`false`) that matches on initial render, then reflects the true client-side media query state after hydration without triggering mismatch warnings. Exported from `@still-void/ui/react/client` along with `createMediaQuery` and `MediaQueryController` type.
+
+### Patch Changes
+
+- [#22](https://github.com/KalleoPinheiro/still-void/pull/22) [`03d0e82`](https://github.com/KalleoPinheiro/still-void/commit/03d0e823bfbeccfe8811f8f2334a70d40bc8d831) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - Fix correctness bugs found by review in the round-5 App Shell / Toast / Alert work (all unreleased in this cycle):
+
+  - `SidebarPanel`: `collapsible="none"` no longer renders an undismissable mobile drawer; the drawer ref now forwards to `Dialog.Content` so consumer refs work below the breakpoint.
+  - `SidebarTrigger`: a consumer `onClick` is now called alongside the internal toggle instead of being silently replaced.
+  - `ToastProvider`: the mount flag now resets on remount, so a toast fired during a React Strict Mode dev remount no longer silently no-ops; the action and close buttons are explicit `type="button"` so they don't submit a surrounding form; toast content is no longer wrapped in an unclassed `<div>`, restoring the intended flex layout.
+  - `Alert`: variant lookup checks own keys only (rejects `"constructor"`/`"toString"`); a custom `icon` node that isn't a `React.isValidElement` (a string, number, or array) is now rendered instead of silently dropped.
+  - `createMediaQuery`: a transition notifies a snapshot of listeners, so one listener unsubscribing mid-transition no longer causes the next listener to be skipped.
+  - CSS: `.sv-toast__action:hover` referenced an undefined `--sv-surface-3` token; now uses the same surface-2/surface pair as `.sv-btn--secondary`, which shares its base color.
+
 ## 3.2.0
 
 ### Minor Changes
