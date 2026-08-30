@@ -160,6 +160,28 @@ describe('Toast (T10)', () => {
     expect(closeButton).toBeInTheDocument();
   });
 
+  // AC-9 (default half): every other test in the file that touches the
+  // close button passes an explicit closeLabel, so the 'Close' default
+  // itself was never asserted.
+  test('close button defaults to the label "Close" when the provider omits closeLabel', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast } = useToast();
+      return <button onClick={() => toast({ title: 'Test' })}>Show</button>;
+    }
+
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show'));
+
+    expect(screen.getByLabelText('Close')).toBeInTheDocument();
+  });
+
   // Stacking: multiple toasts allowed up to max
   test('allows multiple toasts up to max limit', async () => {
     const user = userEvent.setup();
@@ -1185,13 +1207,17 @@ describe('Toast Edge Cases & Coverage', () => {
     expect(screen.getByText('Retry')).toBeInTheDocument();
   });
 
-  // AC: a toast without an explicit `duration` falls back to the provider's
-  // default (entry.duration ?? duration). Every other test in this file passes
-  // `duration` explicitly (usually Infinity) to keep assertions deterministic,
-  // which left this fallback branch itself unexercised — this test covers it
-  // directly via Radix's own `duration={Infinity}` no-auto-dismiss contract
-  // instead of racing a real/faked timer.
-  test('falls back to the provider duration when the toast omits one', async () => {
+  // AC: a toast that omits `duration` entirely uses `toast()`'s own
+  // fallback (`typeof options.duration === 'number' && options.duration > 0
+  // ? options.duration : duration`) to inherit the provider default. Every
+  // other test in this file passes `duration` explicitly (usually Infinity)
+  // to keep assertions deterministic, which left the `undefined` branch of
+  // this specific check unexercised — verified here directly via Radix's
+  // own `duration={Infinity}` no-auto-dismiss contract instead of racing a
+  // real/faked timer. (Note: this is a different fallback than the
+  // defensive `entry.duration ?? duration` in the renderer below, which
+  // stays unreachable via the only current call path — see its comment.)
+  test('falls back to the provider duration when the toast omits duration entirely', async () => {
     const user = userEvent.setup();
 
     function TestComponent() {
@@ -1218,6 +1244,53 @@ describe('Toast Edge Cases & Coverage', () => {
     expect(screen.getByText('Uses provider default')).toBeInTheDocument();
     const toastEl = screen.getByText('Uses provider default').closest('[data-variant]');
     expect(toastEl).toHaveAttribute('data-variant', 'info');
+  });
+
+  // Edge case (spec.md): duration 0 or negative falls back to the provider
+  // default, same as omitting it — `options.duration > 0` is what rejects
+  // both, not just `typeof ... === 'number'`. Using fake timers here
+  // (rather than the Infinity/no-dismiss trick above) to positively prove
+  // the toast survives past where a literal 0ms or negative duration would
+  // have dismissed it immediately.
+  test('duration 0 or negative falls back to the provider default instead of dismissing immediately', async () => {
+    vi.useFakeTimers();
+    try {
+      function TestComponent() {
+        const { toast } = useToast();
+        return (
+          <div>
+            <button onClick={() => toast({ title: 'Zero duration', duration: 0 })}>
+              Show zero
+            </button>
+            <button onClick={() => toast({ title: 'Negative duration', duration: -500 })}>
+              Show negative
+            </button>
+          </div>
+        );
+      }
+
+      render(
+        <ToastProvider duration={2000}>
+          <TestComponent />
+        </ToastProvider>
+      );
+
+      fireEvent.click(screen.getByText('Show zero'));
+      fireEvent.click(screen.getByText('Show negative'));
+
+      // If `duration: 0`/`-500` were used literally, both would already be
+      // gone (0ms) or never have rendered meaningfully; instead both should
+      // still be present just before the *provider's* 2000ms elapses.
+      await act(async () => { await vi.advanceTimersByTimeAsync(1999); });
+      expect(screen.getByText('Zero duration')).toBeInTheDocument();
+      expect(screen.getByText('Negative duration')).toBeInTheDocument();
+
+      await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+      expect(screen.queryByText('Zero duration')).not.toBeInTheDocument();
+      expect(screen.queryByText('Negative duration')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

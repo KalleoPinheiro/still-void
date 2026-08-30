@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { type ReactNode } from 'react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   SidebarProvider,
   SidebarPanel,
@@ -55,6 +55,35 @@ describe('Sidebar collapsible modes', () => {
       expect(panel).toHaveAttribute('role', 'dialog')
       expect(panel).toHaveAttribute('aria-modal', 'true')
       expect(document.querySelector('.sv-overlay')).toBeInTheDocument()
+    })
+
+    // AC-1: above the breakpoint, "icon" + closed renders the collapsed
+    // rail in flow (not a portal/dialog) — every other icon-mode test in
+    // this file runs under the default mobile stub, so this is the only
+    // one that ever renders the desktop branch of this mode at all.
+    it('should render as an in-flow rail (not a dialog) above the breakpoint', () => {
+      const originalMatchMedia = window.matchMedia
+      window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+        matches: true,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }))
+
+      try {
+        render(
+          <SidebarProvider collapsible="icon" defaultOpen={false}>
+            <SidebarPanel data-testid="panel">Content</SidebarPanel>
+          </SidebarProvider>,
+        )
+
+        const panel = document.querySelector('[data-testid="panel"]')
+        expect(panel?.tagName).toBe('ASIDE')
+        expect(panel).not.toHaveAttribute('role', 'dialog')
+        expect(document.querySelector('.sv-overlay')).not.toBeInTheDocument()
+      } finally {
+        window.matchMedia = originalMatchMedia
+      }
     })
   })
 

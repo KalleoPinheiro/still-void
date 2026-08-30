@@ -129,7 +129,7 @@ export function ToastProvider({
 
   const toast = React.useCallback(
     (options: ToastOptions): ToastHandle => {
-      /* v8 ignore next */ if (!isMountedRef.current) return { id: '', dismiss: () => {}, update: () => {} };
+      if (!isMountedRef.current) return { id: '', dismiss: () => {}, update: () => {} };
 
       const id = Math.random().toString(36).substr(2, 9);
       const variant = options.variant ?? 'info';

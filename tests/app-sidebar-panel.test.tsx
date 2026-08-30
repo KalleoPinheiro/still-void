@@ -123,9 +123,18 @@ describe('SidebarPanel and SidebarTrigger', () => {
     })
 
     // AC-7: aria-controls points to panel ID
-    it('should expose aria-controls pointing to valid panelId', () => {
-      const { container } = render(
-        <SidebarProvider defaultOpen={false}>
+    // AC-7: aria-controls must resolve to the actual panel element (its
+    // `id`), not merely be present and non-empty — the previous version of
+    // this test only checked `toBeTruthy()` + a "not all whitespace" regex,
+    // which would still pass even if SidebarPanel's `id={panelId}` were
+    // deleted entirely, since `panelId` (a React useId() value) is truthy
+    // and non-whitespace regardless of whether anything in the DOM uses it.
+    it('should expose aria-controls that resolves to the panel element by id', () => {
+      // defaultOpen: Radix's Dialog.Content (the drawer, the default mode
+      // under the global matchMedia stub) isn't mounted into the DOM at
+      // all while closed, so resolving the id needs it open.
+      render(
+        <SidebarProvider defaultOpen={true}>
           <SidebarTrigger data-testid="trigger" />
           <SidebarPanel data-testid="panel">Content</SidebarPanel>
         </SidebarProvider>,
@@ -133,9 +142,11 @@ describe('SidebarPanel and SidebarTrigger', () => {
 
       const trigger = screen.getByTestId('trigger')
       const ariaControls = trigger.getAttribute('aria-controls')
-
       expect(ariaControls).toBeTruthy()
-      expect(ariaControls).toMatch(/^\S+$/)
+
+      const resolved = document.getElementById(ariaControls!)
+      expect(resolved).not.toBeNull()
+      expect(resolved).toBe(document.querySelector('[data-testid="panel"]'))
     })
 
     // AC-7: aria-expanded and aria-controls are derived (derived === override props)
@@ -320,6 +331,12 @@ describe('SidebarPanel and SidebarTrigger', () => {
       const panel = document.querySelector('[data-testid="panel"]')
       expect(panel).toHaveAttribute('role', 'dialog')
       expect(panel).toHaveAttribute('aria-modal', 'true')
+      // Both halves of `cn('sv-app-sidebar sv-app-sidebar__drawer', …)` —
+      // the CSS contract tests fix what each selector declares, and other
+      // component tests fix role/aria-modal, but nothing previously joined
+      // the two: deleting either class from this element passed every
+      // existing test.
+      expect(panel).toHaveClass('sv-app-sidebar', 'sv-app-sidebar__drawer')
     })
 
     // AC-4: Overlay element exists in drawer mode
