@@ -1690,12 +1690,13 @@ body.sv-body {
   overflow-y: auto;
 }
 
-.sv-app-sidebar__label {
-  font-family: var(--sv-font-display);
-  font-size: var(--sv-text-lg);
-  font-weight: 600;
-  color: var(--sv-text);
-}
+/* `sv-app-sidebar__label` carries no typography of its own — it's a bare
+   hook for the collapsed-state hiding rule below, and content it wraps is
+   always something else's text (a nav link, a heading) that already owns
+   its own font. A Sora/text-lg/600 default shipped here in v3.3.0 fought
+   whatever it wrapped and broke the Sparse-Display Rule (DESIGN.md §3:
+   Sora never sets label text) the moment a consumer used it on ordinary
+   nav-item copy, as the App Sidebar story did. */
 
 .sv-app-sidebar-inset {
   flex: 1;

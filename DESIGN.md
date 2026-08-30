@@ -24,6 +24,10 @@ colors:
   twilight-violet: "oklch(0.72 0.14 295)"
   quiet-mint: "oklch(0.78 0.10 160)"
   warm-amber: "oklch(0.78 0.12 75)"
+  state-danger: "oklch(0.68 0.19 25)"
+  state-success: "oklch(0.75 0.15 150)"
+  state-info: "oklch(0.78 0.12 210)"
+  state-warning: "oklch(0.78 0.12 75)"
 typography:
   display:
     fontFamily: "Sora, ui-sans-serif, system-ui, sans-serif"
@@ -103,6 +107,24 @@ components:
     typography: "{typography.mono}"
     rounded: "{rounded.lg}"
     padding: "16px"
+  alert:
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.text-dark}"
+    rounded: "{rounded.md}"
+    padding: "16px"
+  toast:
+    backgroundColor: "{colors.surface-dark}"
+    textColor: "{colors.text-dark}"
+    rounded: "{rounded.md}"
+    padding: "12px 16px"
+  progress-track:
+    backgroundColor: "{colors.surface-2-dark}"
+    rounded: "{rounded.full}"
+    height: "8px"
+  pagination-link:
+    textColor: "{colors.text-2-dark}"
+    rounded: "{rounded.sm}"
+    height: "40px"
 ---
 
 # Design System: Still Void
@@ -149,8 +171,16 @@ A near-monochrome dark stack (four tonal steps of near-black) carries the whole 
 - **Paper Elevated** (`#FFFFFF`) — card/header surfaces.
 - Text and border roles invert the dark-mode ramp 1:1 (Ink becomes `#16161B`, Ink Faint and Ink Muted swap order) — light mode is the same system read backward, not a redesign.
 
+### Semantic (state colors — fixed regardless of accent or theme)
+A second, independent color set carries meaning rather than brand: `Alert`, `Toast`, and the invalid state on form fields all read these instead of `--sv-accent`, so a status is legible no matter which of the four site accents is active.
+- **Danger** (`oklch(0.68 0.19 25)`, dark; `oklch(0.555 0.19 25)` ink step in light mode for AA text contrast) — destructive actions, form-field `aria-invalid`, `alert--danger`/`toast--danger`.
+- **Success** (`oklch(0.75 0.15 150)`, dark; `oklch(0.515 0.14 150)` ink step in light) — `alert--success`/`toast--success`.
+- **Info** (`oklch(0.78 0.12 210)`, dark; `oklch(0.525 0.09 210)` ink step in light) — `alert--info`/`toast--info`. Same hue as Signal Cyan by coincidence of the source spec, but a separate token (`--sv-info-ink`, not `--sv-accent`) — it stays fixed even when a consumer switches the site accent away from cyan.
+- **Warning** (`oklch(0.78 0.12 75)`, dark; `oklch(0.535 0.11 75)` ink step in light) — `alert--warning`/`toast--warning`. Same hue as Warm Amber, same independence from `data-accent`.
+- Each state color gets its own light-mode "ink" step, darkened per-hue the same way the four site accents do (see `--sv-accent-*-ink` in `theme.css`) — the dark-mode value reads ≥4.5:1 as text on light surfaces without it.
+
 ### Named Rules
-**The One-Accent Rule.** Exactly one *site* accent is active at a time, set via `data-accent` on `<html>` — used for links, the reading-progress bar, active nav/TOC state, and `.sv-gradient-border`. A page never renders two of those specific elements in different accent hues at once. This rule does **not** cover semantic/category-tag colors: callout variants (`note`/`warn`/`aha`) and `CategoryPill` colors are deliberately fixed per meaning, independent of the active site accent — exactly like `callout--warn` staying Warm Amber regardless of `data-accent`. Multiple category colors on one screen is the feature working as designed, not a violation.
+**The One-Accent Rule.** Exactly one *site* accent is active at a time, set via `data-accent` on `<html>` — used for links, the reading-progress bar, active nav/TOC state, and `.sv-gradient-border`. A page never renders two of those specific elements in different accent hues at once. This rule does **not** cover semantic/category-tag colors: callout variants (`note`/`warn`/`aha`), `CategoryPill` colors, and the `Alert`/`Toast` state variants (`info`/`success`/`warning`/`danger`) are deliberately fixed per meaning, independent of the active site accent — exactly like `callout--warn` staying Warm Amber regardless of `data-accent`. Multiple category or state colors on one screen is the feature working as designed, not a violation.
 
 **The No-Approximation Rule.** Every hex and oklch value here is copied verbatim from the source spec. Rounding `oklch(0.78 0.12 210)` to `oklch(0.8 0.12 210)` "for a rounder number" is a regression, not a cleanup.
 
@@ -234,9 +264,35 @@ All four share one CSS rule, `.sv-field` (recipe: `field({ variant })`), so bord
 - **Style:** Raised Void background, 1px Hairline border, 12px radius, JetBrains Mono throughout, uppercase Label-styled header bar showing filename or language.
 - **Copy affordance:** ghost button, Ink Muted → Ink on hover, switches to accent-colored border + text on copy success for 2 seconds — the only component with a timed color state.
 
+### Alert
+- **Shape:** Panel background, 1px Hairline border, 8px radius (`rounded.md`), 16px padding — same frame language as Callouts, but for system/status messaging rather than editorial asides.
+- **Variants:** `info` / `success` / `warning` / `danger`, each recoloring the border, leading icon, and title to its Semantic state color (never the site accent). No variant prop renders a neutral Ink-bordered alert.
+- **Role:** derived from the variant, not set by the caller — `info`/`success` render `role="status"`, `warning`/`danger` render `role="alert"`; omitting the variant forces `role="alert"` unconditionally, so an unstyled alert still interrupts assistive tech rather than silently failing open.
+- **Icon:** leading icon is absolutely positioned at 16px/16px; content shifts right (`padding-left: 28px`) to clear it. Pass `icon={null}` to omit, or a custom node to override the variant default.
+- **Action slot:** optional `action` prop renders below the description with 12px top margin — same "slot, not boolean prop" composition as `Header`'s `actions`.
+
+### Toast
+- **Shape:** same Panel/Hairline/8px-radius frame as Alert and Callouts, so a status message reads consistently whether it's inline (`Alert`) or transient (`Toast`). 12px/16px padding, fixed to the viewport's bottom-right corner with 16px inset, stacked with 12px gaps.
+- **Variants:** `info` / `success` / `warning` / `danger` — identical Semantic-color mapping to `Alert` (icon + title + border color), so the same status reads the same way in both components.
+- **Motion:** fades in/out only (`opacity`, never `transform`) over `--sv-duration-fast` (120ms) with the system's standard hover easing — the one component-level animation exempt from being called ornament, because it's the affordance that tells the user something appeared or was dismissed.
+- **Behavior:** queued, max 3 visible at once (oldest dismissed first), each auto-dismisses on its own timer unless it carries an action; an optional action button sits beside the close button, both keyboard-reachable with the standard 2px accent focus outline.
+
+### App Shell — Sidebar / SidebarPanel / SidebarTrigger / SidebarInset
+- **Layout:** `SidebarProvider` renders a flex row (`.sv-app-shell`) with the sidebar (`<aside>`) and the inset (`<main>`) as direct children above the responsive breakpoint (1024px default) — one markup for both widths, the same discipline as `Header`'s mobile disclosure.
+- **Style:** Panel background, 1px Hairline border on the trailing edge, no shadow. 24px internal padding, 24px gap between sidebar sections.
+- **Responsive:** below the breakpoint, the panel stops being a flex child and renders into a Radix Dialog drawer instead (fixed, full-viewport overlay, fade in/out over 120ms) — the inset alone fills the row, which falls directly out of the flex layout rather than a separate mobile rule.
+- **`collapsible="icon"`:** the closed state shrinks the in-flow sidebar to a 56px icon rail (`--sv-space-14`) and visually hides (not removes — screen readers still get it) its text labels, rather than hiding the sidebar outright.
+- **Trigger:** ghost icon button, Ink Muted → Ink on hover with a Surface-2 background fill, 2px accent focus outline; closing the mobile drawer returns focus to this trigger, never to `<body>`.
+
+### Data Primitives — Progress / Pagination / Separator / Chart
+- **Progress:** an 8px-tall, fully rounded (`rounded.full`) Surface-2 track with an accent-filled indicator (`--sv-accent`, so it does follow `data-accent` — a progress bar is a primary-action signal, not a status one, same category as the reading-progress bar). Width transitions over `--sv-duration-fast`.
+- **Pagination:** a row of 40px-tall (`--sv-space-10`), 6px-radius (`rounded.sm`) pill controls — transparent at rest, Surface-2 on hover, Panel + Hairline border for the active page. Previous/Next variants add horizontal padding for their icon + label pair.
+- **Separator:** a 1px Hairline line, decorative (no ARIA role) by default; pass `decorative={false}` for a divider that carries real meaning.
+- **Chart:** low-level SVG primitives (`ChartContainer`, `ChartGrid`, `ChartAxis`, `ChartLine`, `ChartBar`) rather than a charting engine — geometry is pre-computed pixel space, not domain data. Grid lines and axis text read `var(--sv-border)`/`var(--sv-text-2)`; series color is a required prop, expected to be one of the `-ink` tokens (`--sv-accent-ink`, `--sv-info-ink`, `--sv-warning-ink`) so a chart's own series stay theme- and accent-correct without the component hard-coding hue.
+
 ## 6. shadcn/ui Components
 
-A curated set of shadcn/ui components has been adapted to Still Void, preserving the design system's core principles. Every component in the catalog — the server-safe family (`Button`, `Card`, `Alert`, `Badge`, `Icon`, and the form/table primitives above) and the client-only Radix family (`Dialog`, `AlertDialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`) alike — styles itself with real `sv-*` CSS in `style.css`, not Tailwind utilities. The client-only family emitted Tailwind classes through `2.x`; migrating it to `sv-*` is what made `tailwindcss` droppable as a hard requirement of any component this package ships.
+A curated set of shadcn/ui components has been adapted to Still Void, preserving the design system's core principles. Every component in the catalog — the server-safe family (`Button`, `Card`, `Alert`, `Badge`, `Icon`, `Progress`, `Pagination`, `Separator`, and the form/table primitives above) and the client-only Radix family (`Dialog`, `AlertDialog`, `DropdownMenu`, `Select`, `Tabs`, `Tooltip`, `Toast`) alike — styles itself with real `sv-*` CSS in `style.css`, not Tailwind utilities. The client-only family emitted Tailwind classes through `2.x`; migrating it to `sv-*` is what made `tailwindcss` droppable as a hard requirement of any component this package ships. The App Shell's `SidebarPanel` reuses Radix's `Dialog` primitive for its mobile drawer rather than introducing a second overlay system — see §5's App Shell entry.
 
 ### Theming Strategy
 
@@ -267,6 +323,7 @@ Every Don't below is a named anti-reference from PRODUCT.md, repeated here so th
 
 ### Do:
 - **Do** keep exactly one accent active per page via `data-accent`; never render two accent hues on the same view (see The One-Accent Rule).
+- **Do** use the fixed Semantic colors (danger/success/info/warning) for `Alert`, `Toast`, and invalid-field states — they read the same regardless of the active `data-accent`, same category as the callout/CategoryPill exception to the One-Accent Rule.
 - **Do** use `.sv-gradient-border` on `FeaturedPostCard` only — its rarity is what keeps it a signature (The One-Flourish Rule).
 - **Do** use `text-wrap: balance` on every Display and Headline (The Balanced-Heading Rule).
 - **Do** treat categories as a colored dot + label, never an icon or emoji.

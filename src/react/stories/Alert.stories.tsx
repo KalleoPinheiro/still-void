@@ -70,7 +70,7 @@ export const WithAction: Story = {
   render: () => (
     <Alert
       variant="info"
-      action={<Button size="sm" variant="ghost">Install now</Button>}
+      action={<Button size="sm" variant="outline">Install now</Button>}
     >
       <AlertTitle>Update Available</AlertTitle>
       <AlertDescription>

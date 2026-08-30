@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import {
+  HomeIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+  UsersIcon,
+  DocumentIcon,
+} from '@heroicons/react/24/outline';
 import { SidebarProvider, SidebarPanel, SidebarTrigger, SidebarInset } from '../client/SidebarProvider';
 import { SidebarSection } from '../components/Content';
-import { Button } from '../../components/ui/button';
 
 const meta: Meta = {
   title: 'shadcn/App Sidebar',
@@ -11,41 +17,65 @@ export default meta;
 
 type Story = StoryObj;
 
-// Navigation items for sidebar
+// Navigation items for sidebar. The icons come straight from `@heroicons/react`
+// (already a dependency, AD-013) rather than the design system's own curated
+// `Icon` set: generic app-nav glyphs (home, users, ...) aren't part of that
+// curated set, and this demo doesn't need to expand the package's public API
+// just to illustrate SidebarPanel with realistic-looking content.
 const navItems = [
-  { icon: '🏠', label: 'Dashboard' },
-  { icon: '📊', label: 'Analytics' },
-  { icon: '⚙️', label: 'Settings' },
-  { icon: '👥', label: 'Team' },
-  { icon: '📄', label: 'Docs' },
+  { icon: HomeIcon, label: 'Dashboard' },
+  { icon: ChartBarIcon, label: 'Analytics' },
+  { icon: Cog6ToothIcon, label: 'Settings' },
+  { icon: UsersIcon, label: 'Team' },
+  { icon: DocumentIcon, label: 'Docs' },
 ];
+
+// Shared by every story below: real nav content a consumer would plug into
+// SidebarPanel's `children`. Colored via the same text-2/text tokens as
+// .sv-header__link (no shipped nav-link class exists for this newer App
+// Sidebar family) instead of the browser's default link blue.
+function DemoNav() {
+  return (
+    <nav style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sv-space-1)' }}>
+      <style>{`
+        .sv-demo-nav-link:hover { background: var(--sv-surface-2); color: var(--sv-text); }
+        .sv-demo-nav-link:focus-visible { outline: 2px solid var(--sv-accent-ink); outline-offset: 2px; }
+      `}</style>
+      {navItems.map(({ icon: ItemIcon, label }) => (
+        <a
+          key={label}
+          href="#"
+          onClick={(e) => e.preventDefault()}
+          className="sv-demo-nav-link"
+          style={{
+            padding: 'var(--sv-space-2) var(--sv-space-3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--sv-space-2)',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            borderRadius: 'var(--sv-radius-sm)',
+            color: 'var(--sv-text-2)',
+            fontSize: 'var(--sv-text-sm)',
+            fontWeight: 500,
+            transition:
+              'background var(--sv-duration-fast) var(--sv-ease-hover), color var(--sv-duration-fast) var(--sv-ease-hover)',
+          }}
+        >
+          <ItemIcon className="sv-icon sv-icon--sm" aria-hidden="true" />
+          <span className="sv-app-sidebar__label">{label}</span>
+        </a>
+      ))}
+    </nav>
+  );
+}
 
 export const Offcanvas: Story = {
   render: () => (
     <SidebarProvider collapsible="offcanvas" defaultOpen={true}>
       <SidebarPanel>
         <SidebarSection title="Main">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                style={{
-                  padding: '8px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                }}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </a>
-            ))}
-          </nav>
+          <DemoNav />
         </SidebarSection>
       </SidebarPanel>
       <SidebarInset>
@@ -66,27 +96,7 @@ export const IconRail: Story = {
     <SidebarProvider collapsible="icon" defaultOpen={false}>
       <SidebarPanel>
         <SidebarSection title="Main">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                style={{
-                  padding: '8px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                }}
-              >
-                <span>{item.icon}</span>
-                <span className="sv-app-sidebar__label">{item.label}</span>
-              </a>
-            ))}
-          </nav>
+          <DemoNav />
         </SidebarSection>
       </SidebarPanel>
       <SidebarInset>
@@ -110,27 +120,7 @@ export const None: Story = {
     <SidebarProvider collapsible="none" defaultOpen={true}>
       <SidebarPanel>
         <SidebarSection title="Main">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                style={{
-                  padding: '8px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                }}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </a>
-            ))}
-          </nav>
+          <DemoNav />
         </SidebarSection>
       </SidebarPanel>
       <SidebarInset>
@@ -147,27 +137,7 @@ export const WithHeaderTrigger: Story = {
     <SidebarProvider collapsible="offcanvas" defaultOpen={false}>
       <SidebarPanel>
         <SidebarSection title="Main">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                style={{
-                  padding: '8px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                }}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </a>
-            ))}
-          </nav>
+          <DemoNav />
         </SidebarSection>
       </SidebarPanel>
       <SidebarInset>
@@ -181,7 +151,7 @@ export const WithHeaderTrigger: Story = {
           }}
         >
           <SidebarTrigger />
-          <h1 style={{ fontSize: '16px', fontWeight: 600 }}>My App</h1>
+          <h1 style={{ fontSize: 'var(--sv-text-md)', fontWeight: 600 }}>My App</h1>
         </header>
         <div style={{ padding: '16px' }}>
           <p>Trigger button positioned in header. Sidebar controlled from outside the panel.</p>
