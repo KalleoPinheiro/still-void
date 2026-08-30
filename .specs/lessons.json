@@ -1,0 +1,351 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 20,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "spec_deviation::when wrapping a third party primitive assert in the rendered dom the a11y attribute the spec names aria live role computing a mapping value is not the same as passing it to the primitive",
+      "text": "When wrapping a third-party primitive, assert in the rendered DOM the a11y attribute the spec names (aria-live, role) — computing a mapping value is not the same as passing it to the primitive.",
+      "signal": "spec_deviation",
+      "scope": "src/react/client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "src/react/client/ToastProvider.tsx:235 (AC R5-05.3) (src/react/client)"
+      ],
+      "created": "2026-08-29T20:25:14Z",
+      "last_seen": "2026-08-29T20:25:14Z"
+    },
+    {
+      "id": "L-002",
+      "key": "spec_deviation::validate a numeric prop by rejecting invalid input only math max default value silently clamps legitimate values below the default",
+      "text": "Validate a numeric prop by rejecting invalid input only; Math.max(default, value) silently clamps legitimate values below the default.",
+      "signal": "spec_deviation",
+      "scope": "src/react/client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "src/react/client/ToastProvider.tsx:123 (AC R5-06.3) (src/react/client)"
+      ],
+      "created": "2026-08-29T20:25:14Z",
+      "last_seen": "2026-08-29T20:25:14Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_deviation::a test named for a no op must perform the action and assert the state is unchanged asserting only the initial state proves nothing",
+      "text": "A test named for a no-op must perform the action and assert the state is unchanged; asserting only the initial state proves nothing.",
+      "signal": "spec_deviation",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/app-sidebar-collapsible.test.tsx:66 (AC R5-03.4) (tests)"
+      ],
+      "created": "2026-08-29T20:25:15Z",
+      "last_seen": "2026-08-29T20:25:15Z"
+    },
+    {
+      "id": "L-004",
+      "key": "spec_deviation::when an ac says an attribute stays hardcoded keep it written after the props spread moving it to propx default hands precedence to the consumer and is a silent behaviour change",
+      "text": "When an AC says an attribute stays hardcoded, keep it written after the props spread; moving it to 'propX ?? default' hands precedence to the consumer and is a silent behaviour change.",
+      "signal": "spec_deviation",
+      "scope": "src/components/ui",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "src/components/ui/alert.tsx:27 (AC R5-09.1) (src/components/ui)"
+      ],
+      "created": "2026-08-29T20:25:15Z",
+      "last_seen": "2026-08-29T20:25:15Z"
+    },
+    {
+      "id": "L-005",
+      "key": "surviving_mutant::when a spec names an exact icon per variant assert which icon renders tobeinthedocument cannot distinguish a scrambled mapping",
+      "text": "When a spec names an exact icon per variant, assert which icon renders; toBeInTheDocument cannot distinguish a scrambled mapping.",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M8/M9: src/components/ui/alert.tsx:15-18, src/react/client/ToastProvider.tsx:58-61 (tests)"
+      ],
+      "created": "2026-08-29T20:25:15Z",
+      "last_seen": "2026-08-29T20:25:15Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::if a derived view already truncates a list an eviction side effect on the source state is unobservable assert the source state not only the derived length",
+      "text": "If a derived view already truncates a list, an eviction side effect on the source state is unobservable; assert the source state, not only the derived length.",
+      "signal": "surviving_mutant",
+      "scope": "src/react/client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M3: src/react/client/ToastProvider.tsx:172 (AC R5-06.2) (src/react/client)"
+      ],
+      "created": "2026-08-29T20:25:15Z",
+      "last_seen": "2026-08-29T20:25:15Z"
+    },
+    {
+      "id": "L-007",
+      "key": "ac_gap::never let a v8 ignore pragma stand in for an acceptance criterion if the ac states an ssr behaviour exercise it with rendertostring",
+      "text": "Never let a v8-ignore pragma stand in for an acceptance criterion; if the AC states an SSR behaviour, exercise it with renderToString.",
+      "signal": "ac_gap",
+      "scope": "src/react/client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "src/react/client/hooks.ts:81 (AC R5-01.4) (src/react/client)"
+      ],
+      "created": "2026-08-29T20:25:15Z",
+      "last_seen": "2026-08-29T20:25:15Z"
+    },
+    {
+      "id": "L-008",
+      "key": "ac_gap::a global test stub that pins one branch makes 100 coverage meaningless for the other assert the mode specific contract per branch with a local stub override",
+      "text": "A global test stub that pins one branch makes 100% coverage meaningless for the other; assert the mode-specific contract per branch with a local stub override.",
+      "signal": "ac_gap",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/app-sidebar-panel.test.tsx:46 (AC R5-02.4/5/6/10) (tests)"
+      ],
+      "created": "2026-08-29T20:25:15Z",
+      "last_seen": "2026-08-29T20:25:15Z"
+    },
+    {
+      "id": "L-009",
+      "key": "surviving_mutant::a production fix is not done until a mutation that undoes it fails a test ship the fix and its discriminating assertion in the same commit",
+      "text": "A production fix is not done until a mutation that undoes it fails a test; ship the fix and its discriminating assertion in the same commit.",
+      "signal": "surviving_mutant",
+      "scope": "src/react/client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M10/M10b: src/react/client/ToastProvider.tsx:247 (AC R5-05.3) (src/react/client)"
+      ],
+      "created": "2026-08-29T23:44:28Z",
+      "last_seen": "2026-08-29T23:44:28Z"
+    },
+    {
+      "id": "L-010",
+      "key": "surviving_mutant::test a numeric limit prop at a value that differs from the default in both directions a test using the default value cannot detect a clamp",
+      "text": "Test a numeric limit prop at a value that differs from the default in both directions; a test using the default value cannot detect a clamp.",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M11: src/react/client/ToastProvider.tsx:125 (AC R5-06.3) (tests)"
+      ],
+      "created": "2026-08-29T23:44:28Z",
+      "last_seen": "2026-08-29T23:44:28Z"
+    },
+    {
+      "id": "L-011",
+      "key": "surviving_mutant::never assert a css rule with a greedy regex across the stylesheet anchor on the exact selector string or a neighbouring rule will satisfy the match",
+      "text": "Never assert a CSS rule with a greedy .* regex across the stylesheet; anchor on the exact selector string or a neighbouring rule will satisfy the match.",
+      "signal": "surviving_mutant",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M24: tests/app-sidebar-css-contract.test.ts:141 (tests)"
+      ],
+      "created": "2026-08-29T23:44:28Z",
+      "last_seen": "2026-08-29T23:44:28Z"
+    },
+    {
+      "id": "L-012",
+      "key": "spec_deviation::radix dialog restores focus only to its own dialog trigger ref a custom trigger outside the dialog needs an explicit oncloseautofocus handler or focus lands on body",
+      "text": "Radix Dialog restores focus only to its own Dialog.Trigger ref; a custom trigger outside the Dialog needs an explicit onCloseAutoFocus handler or focus lands on body.",
+      "signal": "spec_deviation",
+      "scope": "src/react/client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "src/react/client/SidebarProvider.tsx:155 (AC R5-02.5) (src/react/client)"
+      ],
+      "created": "2026-08-29T23:44:28Z",
+      "last_seen": "2026-08-29T23:44:28Z"
+    },
+    {
+      "id": "L-013",
+      "key": "spec_deviation::key a collapsed state css rule on every data attribute the ac names omitting the open closed attribute makes the rule fire in states the spec excludes",
+      "text": "Key a collapsed-state CSS rule on every data attribute the AC names; omitting the open/closed attribute makes the rule fire in states the spec excludes.",
+      "signal": "spec_deviation",
+      "scope": "src/css",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "src/css/style.css:1730 (AC R5-03.1) (src/css)"
+      ],
+      "created": "2026-08-29T23:44:28Z",
+      "last_seen": "2026-08-29T23:44:28Z"
+    },
+    {
+      "id": "L-014",
+      "key": "ac_gap::when a component branches on a responsive breakpoint test every collapsible variant mode on both sides of the breakpoint not just the default one",
+      "text": "When a component branches on a responsive breakpoint, test every collapsible/variant mode on BOTH sides of the breakpoint, not just the default one",
+      "signal": "ac_gap",
+      "scope": "react-client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "R5-03 AC-1 / M59 (react-client)"
+      ],
+      "created": "2026-08-30T00:24:27Z",
+      "last_seen": "2026-08-30T00:24:27Z"
+    },
+    {
+      "id": "L-015",
+      "key": "surviving_mutant::a css contract test that pins a selector must be paired with a component test asserting the element actually carries that class",
+      "text": "A CSS-contract test that pins a selector must be paired with a component test asserting the element actually carries that class",
+      "signal": "surviving_mutant",
+      "scope": "css-contract",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M38/M55 SidebarProvider.tsx:195 (css-contract)"
+      ],
+      "created": "2026-08-30T00:24:27Z",
+      "last_seen": "2026-08-30T00:24:27Z"
+    },
+    {
+      "id": "L-016",
+      "key": "ac_gap::every invalid input edge case listed in the spec needs its own test 100 branch coverage does not imply the guard s rejected values were exercised",
+      "text": "Every invalid-input edge case listed in the spec needs its own test; 100% branch coverage does not imply the guard's rejected values were exercised",
+      "signal": "ac_gap",
+      "scope": "react-client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:453 edge case / M56 (react-client)"
+      ],
+      "created": "2026-08-30T00:24:27Z",
+      "last_seen": "2026-08-30T00:24:27Z"
+    },
+    {
+      "id": "L-017",
+      "key": "spec_precision_gap::when the spec fixes a default prop value assert that literal with the prop omitted not only that an explicitly passed override works",
+      "text": "When the spec fixes a default prop value, assert that literal with the prop omitted, not only that an explicitly-passed override works",
+      "signal": "spec_precision_gap",
+      "scope": "react-client",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "R5-05 AC-9 / M23 (react-client)"
+      ],
+      "created": "2026-08-30T00:24:27Z",
+      "last_seen": "2026-08-30T00:24:27Z"
+    },
+    {
+      "id": "L-018",
+      "key": "spec_precision_gap::for an aria id reference aria controls aria labelledby assert the referenced id resolves to the intended element not just that the attribute is non empty",
+      "text": "For an ARIA id reference (aria-controls, aria-labelledby), assert the referenced id resolves to the intended element, not just that the attribute is non-empty",
+      "signal": "spec_precision_gap",
+      "scope": "a11y",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "R5-02 AC-7 / M53 (a11y)"
+      ],
+      "created": "2026-08-30T00:24:27Z",
+      "last_seen": "2026-08-30T00:24:27Z"
+    },
+    {
+      "id": "L-019",
+      "key": "surviving_mutant::re check each v8 ignore pragma against the suite a pragma that can be removed without breaking the coverage threshold is masking a path that is already tested",
+      "text": "Re-check each v8-ignore pragma against the suite; a pragma that can be removed without breaking the coverage threshold is masking a path that is already tested",
+      "signal": "surviving_mutant",
+      "scope": "coverage",
+      "status": "candidate",
+      "features": [
+        "still-void-gaps-round-5-app-shell-feedback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ToastProvider.tsx:132 v8-ignore audit (coverage)"
+      ],
+      "created": "2026-08-30T00:24:27Z",
+      "last_seen": "2026-08-30T00:24:27Z"
+    }
+  ]
+}
