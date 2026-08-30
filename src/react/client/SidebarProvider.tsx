@@ -181,17 +181,27 @@ export interface SidebarPanelProps extends ComponentPropsWithoutRef<'aside'> {
   title?: string
 }
 
-export const SidebarPanel = forwardRef<HTMLDivElement, SidebarPanelProps>(
+export const SidebarPanel = forwardRef<HTMLElement, SidebarPanelProps>(
   function SidebarPanel({ className, title = 'Navigation', children, ...props }, ref) {
-    const { open, setOpen, isMobile, panelId, triggerRef } = useSidebar()
+    const { open, setOpen, isMobile, collapsible, panelId, triggerRef } = useSidebar()
 
-    if (isMobile) {
+    // R5-03 AC-4: collapsible="none" is always expanded in flow — never a
+    // dismissable drawer, even below the breakpoint. Without this guard,
+    // toggle/setOpen are no-ops (see SidebarProvider) and SidebarTrigger
+    // renders null, so a mobile drawer here would have no control to close it.
+    if (isMobile && collapsible !== 'none') {
       // Below breakpoint: drawer in portal
       return (
         <Dialog.Root open={open} onOpenChange={setOpen}>
           <Dialog.Portal>
             <Dialog.Overlay className="sv-overlay" />
             <Dialog.Content
+              // Dialog.Content's ref type is Ref<HTMLDivElement> (Radix's
+              // primitive always renders a div); the consumer-facing ref
+              // here is typed HTMLElement to also cover the desktop
+              // <aside> branch below, so this cast documents that the
+              // underlying node genuinely is a div in the drawer branch.
+              ref={ref as Ref<HTMLDivElement>}
               className={cn('sv-app-sidebar sv-app-sidebar__drawer', className)}
               role="dialog"
               aria-modal="true"
@@ -246,7 +256,7 @@ export interface SidebarTriggerProps extends ComponentPropsWithoutRef<'button'> 
 }
 
 export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>(
-  function SidebarTrigger({ className, label, children, ...props }, ref) {
+  function SidebarTrigger({ className, label, children, onClick, ...props }, ref) {
     const { open, toggle, collapsible, panelId, triggerRef } = useSidebar()
 
     // collapsible="none" → render nothing
@@ -263,7 +273,10 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={label || 'Toggle sidebar'}
-        onClick={toggle}
+        onClick={(event) => {
+          onClick?.(event)
+          toggle()
+        }}
       >
         {children || <Icon name="menu" />}
       </button>

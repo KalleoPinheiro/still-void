@@ -20,8 +20,12 @@ const variantConfig: Record<AlertVariant, { role: 'alert' | 'status'; icon: Icon
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ className, variant, icon, action, role: propRole, ...props }, ref) => {
-    // Validate variant: only use if it's a known variant
-    const config = variant && variant in variantConfig ? variantConfig[variant] : null
+    // Validate variant: only use if it's a known own key (guards against
+    // inherited names like "constructor"/"toString" matching via `in`)
+    const config =
+      variant && Object.prototype.hasOwnProperty.call(variantConfig, variant)
+        ? variantConfig[variant]
+        : null
     const derivedRole = config?.role ?? 'alert'
     // Derived role wins over prop role; without variant, force 'alert' unconditionally
     const effectiveRole = config ? derivedRole : 'alert'
@@ -29,9 +33,10 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     // Determine if icon should be rendered
     let iconElement: React.ReactNode = null
     if (icon !== null) {
-      if (React.isValidElement(icon)) {
+      if (icon !== undefined) {
+        // Render every non-null explicit node (element, string, number, array)
         iconElement = icon
-      } else if (icon === undefined && config) {
+      } else if (config) {
         // Render default icon for this variant
         iconElement = <Icon name={config.icon} aria-hidden="true" />
       }

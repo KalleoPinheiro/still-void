@@ -48,14 +48,16 @@ describe('App Sidebar CSS Contract', () => {
     expect(focusMatch?.join()).toMatch(/outline.*solid.*var\(--sv-accent-ink\)/)
   })
 
-  // AC-12: data-state animation exists
-  it('should animate .sv-app-sidebar__drawer with data-state', () => {
-    // Check for animation rule tied to data-state
+  // AC-12: data-state animation exists. Anchored on the exact selector
+  // (`.sv-app-sidebar[data-state=...]`, shared by drawer and desktop via
+  // the `sv-app-sidebar sv-app-sidebar__drawer` class pair — see
+  // SidebarPanel's Dialog.Content className) and stopped at the first `}`
+  // so an unrelated later rule can't satisfy the match.
+  it('should animate .sv-app-sidebar with data-state', () => {
     const dataStateMatch = styleContent.match(
-      /\.sv-app-shell\[data-state=['\"]open['\"]\].*\.sv-app-sidebar.*\{[^}]*animation[^}]*\}/s,
+      /\.sv-app-sidebar\[data-state=['"]open['"]\]\s*\{[^}]*animation[^}]*\}/,
     )
-    // The rule exists (either inline or in separate selector)
-    expect(styleContent).toContain('data-state')
+    expect(dataStateMatch).toBeTruthy()
   })
 
   // AC-12: Animation uses var(--sv-duration-fast) and var(--sv-ease-hover)

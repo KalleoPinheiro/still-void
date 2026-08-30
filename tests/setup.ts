@@ -28,7 +28,8 @@ if (typeof Element !== 'undefined' && !Element.prototype.releasePointerCapture) 
 }
 
 // jsdom does not implement matchMedia. Stub it globally for tests.
-// Default behavior: matches = false (desktop/no-query-match).
+// Default behavior: matches = false — for the `(min-width: …px)` query
+// SidebarProvider uses, that's the below-breakpoint *mobile* path.
 // Tests can override via vi.stubGlobal or local mocks as needed.
 if (typeof window !== 'undefined' && !window.matchMedia) {
   window.matchMedia = (query: string): MediaQueryList => {
@@ -56,7 +57,14 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
           if (idx >= 0) listeners.splice(idx, 1);
         }
       },
-      dispatchEvent: () => false,
+      dispatchEvent: (event: Event) => {
+        if (event.type === 'change') {
+          for (const listener of [...listeners]) {
+            listener(mql);
+          }
+        }
+        return !event.defaultPrevented;
+      },
     } as unknown as MediaQueryList;
 
     return mql;

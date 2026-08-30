@@ -44,8 +44,9 @@ export function createMediaQuery(query: string): MediaQueryController {
     // Only notify if there's an actual transition
     if (newMatches !== currentMatches) {
       currentMatches = newMatches;
-      // Notify all listeners
-      for (const listener of listeners) {
+      // Notify a snapshot: a listener unsubscribing mid-loop must not skip
+      // the next listener via the live array shifting under `splice`.
+      for (const listener of [...listeners]) {
         listener();
       }
     }

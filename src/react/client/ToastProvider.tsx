@@ -116,6 +116,10 @@ export function ToastProvider({
   const isMountedRef = React.useRef(true);
 
   React.useEffect(() => {
+    // StrictMode dev remount runs mount -> cleanup -> mount again on the
+    // same ref instance; without resetting to true here, the flag is stuck
+    // false after the first cleanup and every later toast() silently no-ops.
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
@@ -248,36 +252,35 @@ function ToastViewportRenderer({
             data-variant={variant}
             className={cn('sv-toast', `sv-toast--${variant}`)}
           >
-            <div>
-              <Icon name={config.icon} className="sv-toast__icon" aria-hidden="true" data-name={config.icon} />
-              <div className="sv-toast__content">
-                {title && <Toast.Title className="sv-toast__title">{title}</Toast.Title>}
-                {description && (
-                  <Toast.Description className="sv-toast__description">
-                    {description}
-                  </Toast.Description>
-                )}
-              </div>
-              <div className="sv-toast__actions">
-                {action && (
-                  <Toast.Action
-                    altText={action.altText}
-                    asChild
+            <Icon name={config.icon} className="sv-toast__icon" aria-hidden="true" data-name={config.icon} />
+            <div className="sv-toast__content">
+              {title && <Toast.Title className="sv-toast__title">{title}</Toast.Title>}
+              {description && (
+                <Toast.Description className="sv-toast__description">
+                  {description}
+                </Toast.Description>
+              )}
+            </div>
+            <div className="sv-toast__actions">
+              {action && (
+                <Toast.Action
+                  altText={action.altText}
+                  asChild
+                >
+                  <button
+                    type="button"
+                    className="sv-toast__action"
+                    onClick={handleActionClick}
                   >
-                    <button
-                      className="sv-toast__action"
-                      onClick={handleActionClick}
-                    >
-                      {action.label}
-                    </button>
-                  </Toast.Action>
-                )}
-                <Toast.Close asChild>
-                  <button className="sv-toast__close" aria-label={closeLabel}>
-                    <Icon name="x" />
+                    {action.label}
                   </button>
-                </Toast.Close>
-              </div>
+                </Toast.Action>
+              )}
+              <Toast.Close asChild>
+                <button type="button" className="sv-toast__close" aria-label={closeLabel}>
+                  <Icon name="x" />
+                </button>
+              </Toast.Close>
             </div>
           </Toast.Root>
         );

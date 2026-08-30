@@ -68,16 +68,14 @@ export const Danger: Story = {
 
 export const WithAction: Story = {
   render: () => (
-    <Alert variant="info">
+    <Alert
+      variant="info"
+      action={<Button size="sm" variant="ghost">Install now</Button>}
+    >
       <AlertTitle>Update Available</AlertTitle>
       <AlertDescription>
         A new version is available. Review and install the latest features.
       </AlertDescription>
-      <div className="sv-alert__action">
-        <Button size="sm" variant="ghost">
-          Install now
-        </Button>
-      </div>
     </Alert>
   ),
 };

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ToastProvider, useToast } from '../client/ToastProvider';
 import { Button } from '../../components/ui/button';
 
@@ -14,7 +14,7 @@ type Story = StoryObj;
 /**
  * Story wrapper that provides ToastProvider context
  */
-function StoryWrapper({ children }: { children: React.ReactNode }) {
+function StoryWrapper({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
       {children}

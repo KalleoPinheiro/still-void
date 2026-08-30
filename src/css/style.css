@@ -1032,6 +1032,7 @@ body.sv-body {
 /* Semantic variants (T1, R5-09) */
 .sv-alert--info {
   --sv-alert-color: var(--sv-info-ink);
+
   border-color: var(--sv-alert-color);
 }
 .sv-alert--info > svg {
@@ -1043,6 +1044,7 @@ body.sv-body {
 
 .sv-alert--success {
   --sv-alert-color: var(--sv-success-ink);
+
   border-color: var(--sv-alert-color);
 }
 .sv-alert--success > svg {
@@ -1054,6 +1056,7 @@ body.sv-body {
 
 .sv-alert--warning {
   --sv-alert-color: var(--sv-warning-ink);
+
   border-color: var(--sv-alert-color);
 }
 .sv-alert--warning > svg {
@@ -1065,6 +1068,7 @@ body.sv-body {
 
 .sv-alert--danger {
   --sv-alert-color: var(--sv-danger-ink);
+
   border-color: var(--sv-alert-color);
 }
 .sv-alert--danger > svg {
@@ -1744,7 +1748,7 @@ body.sv-body {
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
@@ -1888,7 +1892,9 @@ body.sv-body {
   transition: background var(--sv-duration-fast) var(--sv-ease-hover);
 }
 .sv-toast__action:hover {
-  background: var(--sv-surface-3);
+  /* --sv-surface-3 does not exist (2-tier system only). Same base/hover
+     pair as .sv-btn--secondary, which shares this button's surface-2 base. */
+  background: var(--sv-surface);
 }
 .sv-toast__action:focus-visible {
   outline: 2px solid var(--sv-accent-ink);

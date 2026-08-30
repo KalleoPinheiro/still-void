@@ -170,7 +170,7 @@ export const WithHeaderTrigger: Story = {
           </nav>
         </SidebarSection>
       </SidebarPanel>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <SidebarInset>
         <header
           style={{
             padding: '12px 16px',
@@ -183,12 +183,10 @@ export const WithHeaderTrigger: Story = {
           <SidebarTrigger />
           <h1 style={{ fontSize: '16px', fontWeight: 600 }}>My App</h1>
         </header>
-        <SidebarInset>
-          <div style={{ padding: '16px' }}>
-            <p>Trigger button positioned in header. Sidebar controlled from outside the panel.</p>
-          </div>
-        </SidebarInset>
-      </div>
+        <div style={{ padding: '16px' }}>
+          <p>Trigger button positioned in header. Sidebar controlled from outside the panel.</p>
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   ),
 };

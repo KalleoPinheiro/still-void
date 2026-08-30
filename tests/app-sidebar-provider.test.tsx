@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { type ReactNode } from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
@@ -135,62 +135,88 @@ describe('SidebarProvider', () => {
       expect(result.current.open).toBe(true)
     })
 
-    // Edge case: invalid breakpoint → default 1024
+    // Edge case: invalid breakpoint → default 1024. The only observable
+    // effect of the normalization is the query string passed to
+    // window.matchMedia — assert that directly instead of just
+    // "no crash", which stays green even if the normalization is deleted.
     it('should fall back to 1024 when breakpoint is 0', () => {
-      const { result } = renderHook(() => useSidebar(), {
-        wrapper: ({ children }: { children: ReactNode }) => (
-          <SidebarProvider breakpoint={0}>{children}</SidebarProvider>
-        ),
-      })
+      const spy = vi.spyOn(window, 'matchMedia')
+      try {
+        renderHook(() => useSidebar(), {
+          wrapper: ({ children }: { children: ReactNode }) => (
+            <SidebarProvider breakpoint={0}>{children}</SidebarProvider>
+          ),
+        })
 
-      // At 1024px default breakpoint, desktop is detected
-      // (since matchMedia stub defaults to false = mobile, we expect isMobile=true unless breakpoint makes us think we're at desktop)
-      // This test just confirms no crash; actual breakpoint behavior tested in integration
-      expect(result.current).toBeTruthy()
+        expect(spy.mock.calls.map(([query]) => query)).toContain('(min-width: 1024px)')
+      } finally {
+        spy.mockRestore()
+      }
     })
 
     // Edge case: negative breakpoint
     it('should fall back to 1024 when breakpoint is negative', () => {
-      const { result } = renderHook(() => useSidebar(), {
-        wrapper: ({ children }: { children: ReactNode }) => (
-          <SidebarProvider breakpoint={-100}>{children}</SidebarProvider>
-        ),
-      })
+      const spy = vi.spyOn(window, 'matchMedia')
+      try {
+        renderHook(() => useSidebar(), {
+          wrapper: ({ children }: { children: ReactNode }) => (
+            <SidebarProvider breakpoint={-100}>{children}</SidebarProvider>
+          ),
+        })
 
-      expect(result.current).toBeTruthy()
+        expect(spy.mock.calls.map(([query]) => query)).toContain('(min-width: 1024px)')
+      } finally {
+        spy.mockRestore()
+      }
     })
 
     // Edge case: NaN breakpoint
     it('should fall back to 1024 when breakpoint is NaN', () => {
-      const { result } = renderHook(() => useSidebar(), {
-        wrapper: ({ children }: { children: ReactNode }) => (
-          <SidebarProvider breakpoint={NaN}>{children}</SidebarProvider>
-        ),
-      })
+      const spy = vi.spyOn(window, 'matchMedia')
+      try {
+        renderHook(() => useSidebar(), {
+          wrapper: ({ children }: { children: ReactNode }) => (
+            <SidebarProvider breakpoint={NaN}>{children}</SidebarProvider>
+          ),
+        })
 
-      expect(result.current).toBeTruthy()
+        expect(spy.mock.calls.map(([query]) => query)).toContain('(min-width: 1024px)')
+      } finally {
+        spy.mockRestore()
+      }
     })
 
     // Edge case: Infinity breakpoint
     it('should fall back to 1024 when breakpoint is Infinity', () => {
-      const { result } = renderHook(() => useSidebar(), {
-        wrapper: ({ children }: { children: ReactNode }) => (
-          <SidebarProvider breakpoint={Infinity}>{children}</SidebarProvider>
-        ),
-      })
+      const spy = vi.spyOn(window, 'matchMedia')
+      try {
+        renderHook(() => useSidebar(), {
+          wrapper: ({ children }: { children: ReactNode }) => (
+            <SidebarProvider breakpoint={Infinity}>{children}</SidebarProvider>
+          ),
+        })
 
-      expect(result.current).toBeTruthy()
+        expect(spy.mock.calls.map(([query]) => query)).toContain('(min-width: 1024px)')
+      } finally {
+        spy.mockRestore()
+      }
     })
 
-    // Valid breakpoint: should use the provided value
+    // Valid breakpoint: should use the provided value, proving it is not
+    // replaced by the 1024 fallback.
     it('should use provided breakpoint when valid', () => {
-      const { result } = renderHook(() => useSidebar(), {
-        wrapper: ({ children }: { children: ReactNode }) => (
-          <SidebarProvider breakpoint={768}>{children}</SidebarProvider>
-        ),
-      })
+      const spy = vi.spyOn(window, 'matchMedia')
+      try {
+        renderHook(() => useSidebar(), {
+          wrapper: ({ children }: { children: ReactNode }) => (
+            <SidebarProvider breakpoint={768}>{children}</SidebarProvider>
+          ),
+        })
 
-      expect(result.current).toBeTruthy()
+        expect(spy.mock.calls.map(([query]) => query)).toContain('(min-width: 768px)')
+      } finally {
+        spy.mockRestore()
+      }
     })
 
     // AC-1: panelId is a string (stable, generated by useId)
@@ -322,17 +348,20 @@ describe('SidebarProvider', () => {
 
   describe('State transitions', () => {
     it('should update data-state when open changes', () => {
-      const { container, rerender } = render(
+      const { container } = render(
         <SidebarProvider defaultOpen={false}>
           <TestConsumer />
         </SidebarProvider>,
       )
 
-      let wrapper = container.querySelector('.sv-app-shell')
+      const wrapper = container.querySelector('.sv-app-shell')
       expect(wrapper?.getAttribute('data-state')).toBe('closed')
 
-      // This test uses a consumer component to trigger state change
-      // (will be implemented below)
+      fireEvent.click(screen.getByTestId('toggle-button'))
+      expect(wrapper?.getAttribute('data-state')).toBe('open')
+
+      fireEvent.click(screen.getByTestId('toggle-button'))
+      expect(wrapper?.getAttribute('data-state')).toBe('closed')
     })
   })
 
@@ -384,7 +413,7 @@ describe('SidebarProvider', () => {
       window.matchMedia = vi.fn().mockReturnValue(mockMql as unknown as MediaQueryList)
 
       try {
-        render(
+        const { container } = render(
           <SidebarProvider defaultOpen={true}>
             <SidebarTrigger data-testid="trigger" />
             <SidebarPanel>Content</SidebarPanel>
@@ -399,6 +428,12 @@ describe('SidebarProvider', () => {
         act(() => {
           listeners.forEach((cb) => cb({ matches: true } as MediaQueryList))
         })
+
+        // State the intent directly (data-mobile flipped to desktop) rather
+        // than relying on the reader knowing that this mock's `matches: true`
+        // means desktop only because the provider queries `(min-width: …)`.
+        const wrapper = container.querySelector('.sv-app-shell')
+        expect(wrapper).toHaveAttribute('data-mobile', 'false')
 
         // Above the breakpoint the panel is a plain in-flow <aside>, not a
         // Radix Dialog — the lock it held must be released, not orphaned.

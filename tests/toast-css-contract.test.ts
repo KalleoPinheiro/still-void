@@ -40,7 +40,7 @@ describe('Toast CSS Contract', () => {
     const themeContent = readFileSync(themeCssPath, 'utf-8');
 
     // Extract all CSS custom properties used in Toast
-    const tokenMatches = toastSection.match(/var\(--sv-[a-z-]+\)/g) || [];
+    const tokenMatches = toastSection.match(/var\(--sv-[a-z0-9-]+\)/g) || [];
     const uniqueTokens = [...new Set(tokenMatches)];
 
     for (const token of uniqueTokens) {
@@ -114,12 +114,30 @@ describe('Toast CSS Contract', () => {
 
   test('reduced-motion includes sv-toast', () => {
     const content = readFileSync(styleCssPath, 'utf-8');
-    const reducedMotionSection = content.substring(
-      content.indexOf('@media (prefers-reduced-motion: reduce)')
-    );
+    const start = content.indexOf('@media (prefers-reduced-motion: reduce)');
+    expect(start).toBeGreaterThan(-1);
 
-    expect(reducedMotionSection).toContain('.sv-toast');
-    expect(reducedMotionSection).toContain('animation: none');
+    // Bound the slice to the matching closing brace so a later, unrelated
+    // reduced-motion block (or a `.sv-toast` rule outside this one) can't
+    // satisfy the assertion.
+    let braceCount = 0;
+    let end = start;
+    for (let i = start; i < content.length; i++) {
+      if (content[i] === '{') braceCount++;
+      if (content[i] === '}') {
+        braceCount--;
+        if (braceCount === 0) {
+          end = i + 1;
+          break;
+        }
+      }
+    }
+    const reducedMotionSection = content.substring(start, end);
+
+    // Exact selector, not a `.sv-toast__viewport`-matching substring.
+    const toastRuleMatch = reducedMotionSection.match(/\.sv-toast\s*\{[^}]*\}/);
+    expect(toastRuleMatch).toBeTruthy();
+    expect(toastRuleMatch![0]).toMatch(/animation:\s*none/);
   });
 
   test('uses valid spacing tokens', () => {
