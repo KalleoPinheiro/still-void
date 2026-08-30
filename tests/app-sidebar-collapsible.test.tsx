@@ -37,6 +37,25 @@ describe('Sidebar collapsible modes', () => {
       const trigger = screen.getByTestId('trigger')
       expect(trigger).toBeInTheDocument()
     })
+
+    // AC-3: below the breakpoint, "icon" behaves exactly like "offcanvas" —
+    // SidebarPanel's isMobile branch doesn't read `collapsible` at all, so
+    // this is really a test that it stays that way. The global matchMedia
+    // stub already resolves matches:false (mobile) by default, which every
+    // other test in this describe block relies on implicitly; this one
+    // makes that dependency explicit and asserts the actual drawer markup.
+    it('should render as a full drawer (not an icon rail) below the breakpoint', () => {
+      render(
+        <SidebarProvider collapsible="icon" defaultOpen={true}>
+          <SidebarPanel data-testid="panel">Content</SidebarPanel>
+        </SidebarProvider>,
+      )
+
+      const panel = document.querySelector('[data-testid="panel"]')
+      expect(panel).toHaveAttribute('role', 'dialog')
+      expect(panel).toHaveAttribute('aria-modal', 'true')
+      expect(document.querySelector('.sv-overlay')).toBeInTheDocument()
+    })
   })
 
   describe('collapsible="none" mode', () => {

@@ -1,8 +1,13 @@
 import { renderHook, act } from '@testing-library/react'
 import { render, screen } from '@testing-library/react'
 import { type ReactNode } from 'react'
-import { describe, it, expect, beforeEach } from 'vitest'
-import { SidebarProvider, useSidebar } from '../src/react/client/SidebarProvider'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import {
+  SidebarProvider,
+  SidebarPanel,
+  SidebarTrigger,
+  useSidebar,
+} from '../src/react/client/SidebarProvider'
 
 /**
  * T5: SidebarProvider + useSidebar + wrapper .sv-app-shell
@@ -328,6 +333,79 @@ describe('SidebarProvider', () => {
 
       // This test uses a consumer component to trigger state change
       // (will be implemented below)
+    })
+  })
+
+  describe('Nested providers', () => {
+    // Edge case (spec.md): inner provider's context wins for its own subtree
+    it('should let the inner provider win for useSidebar() calls inside it', () => {
+      function Inner() {
+        const { collapsible } = useSidebar()
+        return <div data-testid="inner-collapsible">{collapsible}</div>
+      }
+
+      render(
+        <SidebarProvider collapsible="offcanvas">
+          <SidebarProvider collapsible="icon">
+            <Inner />
+          </SidebarProvider>
+        </SidebarProvider>,
+      )
+
+      expect(screen.getByTestId('inner-collapsible')).toHaveTextContent('icon')
+    })
+  })
+
+  describe('Breakpoint crossing', () => {
+    // AC-10: crossing the breakpoint while the drawer is open leaves no
+    // scroll-lock or orphaned focus trap — i.e. isMobile flipping to false
+    // mid-render must not leave any of the drawer's side effects behind.
+    it('should release body scroll-lock when crossing from mobile to desktop while open', () => {
+      const listeners: ((mql: MediaQueryList) => void)[] = []
+      let matches = false // starts mobile: default stub behavior
+
+      const mockMql = {
+        get matches() {
+          return matches
+        },
+        addEventListener: (type: string, cb: (mql: MediaQueryList) => void) => {
+          if (type === 'change') listeners.push(cb)
+        },
+        removeEventListener: (type: string, cb: (mql: MediaQueryList) => void) => {
+          const i = listeners.indexOf(cb)
+          if (i >= 0) listeners.splice(i, 1)
+        },
+      }
+
+      const originalMatchMedia = window.matchMedia
+      // Return the SAME object reference every call (not a spread copy) —
+      // `{...mockMql}` would evaluate the `matches` getter once at spread
+      // time and bake in a static boolean, silently losing reactivity.
+      window.matchMedia = vi.fn().mockReturnValue(mockMql as unknown as MediaQueryList)
+
+      try {
+        render(
+          <SidebarProvider defaultOpen={true}>
+            <SidebarTrigger data-testid="trigger" />
+            <SidebarPanel>Content</SidebarPanel>
+          </SidebarProvider>,
+        )
+
+        // Mobile + open: drawer is up, body scroll is locked.
+        expect(document.body).toHaveAttribute('data-scroll-locked')
+
+        // Cross the breakpoint: flip the query result and fire 'change'.
+        matches = true
+        act(() => {
+          listeners.forEach((cb) => cb({ matches: true } as MediaQueryList))
+        })
+
+        // Above the breakpoint the panel is a plain in-flow <aside>, not a
+        // Radix Dialog — the lock it held must be released, not orphaned.
+        expect(document.body).not.toHaveAttribute('data-scroll-locked')
+      } finally {
+        window.matchMedia = originalMatchMedia
+      }
     })
   })
 })

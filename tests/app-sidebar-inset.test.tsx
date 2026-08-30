@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { SidebarProvider, SidebarInset } from '../src/react/client/SidebarProvider'
+import { SidebarProvider, SidebarPanel, SidebarInset } from '../src/react/client/SidebarProvider'
 
 /**
  * T8: SidebarInset component
@@ -73,5 +73,25 @@ describe('SidebarInset', () => {
 
     expect(screen.getByText('Main Article')).toBeInTheDocument()
     expect(screen.getByText('Content')).toBeInTheDocument()
+  })
+
+  // AC-3: below the breakpoint the inset spans full width. jsdom doesn't
+  // compute real layout, so this can't be asserted by measuring pixels —
+  // instead it asserts the mechanism that makes it true: .sv-app-shell is
+  // `display: flex` (see the CSS contract test) and SidebarPanel renders
+  // into a portal when mobile (the global matchMedia stub defaults to
+  // mobile), so the inset is left as the *only* direct child of the flex
+  // row — `flex: 1` on a lone flex item necessarily fills 100% of it.
+  it('should be the sole flex child of .sv-app-shell when the panel is in drawer mode', () => {
+    const { container } = render(
+      <SidebarProvider defaultOpen={false}>
+        <SidebarPanel>Nav</SidebarPanel>
+        <SidebarInset data-testid="inset">Main content</SidebarInset>
+      </SidebarProvider>,
+    )
+
+    const shell = container.querySelector('.sv-app-shell')
+    expect(shell).toBeInTheDocument()
+    expect(Array.from(shell!.children)).toEqual([screen.getByTestId('inset')])
   })
 })

@@ -200,22 +200,29 @@ describe('Alert with variant (T1)', () => {
     const alert = screen.getByRole('status');
     expect(alert).toHaveClass('sv-alert', 'sv-alert--info', 'custom-class');
   });
+
+  // AC-8: AlertTitle/AlertDescription keep working unchanged inside a
+  // variant Alert — every other test in this file that combines them omits
+  // `variant`.
+  test('AlertTitle and AlertDescription render normally inside a variant Alert', () => {
+    render(
+      <Alert variant="danger">
+        <AlertTitle>Something failed</AlertTitle>
+        <AlertDescription>Try again in a moment.</AlertDescription>
+      </Alert>,
+    );
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveClass('sv-alert--danger');
+    const title = screen.getByText('Something failed');
+    expect(title).toHaveClass('sv-alert__title');
+    const description = screen.getByText('Try again in a moment.');
+    expect(description).toHaveClass('sv-alert__description');
+  });
 });
 
 describe('Alert with action slot (T2)', () => {
   // AC-1: action renders inside .sv-alert__action
-  test('renders action inside sv-alert__action element', () => {
-    render(
-      <Alert>
-        <AlertTitle>Title</AlertTitle>
-        <AlertDescription>Description</AlertDescription>
-        <button>Undo</button>
-      </Alert>,
-    );
-    // For this test we need to manually structure with action
-    // Let's test when action prop is used
-  });
-
   test('action slot element exists when action is provided', () => {
     render(
       <Alert action={<button>Undo</button>}>
@@ -300,6 +307,14 @@ describe('style.css Alert section — CSS contract (T1)', () => {
 
   test('no rule in the Alert section uses box-shadow (Flat-By-Default)', () => {
     expect(alertSection).not.toMatch(/box-shadow/);
+  });
+
+  // AC-3 (action slot spacing): .sv-alert__action uses the --sv-space-*
+  // scale rather than a hardcoded pixel margin.
+  test('.sv-alert__action rule uses the --sv-space-* scale', () => {
+    const actionMatch = alertSection.match(/\.sv-alert__action\s*\{[^}]*\}/);
+    expect(actionMatch).toBeTruthy();
+    expect(actionMatch![0]).toMatch(/var\(--sv-space-\d+\)/);
   });
 
   test('no token -soft introduced', () => {

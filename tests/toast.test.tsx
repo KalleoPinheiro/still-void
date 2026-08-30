@@ -53,9 +53,13 @@ describe('Toast (T10)', () => {
 
     await user.click(screen.getByText('Show Toast'));
 
-    // Check that viewport region exists
+    // Check that viewport region exists, with the accessible name Radix
+    // derives from the provider's `label` prop (default 'Notifications',
+    // plus Radix's own hotkey suffix) — a bare role="region" with no name
+    // is exactly what AC-2 requires more than just presence.
     const viewport = screen.getByRole('region');
     expect(viewport).toBeInTheDocument();
+    expect(viewport).toHaveAccessibleName(/^Notifications/);
 
     // Check toast content
     expect(screen.getByText('Test Toast')).toBeInTheDocument();
@@ -488,6 +492,50 @@ describe('Toast Action (T11)', () => {
     const actionButton = screen.getByText('Undo');
     expect(actionButton).toBeInTheDocument();
     expect(actionButton).toHaveClass('sv-toast__action');
+  });
+
+  // AC-1: altText is forwarded to Radix's Toast.Action, not just accepted
+  // and dropped. Radix stores it as `data-radix-toast-announce-alt` on the
+  // element (see node_modules/@radix-ui/react-toast — the hidden announcer
+  // reads `node.dataset.radixToastAnnounceAlt`), so a screen reader hears
+  // this text instead of (or in addition to) the visible button label,
+  // which matters when the label alone ("Undo") isn't descriptive enough.
+  test('forwards altText to the action element for the screen-reader announcer', async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const { toast } = useToast();
+      return (
+        <button
+          onClick={() => {
+            toast({
+              title: 'Connection lost',
+              action: {
+                label: 'Retry',
+                altText: 'Retry connecting to the server',
+                onClick: () => {},
+              },
+            });
+          }}
+        >
+          Show
+        </button>
+      );
+    }
+
+    render(
+      <ToastProvider duration={Infinity}>
+        <TestComponent />
+      </ToastProvider>
+    );
+
+    await user.click(screen.getByText('Show'));
+
+    const actionButton = screen.getByText('Retry');
+    expect(actionButton).toHaveAttribute(
+      'data-radix-toast-announce-alt',
+      'Retry connecting to the server',
+    );
   });
 
   // AC-2: Action click calls onClick and dismisses toast
@@ -1473,6 +1521,9 @@ describe('Toast Mutation Coverage (F8 — M3, M9)', () => {
       // The Icon component should render with data-name matching the expected icon
       expect(iconEl).toBeInTheDocument();
       expect(iconEl).toHaveAttribute('data-name', expectedIcon);
+      // AC-5: decorative, must not be exposed to assistive tech — the
+      // title text already carries the meaning.
+      expect(iconEl).toHaveAttribute('aria-hidden', 'true');
 
       unmount();
     }
