@@ -166,3 +166,55 @@ describe('the table stays flat and theme-driven', () => {
     expect(bodyOf(selector)).not.toMatch(/#[0-9a-fA-F]{3}|oklch\(|rgba?\(|hsla?\(/);
   });
 });
+
+// Stacked mode (C5): every .sv-table--stack rule lives inside the narrow-viewport
+// media query, so ≥ 40rem the table renders exactly as before.
+describe('stacked mode below 40rem', () => {
+  const uncommented = stripComments(css);
+
+  function narrowBlock(): string {
+    const opener = '@media (width < 40rem) {';
+    const start = uncommented.indexOf(opener);
+    if (start === -1) return '';
+    let depth = 1;
+    let i = start + opener.length;
+    while (depth > 0 && i < uncommented.length) {
+      if (uncommented[i] === '{') depth += 1;
+      if (uncommented[i] === '}') depth -= 1;
+      i += 1;
+    }
+    return uncommented.slice(start + opener.length, i - 1);
+  }
+
+  function stackRule(block: string, selector: string): string | undefined {
+    const re = /([^{}]+)\{([^{}]*)\}/g;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(block))) {
+      const selectors = (match[1] as string).split(',').map((s) => s.trim().replace(/\s+/g, ' '));
+      if (selectors.includes(selector)) return (match[2] as string).trim();
+    }
+    return undefined;
+  }
+
+  test('sv-table--stack só abaixo de 40rem', () => {
+    const block = narrowBlock();
+    expect(block).not.toBe('');
+    const outside = uncommented.replace(block, '');
+    expect(outside).not.toMatch(/\.sv-table--stack/);
+
+    for (const selector of ['.sv-table--stack .sv-table__row', '.sv-table--stack .sv-table__td']) {
+      const body = stackRule(block, selector);
+      expect(body, selector).toBeDefined();
+      expect(body).toMatch(/display:\s*(block|grid)/);
+    }
+
+    const head = stackRule(block, '.sv-table--stack .sv-table__head');
+    expect(head).toBeDefined();
+    expect(head).not.toMatch(/display:\s*none/);
+    expect(head).toMatch(/clip-path:\s*inset\(50%\)/);
+
+    const label = stackRule(block, '.sv-table--stack .sv-table__td[data-label]::before');
+    expect(label).toBeDefined();
+    expect(label).toMatch(/content:\s*attr\(data-label\)/);
+  });
+});

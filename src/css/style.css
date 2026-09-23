@@ -333,7 +333,9 @@ body.sv-body {
 }
 .sv-layout {
   display: grid;
-  grid-template-columns: 1fr;
+  /* minmax(0, 1fr), not 1fr: a bare 1fr is minmax(auto, 1fr), so the column
+     grew to its content's min-content and pushed narrow pages sideways. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sv-space-10);
   max-width: 1120px;
   margin: 0 auto;
@@ -853,6 +855,49 @@ body.sv-body {
   color: var(--sv-text-2);
   font-size: var(--sv-text-sm);
 }
+/* Stacked mode (<Table stack>): below 40rem each row becomes a block and each
+   cell a label/value pair, the label read from data-label (<TableCell label>).
+   The head is hidden visually but stays in the accessibility tree. At 40rem and
+   up nothing here applies and the table renders exactly as above. */
+@media (width < 40rem) {
+  .sv-table--stack .sv-table__head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sv-table--stack,
+  .sv-table--stack .sv-table__body,
+  .sv-table--stack .sv-table__foot {
+    display: block;
+  }
+  .sv-table--stack .sv-table__row {
+    display: block;
+    padding: var(--sv-space-2) 0;
+  }
+  .sv-table--stack .sv-table__td {
+    display: grid;
+    grid-template-columns: minmax(6rem, 35%) minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--sv-space-3);
+    padding: var(--sv-space-1) var(--sv-space-3);
+    text-align: start;
+    overflow-wrap: anywhere;
+  }
+  .sv-table--stack .sv-table__td:not([data-label]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sv-table--stack .sv-table__td[data-label]::before {
+    content: attr(data-label);
+    font-size: var(--sv-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--sv-text-3);
+  }
+}
 
 /* ---------- Button ---------- */
 /* Default variant/size need no modifier class — .sv-btn alone is a complete,
@@ -958,6 +1003,19 @@ body.sv-body {
 .sv-btn--icon {
   width: var(--sv-space-10);
   padding: 0;
+}
+
+/* ---------- Touch targets ---------- */
+/* On a narrow or touch viewport every button and field reaches
+   44x44px (WCAG 2.5.5). Pointer-fine desktop keeps the heights above. */
+@media (width < 40rem), (pointer: coarse) {
+  .sv-btn,
+  .sv-field {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
+  .sv-btn--icon {
+    min-width: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
 }
 
 /* ---------- Card ---------- */
