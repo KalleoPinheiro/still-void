@@ -129,3 +129,9 @@ describe('hero on narrow viewports', () => {
     );
   });
 });
+
+describe('tabs panel width', () => {
+  test('the tab panel stretches to the container width', () => {
+    expect(declIn(topLevelRules(css).get('.sv-tabs__content') as string, 'align-self')).toBe('stretch');
+  });
+});

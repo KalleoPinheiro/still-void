@@ -1555,6 +1555,9 @@ body.sv-body {
 }
 .sv-tabs__content {
   margin-top: var(--sv-space-2);
+  /* The root aligns flex-start so the list keeps its content width; the panel
+     must still fill the container, or a form inside it shrinks to min-content. */
+  align-self: stretch;
 }
 .sv-tabs__content:focus-visible {
   outline: 2px solid var(--sv-accent-ink);
