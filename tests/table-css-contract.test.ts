@@ -222,6 +222,9 @@ describe('stacked mode below 40rem', () => {
     const label = stackRule(block, '.sv-table--stack .sv-table__td[data-label]::before');
     expect(label).toBeDefined();
     expect(label).toMatch(/content:\s*attr\(data-label\)/);
+    // Consumer padding/alignment utilities must not erase the label column.
+    const cell = stackRule(block, '.sv-table--stack .sv-table__td[data-label]');
+    expect(cell).toMatch(/padding-inline-start:[^;]*!important/);
     // The label is taken out of flow so multi-child cells keep their children together.
     expect(label).toMatch(/position:\s*absolute/);
   });
