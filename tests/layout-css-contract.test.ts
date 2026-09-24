@@ -64,14 +64,16 @@ function declIn(body: string, property: string): string | undefined {
   return found ? (found[1] as string).trim() : undefined;
 }
 
+/** Every declaration the block gives `selector`, across all rules that list it. */
 function ruleIn(block: string, selector: string): string | undefined {
   const re = /([^{}]+)\{([^{}]*)\}/g;
+  const bodies: string[] = [];
   let match: RegExpExecArray | null;
   while ((match = re.exec(block))) {
     const selectors = (match[1] as string).split(',').map((s) => s.trim());
-    if (selectors.includes(selector)) return (match[2] as string).trim();
+    if (selectors.includes(selector)) bodies.push((match[2] as string).trim().replace(/;?$/, ';'));
   }
-  return undefined;
+  return bodies.length > 0 ? bodies.join('\n') : undefined;
 }
 
 const TOUCH_TARGET = 'calc(var(--sv-space-10) + var(--sv-space-1))';
@@ -97,10 +99,18 @@ describe('touch targets', () => {
     }
   });
 
-  test('icon buttons also reach 44px wide', () => {
-    const body = ruleIn(blocks.join('\n'), '.sv-btn--icon');
-    expect(body).toBeDefined();
+  test('buttons also reach 44px wide, so a one-word button is still a target', () => {
+    const body = ruleIn(blocks.join('\n'), '.sv-btn');
     expect(declIn(body as string, 'min-width')).toBe(TOUCH_TARGET);
+  });
+
+  test('tab triggers reach 44px and the strip scrolls inside itself', () => {
+    const joined = blocks.join('\n');
+    expect(declIn(ruleIn(joined, '.sv-tabs__trigger') as string, 'min-height')).toBe(TOUCH_TARGET);
+    const list = ruleIn(joined, '.sv-tabs__list') as string;
+    expect(declIn(list, 'overflow-x')).toBe('auto');
+    expect(declIn(list, 'max-width')).toBe('100%');
+    expect(declIn(list, 'height')).toBe('auto');
   });
 
   test('pointer-fine desktop keeps the base heights', () => {

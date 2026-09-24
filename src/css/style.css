@@ -1013,7 +1013,7 @@ body.sv-body {
   .sv-field {
     min-height: calc(var(--sv-space-10) + var(--sv-space-1));
   }
-  .sv-btn--icon {
+  .sv-btn {
     min-width: calc(var(--sv-space-10) + var(--sv-space-1));
   }
 }
@@ -1552,6 +1552,21 @@ body.sv-body {
 .sv-tabs__content:focus-visible {
   outline: 2px solid var(--sv-accent-ink);
   outline-offset: 2px;
+}
+
+/* ---------- Tabs touch ---------- */
+/* Triggers reach 44px and a strip wider than the viewport scrolls inside
+   itself instead of widening the page. Declared after the base rules above so
+   the list's height override wins at equal specificity. */
+@media (width < 40rem), (pointer: coarse) {
+  .sv-tabs__list {
+    height: auto;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .sv-tabs__trigger {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
 }
 
 /* ---------- Separator ---------- */
