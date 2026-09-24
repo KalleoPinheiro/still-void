@@ -113,6 +113,11 @@ describe('touch targets', () => {
     expect(declIn(list, 'height')).toBe('auto');
   });
 
+  test('the label wrapping a checkbox is the 44px target', () => {
+    const body = ruleIn(blocks.join('\n'), 'label:has(> .sv-check)');
+    expect(declIn(body as string, 'min-height')).toBe(TOUCH_TARGET);
+  });
+
   test('pointer-fine desktop keeps the base heights', () => {
     const top = topLevelRules(css);
     expect(declIn(top.get('.sv-btn') as string, 'min-height')).toBeUndefined();

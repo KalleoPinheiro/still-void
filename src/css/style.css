@@ -1023,6 +1023,11 @@ body.sv-body {
   .sv-btn {
     min-width: calc(var(--sv-space-10) + var(--sv-space-1));
   }
+  /* A checkbox stays its drawn size; the label wrapping it is the target, since
+     tapping the label toggles the input. */
+  label:has(> .sv-check) {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
 }
 
 /* ---------- Card ---------- */
