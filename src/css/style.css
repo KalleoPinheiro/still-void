@@ -1588,6 +1588,9 @@ body.sv-body {
     height: auto;
     max-width: 100%;
     overflow-x: auto;
+    /* Centered content that overflows spills to the left, where it cannot be
+       scrolled to; start-aligned keeps the first trigger reachable. */
+    justify-content: flex-start;
   }
   .sv-tabs__trigger {
     min-height: calc(var(--sv-space-10) + var(--sv-space-1));

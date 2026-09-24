@@ -111,6 +111,7 @@ describe('touch targets', () => {
     expect(declIn(list, 'overflow-x')).toBe('auto');
     expect(declIn(list, 'max-width')).toBe('100%');
     expect(declIn(list, 'height')).toBe('auto');
+    expect(declIn(list, 'justify-content')).toBe('flex-start');
   });
 
   test('the label wrapping a checkbox is the 44px target', () => {
@@ -144,5 +145,15 @@ describe('hero on narrow viewports', () => {
 describe('tabs panel width', () => {
   test('the tab panel stretches to the container width', () => {
     expect(declIn(topLevelRules(css).get('.sv-tabs__content') as string, 'align-self')).toBe('stretch');
+  });
+});
+
+describe('narrow and touch rules stay theme-driven', () => {
+  test('no literal color inside the narrow or touch media blocks', () => {
+    const blocks = [
+      ...mediaBlocks(css, '(width < 40rem), (pointer: coarse)'),
+      ...mediaBlocks(css, '(width < 40rem)'),
+    ].join('\n');
+    expect(blocks).not.toMatch(/#[0-9a-fA-F]{3,8}\b|oklch\(|rgba?\(|hsla?\(/);
   });
 });
