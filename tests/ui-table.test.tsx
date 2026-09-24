@@ -275,3 +275,42 @@ describe('Table — className composition and edge cases', () => {
     expect(screen.getByText('raw cell')).toBeInTheDocument();
   });
 });
+
+// Stacked mode for narrow viewports (VittaFlow layout mobile-first, C3 + C4).
+describe('Table stack + TableCell label', () => {
+  test('stack adiciona sv-table--stack', () => {
+    const { rerender } = render(<Table stack aria-label="t" />);
+    expect(screen.getByRole('table')).toHaveClass('sv-table', 'sv-table--stack');
+    rerender(<Table aria-label="t" />);
+    expect(screen.getByRole('table')).not.toHaveClass('sv-table--stack');
+  });
+
+  test('stack is not forwarded to the DOM as an attribute', () => {
+    render(<Table stack aria-label="t" />);
+    expect(screen.getByRole('table')).not.toHaveAttribute('stack');
+  });
+
+  test('label vira data-label', () => {
+    const { container, rerender } = render(
+      <table>
+        <tbody>
+          <tr>
+            <TableCell label="Nome">Maria</TableCell>
+          </tr>
+        </tbody>
+      </table>
+    );
+    expect(container.querySelector('td')).toHaveAttribute('data-label', 'Nome');
+    expect(container.querySelector('td')).not.toHaveAttribute('label');
+    rerender(
+      <table>
+        <tbody>
+          <tr>
+            <TableCell>Maria</TableCell>
+          </tr>
+        </tbody>
+      </table>
+    );
+    expect(container.querySelector('td')).not.toHaveAttribute('data-label');
+  });
+});

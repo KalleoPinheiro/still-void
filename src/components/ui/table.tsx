@@ -4,12 +4,18 @@ import { table, tableClasses } from "../../recipes/table"
 
 export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
   containerClassName?: string
+  /** Below 40rem, render each row as a block of label/value pairs. Pair with `TableCell label`. */
+  stack?: boolean
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, containerClassName, ...props }, ref) => (
+  ({ className, containerClassName, stack, ...props }, ref) => (
     <div className={cn(tableClasses.container, containerClassName)}>
-      <table className={cn(table(), className)} ref={ref} {...props} />
+      <table
+        className={cn(table(), stack && "sv-table--stack", className)}
+        ref={ref}
+        {...props}
+      />
     </div>
   )
 )
@@ -65,11 +71,19 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
 TableHead.displayName = "TableHead"
 
 export interface TableCellProps
-  extends React.TdHTMLAttributes<HTMLTableCellElement> {}
+  extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  /** Column name shown before the value when the table is stacked (`Table stack`). */
+  label?: string
+}
 
 const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, ...props }, ref) => (
-    <td className={cn(tableClasses.td, className)} ref={ref} {...props} />
+  ({ className, label, ...props }, ref) => (
+    <td
+      className={cn(tableClasses.td, className)}
+      data-label={label}
+      ref={ref}
+      {...props}
+    />
   )
 )
 TableCell.displayName = "TableCell"

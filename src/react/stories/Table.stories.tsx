@@ -87,3 +87,30 @@ export const WideTableScrolls: Story = {
     </div>
   ),
 };
+
+export const StackedOnNarrowViewports: Story = {
+  name: 'Stacked below 40rem (stack + label)',
+  parameters: { viewport: { defaultViewport: 'mobile1' } },
+  render: () => (
+    <Table stack>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Quarto</TableHead>
+          <TableHead>Diagnóstico</TableHead>
+          <TableHead>Total</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {patients.map((patient) => (
+          <TableRow key={patient.name}>
+            <TableCell label="Nome">{patient.name}</TableCell>
+            <TableCell label="Quarto">{patient.room}</TableCell>
+            <TableCell label="Diagnóstico">{patient.diagnosis}</TableCell>
+            <TableCell label="Total">{patient.total}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+};

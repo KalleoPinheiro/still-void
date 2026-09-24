@@ -166,3 +166,70 @@ describe('the table stays flat and theme-driven', () => {
     expect(bodyOf(selector)).not.toMatch(/#[0-9a-fA-F]{3}|oklch\(|rgba?\(|hsla?\(/);
   });
 });
+
+// Stacked mode (C5): every .sv-table--stack rule lives inside the narrow-viewport
+// media query, so ≥ 40rem the table renders exactly as before.
+describe('stacked mode below 40rem', () => {
+  const uncommented = stripComments(css);
+
+  /** Every `@media (width < 40rem)` block, in file order. */
+  function narrowBlocks(): string[] {
+    const opener = '@media (width < 40rem) {';
+    const blocks: string[] = [];
+    let start = uncommented.indexOf(opener);
+    while (start !== -1) {
+      let depth = 1;
+      let i = start + opener.length;
+      while (depth > 0 && i < uncommented.length) {
+        if (uncommented[i] === '{') depth += 1;
+        if (uncommented[i] === '}') depth -= 1;
+        i += 1;
+      }
+      blocks.push(uncommented.slice(start + opener.length, i - 1));
+      start = uncommented.indexOf(opener, i);
+    }
+    return blocks;
+  }
+
+  function stackRule(block: string, selector: string): string | undefined {
+    const re = /([^{}]+)\{([^{}]*)\}/g;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(block))) {
+      const selectors = (match[1] as string).split(',').map((s) => s.trim().replace(/\s+/g, ' '));
+      if (selectors.includes(selector)) return (match[2] as string).trim();
+    }
+    return undefined;
+  }
+
+  test('sv-table--stack só abaixo de 40rem', () => {
+    const blocks = narrowBlocks();
+    const block = blocks.join('\n');
+    expect(block).toMatch(/\.sv-table--stack/);
+    const outside = blocks.reduce((rest, b) => rest.replace(b, ''), uncommented);
+    expect(outside).not.toMatch(/\.sv-table--stack/);
+
+    for (const selector of ['.sv-table--stack .sv-table__row', '.sv-table--stack .sv-table__td']) {
+      const body = stackRule(block, selector);
+      expect(body, selector).toBeDefined();
+      expect(body).toMatch(/display:\s*(block|grid)/);
+    }
+
+    const head = stackRule(block, '.sv-table--stack .sv-table__head');
+    expect(head).toBeDefined();
+    expect(head).not.toMatch(/display:\s*none/);
+    expect(head).toMatch(/clip-path:\s*inset\(50%\)/);
+
+    const label = stackRule(block, '.sv-table--stack .sv-table__td[data-label]::before');
+    expect(label).toBeDefined();
+    expect(label).toMatch(/content:\s*attr\(data-label\)/);
+    // A labelled cell is a two-column grid: label first, every child second, so a
+    // wrapping label grows the cell instead of overlapping the next one.
+    const cell = stackRule(block, '.sv-table--stack .sv-table__td[data-label]');
+    expect(cell).toMatch(/display:\s*grid/);
+    expect(stackRule(block, '.sv-table--stack .sv-table__td[data-label] > *')).toMatch(/grid-column:\s*2/);
+    expect(label).toMatch(/grid-column:\s*1/);
+    expect(label).not.toMatch(/position:\s*absolute/);
+    // Consumer padding/alignment utilities must not erase the stacked geometry.
+    expect(stackRule(block, '.sv-table--stack .sv-table__td')).toMatch(/padding:[^;]*!important/);
+  });
+});

@@ -333,7 +333,9 @@ body.sv-body {
 }
 .sv-layout {
   display: grid;
-  grid-template-columns: 1fr;
+  /* minmax(0, 1fr), not 1fr: a bare 1fr is minmax(auto, 1fr), so the column
+     grew to its content's min-content and pushed narrow pages sideways. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sv-space-10);
   max-width: 1120px;
   margin: 0 auto;
@@ -388,6 +390,13 @@ body.sv-body {
   line-height: 1.7;
   max-width: 60ch;
   margin: 0;
+}
+/* Narrow viewports: the display step (2.75rem) pushes the page's content below
+   the fold on a phone, so the title drops to the headline step (1.75rem). */
+@media (width < 40rem) {
+  .sv-hero__title {
+    font-size: var(--sv-text-2xl);
+  }
 }
 
 /* ---------- Skeleton ---------- */
@@ -853,6 +862,60 @@ body.sv-body {
   color: var(--sv-text-2);
   font-size: var(--sv-text-sm);
 }
+/* Stacked mode (<Table stack>): below 40rem each row becomes a block and each
+   cell a label/value pair, the label read from data-label (<TableCell label>).
+   The head is hidden visually but stays in the accessibility tree. At 40rem and
+   up nothing here applies and the table renders exactly as above. */
+@media (width < 40rem) {
+  .sv-table--stack .sv-table__head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sv-table--stack,
+  .sv-table--stack .sv-table__body,
+  .sv-table--stack .sv-table__foot {
+    display: block;
+  }
+  .sv-table--stack .sv-table__row {
+    display: block;
+    padding: var(--sv-space-2) 0;
+  }
+  /* A labelled cell is a two-column grid: the label (::before) in the first
+     column, every child of the cell in the second, one per row. The label is
+     in flow, so a label that wraps grows the cell instead of overlapping the
+     next one. !important on the geometry only: consumers put padding and
+     text-align utilities on cells for the desktop table, and utilities outrank
+     this package's layer. */
+  .sv-table--stack .sv-table__td {
+    display: block;
+    padding: var(--sv-space-1) var(--sv-space-3) !important;
+    text-align: start !important;
+    overflow-wrap: anywhere;
+  }
+  .sv-table--stack .sv-table__td[data-label] {
+    display: grid;
+    grid-template-columns: minmax(0, 35%) minmax(0, 1fr);
+    column-gap: var(--sv-space-3);
+    align-items: baseline;
+  }
+  .sv-table--stack .sv-table__td[data-label] > * {
+    grid-column: 2;
+  }
+  .sv-table--stack .sv-table__td[data-label]::before {
+    content: attr(data-label);
+    grid-column: 1;
+    grid-row: 1;
+    font-size: var(--sv-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--sv-text-3);
+  }
+}
 
 /* ---------- Button ---------- */
 /* Default variant/size need no modifier class — .sv-btn alone is a complete,
@@ -958,6 +1021,24 @@ body.sv-body {
 .sv-btn--icon {
   width: var(--sv-space-10);
   padding: 0;
+}
+
+/* ---------- Touch targets ---------- */
+/* On a narrow or touch viewport every button and field reaches
+   44x44px (WCAG 2.5.5). Pointer-fine desktop keeps the heights above. */
+@media (width < 40rem), (pointer: coarse) {
+  .sv-btn,
+  .sv-field {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
+  .sv-btn {
+    min-width: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
+  /* A checkbox stays its drawn size; the label wrapping it is the target, since
+     tapping the label toggles the input. */
+  label:has(> .sv-check) {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
 }
 
 /* ---------- Card ---------- */
@@ -1490,10 +1571,32 @@ body.sv-body {
 }
 .sv-tabs__content {
   margin-top: var(--sv-space-2);
+  /* The root aligns flex-start so the list keeps its content width; the panel
+     must still fill the container, or a form inside it shrinks to min-content. */
+  align-self: stretch;
 }
 .sv-tabs__content:focus-visible {
   outline: 2px solid var(--sv-accent-ink);
   outline-offset: 2px;
+}
+
+/* ---------- Tabs touch ---------- */
+/* Triggers reach 44px and a strip wider than the viewport scrolls inside
+   itself instead of widening the page. Declared after the base rules above so
+   the list's height override wins at equal specificity. */
+@media (width < 40rem), (pointer: coarse) {
+  .sv-tabs__list {
+    height: auto;
+    max-width: 100%;
+    overflow-x: auto;
+    /* Centered content that overflows spills to the left, where it cannot be
+       scrolled to; start-aligned keeps the first trigger reachable. */
+    justify-content: flex-start;
+  }
+  .sv-tabs__trigger {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+    min-width: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
 }
 
 /* ---------- Separator ---------- */
@@ -1605,6 +1708,15 @@ body.sv-body {
   min-width: var(--sv-space-10);
   height: var(--sv-space-10);
   color: var(--sv-text-3);
+}
+
+/* ---------- Pagination touch ---------- */
+/* Page links and "load more" reach 44x44px on narrow or touch viewports. */
+@media (width < 40rem), (pointer: coarse) {
+  .sv-pagination__link {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+    min-width: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
 }
 
 /* ---------- Chart ---------- */
