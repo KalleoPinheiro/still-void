@@ -107,6 +107,7 @@ describe('touch targets', () => {
   test('tab triggers reach 44px and the strip scrolls inside itself', () => {
     const joined = blocks.join('\n');
     expect(declIn(ruleIn(joined, '.sv-tabs__trigger') as string, 'min-height')).toBe(TOUCH_TARGET);
+    expect(declIn(ruleIn(joined, '.sv-tabs__trigger') as string, 'min-width')).toBe(TOUCH_TARGET);
     const list = ruleIn(joined, '.sv-tabs__list') as string;
     expect(declIn(list, 'overflow-x')).toBe('auto');
     expect(declIn(list, 'max-width')).toBe('100%');

@@ -211,7 +211,7 @@ describe('stacked mode below 40rem', () => {
     for (const selector of ['.sv-table--stack .sv-table__row', '.sv-table--stack .sv-table__td']) {
       const body = stackRule(block, selector);
       expect(body, selector).toBeDefined();
-      expect(body).toMatch(/display:\s*block/);
+      expect(body).toMatch(/display:\s*(block|grid)/);
     }
 
     const head = stackRule(block, '.sv-table--stack .sv-table__head');
@@ -222,10 +222,14 @@ describe('stacked mode below 40rem', () => {
     const label = stackRule(block, '.sv-table--stack .sv-table__td[data-label]::before');
     expect(label).toBeDefined();
     expect(label).toMatch(/content:\s*attr\(data-label\)/);
-    // Consumer padding/alignment utilities must not erase the label column.
+    // A labelled cell is a two-column grid: label first, every child second, so a
+    // wrapping label grows the cell instead of overlapping the next one.
     const cell = stackRule(block, '.sv-table--stack .sv-table__td[data-label]');
-    expect(cell).toMatch(/padding-inline-start:[^;]*!important/);
-    // The label is taken out of flow so multi-child cells keep their children together.
-    expect(label).toMatch(/position:\s*absolute/);
+    expect(cell).toMatch(/display:\s*grid/);
+    expect(stackRule(block, '.sv-table--stack .sv-table__td[data-label] > *')).toMatch(/grid-column:\s*2/);
+    expect(label).toMatch(/grid-column:\s*1/);
+    expect(label).not.toMatch(/position:\s*absolute/);
+    // Consumer padding/alignment utilities must not erase the stacked geometry.
+    expect(stackRule(block, '.sv-table--stack .sv-table__td')).toMatch(/padding:[^;]*!important/);
   });
 });

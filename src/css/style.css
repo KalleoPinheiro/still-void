@@ -884,30 +884,31 @@ body.sv-body {
     display: block;
     padding: var(--sv-space-2) 0;
   }
-  /* The label sits in a fixed left column (absolutely positioned ::before)
-     and the value flows normally in the rest of the cell, so a cell with
-     several children (a name and a phone, three action buttons) keeps them
-     together in the value column instead of scattering them across a grid. */
-  /* !important on the cell geometry only: consumers put padding and text-align
-     utilities on cells for the desktop table, and utilities outrank this
-     package's layer — without it they erase the label column in stacked mode. */
+  /* A labelled cell is a two-column grid: the label (::before) in the first
+     column, every child of the cell in the second, one per row. The label is
+     in flow, so a label that wraps grows the cell instead of overlapping the
+     next one. !important on the geometry only: consumers put padding and
+     text-align utilities on cells for the desktop table, and utilities outrank
+     this package's layer. */
   .sv-table--stack .sv-table__td {
     display: block;
-    position: relative;
-    min-height: calc(var(--sv-space-6) + var(--sv-space-2));
     padding: var(--sv-space-1) var(--sv-space-3) !important;
     text-align: start !important;
     overflow-wrap: anywhere;
   }
   .sv-table--stack .sv-table__td[data-label] {
-    padding-inline-start: calc(35% + var(--sv-space-3)) !important;
+    display: grid;
+    grid-template-columns: minmax(0, 35%) minmax(0, 1fr);
+    column-gap: var(--sv-space-3);
+    align-items: baseline;
+  }
+  .sv-table--stack .sv-table__td[data-label] > * {
+    grid-column: 2;
   }
   .sv-table--stack .sv-table__td[data-label]::before {
     content: attr(data-label);
-    position: absolute;
-    inset-inline-start: var(--sv-space-3);
-    top: var(--sv-space-2);
-    width: calc(35% - var(--sv-space-3));
+    grid-column: 1;
+    grid-row: 1;
     font-size: var(--sv-text-xs);
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -1594,6 +1595,7 @@ body.sv-body {
   }
   .sv-tabs__trigger {
     min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+    min-width: calc(var(--sv-space-10) + var(--sv-space-1));
   }
 }
 
