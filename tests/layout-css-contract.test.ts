@@ -118,6 +118,12 @@ describe('touch targets', () => {
     expect(declIn(body as string, 'min-height')).toBe(TOUCH_TARGET);
   });
 
+  test('pagination links reach 44px', () => {
+    const body = ruleIn(blocks.join('\n'), '.sv-pagination__link');
+    expect(declIn(body as string, 'min-height')).toBe(TOUCH_TARGET);
+    expect(declIn(body as string, 'min-width')).toBe(TOUCH_TARGET);
+  });
+
   test('pointer-fine desktop keeps the base heights', () => {
     const top = topLevelRules(css);
     expect(declIn(top.get('.sv-btn') as string, 'min-height')).toBeUndefined();

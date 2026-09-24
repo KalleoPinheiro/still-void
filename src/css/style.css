@@ -1695,6 +1695,15 @@ body.sv-body {
   color: var(--sv-text-3);
 }
 
+/* ---------- Pagination touch ---------- */
+/* Page links and "load more" reach 44x44px on narrow or touch viewports. */
+@media (width < 40rem), (pointer: coarse) {
+  .sv-pagination__link {
+    min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+    min-width: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
+}
+
 /* ---------- Chart ---------- */
 /* Visual geometry only — no scale engine, see design.md. `overflow: visible`
    is the one non-default here: an axis label sitting exactly at the SVG's
