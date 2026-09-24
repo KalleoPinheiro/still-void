@@ -211,7 +211,7 @@ describe('stacked mode below 40rem', () => {
     for (const selector of ['.sv-table--stack .sv-table__row', '.sv-table--stack .sv-table__td']) {
       const body = stackRule(block, selector);
       expect(body, selector).toBeDefined();
-      expect(body).toMatch(/display:\s*(block|grid)/);
+      expect(body).toMatch(/display:\s*block/);
     }
 
     const head = stackRule(block, '.sv-table--stack .sv-table__head');
@@ -222,5 +222,7 @@ describe('stacked mode below 40rem', () => {
     const label = stackRule(block, '.sv-table--stack .sv-table__td[data-label]::before');
     expect(label).toBeDefined();
     expect(label).toMatch(/content:\s*attr\(data-label\)/);
+    // The label is taken out of flow so multi-child cells keep their children together.
+    expect(label).toMatch(/position:\s*absolute/);
   });
 });
