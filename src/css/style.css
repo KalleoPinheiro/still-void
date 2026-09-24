@@ -391,6 +391,13 @@ body.sv-body {
   max-width: 60ch;
   margin: 0;
 }
+/* Narrow viewports: the display step (2.75rem) pushes the page's content below
+   the fold on a phone, so the title drops to the headline step (1.75rem). */
+@media (width < 40rem) {
+  .sv-hero__title {
+    font-size: var(--sv-text-2xl);
+  }
+}
 
 /* ---------- Skeleton ---------- */
 .sv-skeleton-line {

@@ -119,3 +119,13 @@ describe('touch targets', () => {
     expect(declIn(top.get('.sv-field') as string, 'min-height')).toBeUndefined();
   });
 });
+
+describe('hero on narrow viewports', () => {
+  test('hero title uses the headline step below 40rem', () => {
+    const body = ruleIn(mediaBlocks(css, '(width < 40rem)').join('\n'), '.sv-hero__title');
+    expect(declIn(body as string, 'font-size')).toBe('var(--sv-text-2xl)');
+    expect(declIn(topLevelRules(css).get('.sv-hero__title') as string, 'font-size')).toBe(
+      'var(--sv-text-4xl)',
+    );
+  });
+});

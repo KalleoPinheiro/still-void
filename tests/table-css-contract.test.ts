@@ -172,18 +172,23 @@ describe('the table stays flat and theme-driven', () => {
 describe('stacked mode below 40rem', () => {
   const uncommented = stripComments(css);
 
-  function narrowBlock(): string {
+  /** Every `@media (width < 40rem)` block, in file order. */
+  function narrowBlocks(): string[] {
     const opener = '@media (width < 40rem) {';
-    const start = uncommented.indexOf(opener);
-    if (start === -1) return '';
-    let depth = 1;
-    let i = start + opener.length;
-    while (depth > 0 && i < uncommented.length) {
-      if (uncommented[i] === '{') depth += 1;
-      if (uncommented[i] === '}') depth -= 1;
-      i += 1;
+    const blocks: string[] = [];
+    let start = uncommented.indexOf(opener);
+    while (start !== -1) {
+      let depth = 1;
+      let i = start + opener.length;
+      while (depth > 0 && i < uncommented.length) {
+        if (uncommented[i] === '{') depth += 1;
+        if (uncommented[i] === '}') depth -= 1;
+        i += 1;
+      }
+      blocks.push(uncommented.slice(start + opener.length, i - 1));
+      start = uncommented.indexOf(opener, i);
     }
-    return uncommented.slice(start + opener.length, i - 1);
+    return blocks;
   }
 
   function stackRule(block: string, selector: string): string | undefined {
@@ -197,9 +202,10 @@ describe('stacked mode below 40rem', () => {
   }
 
   test('sv-table--stack só abaixo de 40rem', () => {
-    const block = narrowBlock();
-    expect(block).not.toBe('');
-    const outside = uncommented.replace(block, '');
+    const blocks = narrowBlocks();
+    const block = blocks.join('\n');
+    expect(block).toMatch(/\.sv-table--stack/);
+    const outside = blocks.reduce((rest, b) => rest.replace(b, ''), uncommented);
     expect(outside).not.toMatch(/\.sv-table--stack/);
 
     for (const selector of ['.sv-table--stack .sv-table__row', '.sv-table--stack .sv-table__td']) {
