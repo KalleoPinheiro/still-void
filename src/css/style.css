@@ -1347,6 +1347,98 @@ body.sv-body {
   outline-offset: 2px;
 }
 
+/* ---------- Bottom sheet ---------- */
+/* The mobile counterpart of Dialog: anchored to the bottom edge, full width,
+   rounded only on top. Same surface/border language as .sv-dialog -- no shadow.
+   Height is capped at 90dvh so the overlay stays visible and tappable; the
+   content scrolls inside .sv-sheet__body. The bottom padding adds the device
+   safe area so actions never sit under the home indicator. */
+.sv-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--sv-z-modal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-4);
+  max-height: 90dvh;
+  padding: var(--sv-space-2) var(--sv-space-4) calc(var(--sv-space-4) + env(safe-area-inset-bottom, 0px));
+  border: 1px solid var(--sv-border);
+  border-bottom: none;
+  border-radius: var(--sv-radius-xl) var(--sv-radius-xl) 0 0;
+  background: var(--sv-surface);
+  color: var(--sv-text);
+  transform: translateY(var(--sv-sheet-drag, 0px));
+}
+.sv-sheet[data-state='open'] {
+  animation: sv-sheet-in var(--sv-duration-base) var(--sv-ease-hover);
+}
+.sv-sheet[data-state='closed'] {
+  animation: sv-sheet-out var(--sv-duration-base) var(--sv-ease-hover);
+}
+.sv-sheet[data-dragging='true'] {
+  animation: none;
+  user-select: none;
+}
+/* The grab area is 24px tall (WCAG 2.5.8 minimum target); the visible bar is the
+   pseudo-element. touch-action: none keeps the page from scrolling mid-drag. */
+.sv-sheet__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  flex: none;
+  height: var(--sv-space-6);
+  margin-inline: calc(var(--sv-space-4) * -1);
+}
+.sv-sheet__handle[data-draggable='true'] {
+  touch-action: none;
+  cursor: grab;
+}
+.sv-sheet__handle::before {
+  content: '';
+  width: var(--sv-space-10);
+  height: var(--sv-space-1);
+  border-radius: var(--sv-radius-full);
+  background: var(--sv-control-border);
+}
+.sv-sheet__close {
+  position: absolute;
+  top: var(--sv-space-2);
+  right: var(--sv-space-2);
+}
+.sv-sheet__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-1);
+  padding-right: var(--sv-space-18);
+}
+.sv-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sv-sheet__footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: var(--sv-space-2);
+}
+.sv-sheet__title {
+  font-family: var(--sv-font-display);
+  font-size: var(--sv-text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--sv-text);
+}
+.sv-sheet__description {
+  font-size: var(--sv-text-sm);
+  line-height: 1.5;
+  color: var(--sv-text-2);
+}
+
 /* ---------- Popovers ---------- */
 /* One floating surface for the SelectContent, the DropdownMenuContent and the
    TooltipContent. They were three near-identical utility strings before, which
@@ -2074,6 +2166,7 @@ body.sv-body {
      all — the closed panel never has a chance to snap into view. */
   .sv-overlay,
   .sv-dialog,
+  .sv-sheet,
   .sv-pop,
   .sv-app-sidebar,
   .sv-toast {

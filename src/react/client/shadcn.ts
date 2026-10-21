@@ -21,6 +21,21 @@ export {
 } from '../../components/ui/dialog';
 
 export {
+  BottomSheet,
+  type BottomSheetProps,
+  BottomSheetTrigger,
+  BottomSheetClose,
+  BottomSheetOverlay,
+  BottomSheetContent,
+  type BottomSheetContentProps,
+  BottomSheetHeader,
+  BottomSheetBody,
+  BottomSheetFooter,
+  BottomSheetTitle,
+  BottomSheetDescription,
+} from '../../components/ui/bottom-sheet';
+
+export {
   AlertDialog,
   AlertDialogPortal,
   AlertDialogOverlay,
