@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { colors, accentsInk, semanticInk, type ThemeMode } from '../src/tokens/colors';
-import { contrastRatio } from './utils/color';
+import { colors, accents, accentsInk, semantic, semanticInk, type ThemeMode } from '../src/tokens/colors';
+import { contrastRatio, parseColor } from './utils/color';
 
 const AA_TEXT = 4.5;
 
@@ -62,6 +62,34 @@ describe('WCAG AA contrast — Button variant="accent" (background accent-ink, t
       test(`${theme} accent-${name}-ink background with sv-bg text clears ${AA_TEXT}:1`, () => {
         expect(contrastRatio(colors[theme].bg, ink)).toBeGreaterThanOrEqual(AA_TEXT);
       });
+    }
+  }
+});
+
+// Tinted backgrounds ("soft" chips, active rows, badges) are the most common way a
+// consumer puts ink text on a colored surface: the hue at 10% over the page surface.
+// The ink steps must keep clearing AA there, not only on the flat surfaces above.
+const TINT = 0.1;
+
+function tintOver(base: string, surface: string): string {
+  const fg = parseColor(base);
+  const bg = parseColor(surface);
+  const hex = fg.map((v, i) => Math.round((v * TINT + bg[i]! * (1 - TINT)) * 255).toString(16).padStart(2, '0'));
+  return `#${hex.join('')}`;
+}
+
+describe('WCAG AA text contrast — ink on its own 10% tint', () => {
+  for (const theme of ['dark', 'light'] as const) {
+    const pairs: Array<[string, string, string]> = [
+      ...Object.entries(accents).map(([n, base]) => [`accent-${n}`, base, accentsInk[theme][n as keyof typeof accents]] as [string, string, string]),
+      ...Object.entries(semantic[theme]).map(([n, base]) => [n, base, semanticInk[theme][n as keyof typeof semanticInk.dark]] as [string, string, string]),
+    ];
+    for (const [name, base, ink] of pairs) {
+      for (const surface of surfacesByTheme[theme]) {
+        test(`${theme} ${name}-ink on a 10% ${name} tint over ${surface} clears ${AA_TEXT}:1`, () => {
+          expect(contrastRatio(ink, tintOver(base, surface))).toBeGreaterThanOrEqual(AA_TEXT);
+        });
+      }
     }
   }
 });
