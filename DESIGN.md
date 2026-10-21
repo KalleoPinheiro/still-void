@@ -173,10 +173,10 @@ A near-monochrome dark stack (four tonal steps of near-black) carries the whole 
 
 ### Semantic (state colors — fixed regardless of accent or theme)
 A second, independent color set carries meaning rather than brand: `Alert`, `Toast`, and the invalid state on form fields all read these instead of `--sv-accent`, so a status is legible no matter which of the four site accents is active.
-- **Danger** (`oklch(0.68 0.19 25)`, dark; `oklch(0.555 0.19 25)` ink step in light mode for AA text contrast) — destructive actions, form-field `aria-invalid`, `alert--danger`/`toast--danger`.
-- **Success** (`oklch(0.75 0.15 150)`, dark; `oklch(0.515 0.14 150)` ink step in light) — `alert--success`/`toast--success`.
-- **Info** (`oklch(0.78 0.12 210)`, dark; `oklch(0.525 0.09 210)` ink step in light) — `alert--info`/`toast--info`. Same hue as Signal Cyan by coincidence of the source spec, but a separate token (`--sv-info-ink`, not `--sv-accent`) — it stays fixed even when a consumer switches the site accent away from cyan.
-- **Warning** (`oklch(0.78 0.12 75)`, dark; `oklch(0.535 0.11 75)` ink step in light) — `alert--warning`/`toast--warning`. Same hue as Warm Amber, same independence from `data-accent`.
+- **Danger** (`oklch(0.68 0.19 25)`, dark; `oklch(0.535 0.19 25)` ink step in light mode for AA text contrast) — destructive actions, form-field `aria-invalid`, `alert--danger`/`toast--danger`.
+- **Success** (`oklch(0.75 0.15 150)`, dark; `oklch(0.51 0.14 150)` ink step in light) — `alert--success`/`toast--success`.
+- **Info** (`oklch(0.78 0.12 210)`, dark; `oklch(0.515 0.09 210)` ink step in light) — `alert--info`/`toast--info`. Same hue as Signal Cyan by coincidence of the source spec, but a separate token (`--sv-info-ink`, not `--sv-accent`) — it stays fixed even when a consumer switches the site accent away from cyan.
+- **Warning** (`oklch(0.78 0.12 75)`, dark; `oklch(0.53 0.11 75)` ink step in light) — `alert--warning`/`toast--warning`. Same hue as Warm Amber, same independence from `data-accent`.
 - Each state color gets its own light-mode "ink" step, darkened per-hue the same way the four site accents do (see `--sv-accent-*-ink` in `theme.css`) — the dark-mode value reads ≥4.5:1 as text on light surfaces without it.
 
 ### Named Rules

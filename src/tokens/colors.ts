@@ -57,10 +57,10 @@ export const accentsInk = {
     amber: 'oklch(0.78 0.12 75)',
   },
   light: {
-    cyan: 'oklch(0.525 0.09 210)',
-    violet: 'oklch(0.545 0.14 295)',
-    mint: 'oklch(0.52 0.1 160)',
-    amber: 'oklch(0.535 0.11 75)',
+    cyan: 'oklch(0.515 0.09 210)',
+    violet: 'oklch(0.535 0.14 295)',
+    mint: 'oklch(0.515 0.1 160)',
+    amber: 'oklch(0.53 0.11 75)',
   },
 } as const;
 
@@ -93,10 +93,10 @@ export const semanticInk = {
     warning: 'oklch(0.78 0.12 75)',
   },
   light: {
-    danger: 'oklch(0.555 0.19 25)',
-    success: 'oklch(0.515 0.14 150)',
-    info: 'oklch(0.525 0.09 210)',
-    warning: 'oklch(0.535 0.11 75)',
+    danger: 'oklch(0.535 0.19 25)',
+    success: 'oklch(0.51 0.14 150)',
+    info: 'oklch(0.515 0.09 210)',
+    warning: 'oklch(0.53 0.11 75)',
   },
 } as const;
 

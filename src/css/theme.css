@@ -124,16 +124,16 @@
   /* WCAG AA fix: the dark-mode accent hues read 1.8–2.6:1 as text on light
      surfaces. Darkened per-hue steps restore ≥4.5:1 without touching the
      canonical (dark-mode, surface-use) accent values above. */
-  --sv-accent-cyan-ink: oklch(0.525 0.09 210);
-  --sv-accent-violet-ink: oklch(0.545 0.14 295);
-  --sv-accent-mint-ink: oklch(0.52 0.1 160);
-  --sv-accent-amber-ink: oklch(0.535 0.11 75);
+  --sv-accent-cyan-ink: oklch(0.515 0.09 210);
+  --sv-accent-violet-ink: oklch(0.535 0.14 295);
+  --sv-accent-mint-ink: oklch(0.515 0.1 160);
+  --sv-accent-amber-ink: oklch(0.53 0.11 75);
 
   /* Same WCAG AA fix, applied to the semantic state colors. */
-  --sv-danger-ink: oklch(0.555 0.19 25);
-  --sv-success-ink: oklch(0.515 0.14 150);
-  --sv-info-ink: oklch(0.525 0.09 210);
-  --sv-warning-ink: oklch(0.535 0.11 75);
+  --sv-danger-ink: oklch(0.535 0.19 25);
+  --sv-success-ink: oklch(0.51 0.14 150);
+  --sv-info-ink: oklch(0.515 0.09 210);
+  --sv-warning-ink: oklch(0.53 0.11 75);
 }
 
 /* Accent switching is pure CSS — works in Server Components. */
