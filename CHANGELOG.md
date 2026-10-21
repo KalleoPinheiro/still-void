@@ -1,5 +1,13 @@
 # @still-void/ui
 
+## 3.5.0
+
+### Minor Changes
+
+- [#30](https://github.com/KalleoPinheiro/still-void/pull/30) [`16ba4f1`](https://github.com/KalleoPinheiro/still-void/commit/16ba4f192801361ebe95d36c1ab5a418bb3fafc1) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - New `--sv-control-border` token (`controlBorder` in `colors`, `sv-control-border` in the Tailwind theme): the edge of form controls at ≥3:1 on every surface, in both themes (WCAG 1.4.11). `.sv-field` (Input, Textarea, NativeSelect, FileInput) now uses it, so field borders are visibly stronger than before; the decorative `--sv-border` and `--sv-border-strong` are unchanged.
+
+- [#32](https://github.com/KalleoPinheiro/still-void/pull/32) [`44ef0ba`](https://github.com/KalleoPinheiro/still-void/commit/44ef0ba767bcbddc16ecea61dea3ecb8fae687cc) Thanks [@KalleoPinheiro](https://github.com/KalleoPinheiro)! - New `BottomSheet` family in `@still-void/ui/react/client` (`BottomSheet`, `BottomSheetTrigger`, `BottomSheetContent`, `BottomSheetHeader`, `BottomSheetBody`, `BottomSheetFooter`, `BottomSheetTitle`, `BottomSheetDescription`, `BottomSheetClose`, `BottomSheetOverlay`): a modal panel that rises from the bottom edge for mobile edit forms. Built on the Dialog primitive, so focus is trapped, Escape and the overlay dismiss, focus returns to the trigger, and `aria-modal` is always set. It has a drag handle (drag down past 96px to dismiss, `draggable={false}` to disable), a visible Cancel button (`closeLabel`, `showCloseButton`), respects the device safe area and `prefers-reduced-motion`, and uses only existing tokens. New classes: `sv-sheet`, `sv-sheet__handle`, `sv-sheet__close`, `sv-sheet__header`, `sv-sheet__body`, `sv-sheet__footer`, `sv-sheet__title`, `sv-sheet__description`; new keyframes `sv-sheet-in` / `sv-sheet-out`.
+
 ## 3.4.1
 
 ### Patch Changes
