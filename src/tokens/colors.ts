@@ -11,6 +11,9 @@ export const colors = {
     surface2: '#1C1C22',
     border: 'rgba(255,255,255,0.08)',
     borderStrong: 'rgba(255,255,255,0.14)',
+    // WCAG 1.4.11: edge of an input/select/checkbox must read ≥3:1 on every surface; the
+    // decorative borders above sit near 1.5:1 and stay decorative.
+    controlBorder: '#6B6B76',
     text: '#EDEDF0',
     text2: '#8B8B96',
     // Corrected from #5A5A66 (~2.6:1 on surface) to meet WCAG AA 4.5:1 — text3 is used for
@@ -24,6 +27,7 @@ export const colors = {
     surface2: '#F2F2EF',
     border: 'rgba(0,0,0,0.08)',
     borderStrong: 'rgba(0,0,0,0.14)',
+    controlBorder: '#85858E',
     text: '#16161B',
     text2: '#5A5A66',
     // Corrected from #8B8B96 (~3.1:1 on white) to meet WCAG AA 4.5:1, same reasoning as dark.

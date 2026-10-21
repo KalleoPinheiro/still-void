@@ -100,7 +100,7 @@ describe('.sv-field reproduces the Input frame from tokens', () => {
     ['width', '100%'],
     ['height', 'var(--sv-space-10)'],
     ['padding', 'var(--sv-space-2) var(--sv-space-3)'],
-    ['border', '1px solid var(--sv-border)'],
+    ['border', '1px solid var(--sv-control-border)'],
     ['border-radius', 'var(--sv-radius-sm)'],
     ['background', 'var(--sv-surface)'],
     ['color', 'var(--sv-text)'],
