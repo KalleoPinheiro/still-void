@@ -175,6 +175,7 @@ for any component this package ships, in any version.
 - `SidebarProvider` / `SidebarPanel` / `SidebarTrigger` / `SidebarInset` / `useSidebar` — responsive app shell with toggleable sidebar (drawer below breakpoint, static panel above); read/control state via context
 - `ToastProvider` / `useToast` — notification queue (up to 3 by default, configurable), auto-dismiss (5s default), pause on hover/focus; four severities with semantic `aria-live` announcements
 - `Dialog` — modal with trigger, content, header, footer, title, description; renders a close button by default (`showCloseButton={false}` to opt out)
+- `BottomSheet` — mobile modal that rises from the bottom edge (drag handle, Cancel button, safe-area aware); same focus trap, Escape and overlay dismissal as `Dialog`
 - `AlertDialog` — the same modal mechanics as `Dialog`, without a close button, for destructive confirmations that must be resolved through explicit `Action`/`Cancel`
 - `Select` — dropdown with groups, labels, and scroll
 - `Dropdown` — menu with items, checkboxes, radio groups, labels, separators

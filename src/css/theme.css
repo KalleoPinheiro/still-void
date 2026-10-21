@@ -239,6 +239,24 @@
    a flat, non-recursive selector-body regex in the CSS contract tests, which
    cannot handle a rule with nested braces — the same reason
    `sv-skeleton-shimmer` above lives here instead of next to `.sv-skeleton`. */
+/* Bottom sheet slide. `from`/`to` honour --sv-sheet-drag so a sheet released
+   mid-drag leaves from where the finger let go instead of snapping back. */
+@keyframes sv-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(var(--sv-sheet-drag, 0px));
+  }
+}
+@keyframes sv-sheet-out {
+  from {
+    transform: translateY(var(--sv-sheet-drag, 0px));
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
 @keyframes sv-fade-in {
   from {
     opacity: 0;
