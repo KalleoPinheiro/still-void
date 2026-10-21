@@ -93,3 +93,17 @@ describe('WCAG AA text contrast — ink on its own 10% tint', () => {
     }
   }
 });
+
+// WCAG 1.4.11 (AA, non-text contrast): the edge of an input, select or textarea
+// must read ≥3:1 against every surface it can sit on. `--sv-border` and
+// `--sv-border-strong` are decorative (~1.5:1) and deliberately not checked.
+describe('WCAG AA non-text contrast — control border', () => {
+  const AA_NON_TEXT = 3;
+  for (const theme of ['dark', 'light'] as const) {
+    for (const surface of surfacesByTheme[theme]) {
+      test(`${theme} control-border on ${surface} clears ${AA_NON_TEXT}:1`, () => {
+        expect(contrastRatio(colors[theme].controlBorder, surface)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+  }
+});
