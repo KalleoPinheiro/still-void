@@ -1024,9 +1024,10 @@ body.sv-body {
 }
 
 /* ---------- Touch targets ---------- */
-/* On a narrow or touch viewport every button and field reaches
-   44x44px (WCAG 2.5.5). Pointer-fine desktop keeps the heights above. */
-@media (width < 40rem), (pointer: coarse) {
+/* Below 64rem (tablet) or on a coarse primary pointer every button and field
+   reaches 44x44px (WCAG 2.5.5). A fine pointer on a wide window keeps the
+   heights above. */
+@media (width < 64rem), (pointer: coarse) {
   .sv-btn,
   .sv-field {
     min-height: calc(var(--sv-space-10) + var(--sv-space-1));
@@ -1036,8 +1037,26 @@ body.sv-body {
   }
   /* A checkbox stays its drawn size; the label wrapping it is the target, since
      tapping the label toggles the input. */
-  label:has(> .sv-check) {
+  label:has(> .sv-check),
+  label:has(> .sv-radio),
+  .sv-choice {
     min-height: calc(var(--sv-space-10) + var(--sv-space-1));
+  }
+  /* Bare icon controls keep their drawn size; an invisible 44x44px pseudo-element
+     centred on the control extends the hit area without moving the icon. */
+  .sv-dialog__close::after,
+  .sv-toast__close::after,
+  .sv-app-sidebar-trigger::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--sv-space-10) + var(--sv-space-1));
+    height: calc(var(--sv-space-10) + var(--sv-space-1));
+    transform: translate(-50%, -50%);
+  }
+  .sv-toast__close {
+    position: relative;
   }
 }
 
@@ -1676,7 +1695,7 @@ body.sv-body {
 /* Triggers reach 44px and a strip wider than the viewport scrolls inside
    itself instead of widening the page. Declared after the base rules above so
    the list's height override wins at equal specificity. */
-@media (width < 40rem), (pointer: coarse) {
+@media (width < 64rem), (pointer: coarse) {
   .sv-tabs__list {
     height: auto;
     max-width: 100%;
@@ -1804,7 +1823,7 @@ body.sv-body {
 
 /* ---------- Pagination touch ---------- */
 /* Page links and "load more" reach 44x44px on narrow or touch viewports. */
-@media (width < 40rem), (pointer: coarse) {
+@media (width < 64rem), (pointer: coarse) {
   .sv-pagination__link {
     min-height: calc(var(--sv-space-10) + var(--sv-space-1));
     min-width: calc(var(--sv-space-10) + var(--sv-space-1));
@@ -1912,6 +1931,7 @@ body.sv-body {
 }
 
 .sv-app-sidebar-trigger {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -87,7 +87,7 @@ describe('.sv-layout on narrow viewports', () => {
 });
 
 describe('touch targets', () => {
-  const blocks = mediaBlocks(css, '(width < 40rem), (pointer: coarse)');
+  const blocks = mediaBlocks(css, '(width < 64rem), (pointer: coarse)');
 
   test('alvo de toque de 44px em sv-btn e sv-field', () => {
     expect(blocks.length).toBeGreaterThan(0);
@@ -118,6 +118,35 @@ describe('touch targets', () => {
   test('the label wrapping a checkbox is the 44px target', () => {
     const body = ruleIn(blocks.join('\n'), 'label:has(> .sv-check)');
     expect(declIn(body as string, 'min-height')).toBe(TOUCH_TARGET);
+  });
+
+  test('the touch rules hold up to the tablet breakpoint, not only phones', () => {
+    expect(mediaBlocks(css, '(width < 64rem), (pointer: coarse)').length).toBeGreaterThan(0);
+    expect(mediaBlocks(css, '(width < 40rem), (pointer: coarse)')).toHaveLength(0);
+  });
+
+  test('radio and choice labels are 44px targets like the checkbox label', () => {
+    const joined = blocks.join('\n');
+    for (const selector of ['label:has(> .sv-radio)', '.sv-choice']) {
+      expect(declIn(ruleIn(joined, selector) as string, 'min-height'), selector).toBe(TOUCH_TARGET);
+    }
+  });
+
+  test('compact icon controls get a 44x44px hit area without growing the icon', () => {
+    const joined = blocks.join('\n');
+    for (const selector of [
+      '.sv-dialog__close::after',
+      '.sv-toast__close::after',
+      '.sv-app-sidebar-trigger::after',
+    ]) {
+      const body = ruleIn(joined, selector) as string;
+      expect(body, selector).toBeDefined();
+      expect(declIn(body, 'width')).toBe(TOUCH_TARGET);
+      expect(declIn(body, 'height')).toBe(TOUCH_TARGET);
+      expect(declIn(body, 'position')).toBe('absolute');
+    }
+    expect(declIn(ruleIn(joined, '.sv-toast__close') as string, 'position')).toBe('relative');
+    expect(declIn(topLevelRules(css).get('.sv-app-sidebar-trigger') as string, 'position')).toBe('relative');
   });
 
   test('pagination links reach 44px', () => {
@@ -152,7 +181,7 @@ describe('tabs panel width', () => {
 describe('narrow and touch rules stay theme-driven', () => {
   test('no literal color inside the narrow or touch media blocks', () => {
     const blocks = [
-      ...mediaBlocks(css, '(width < 40rem), (pointer: coarse)'),
+      ...mediaBlocks(css, '(width < 64rem), (pointer: coarse)'),
       ...mediaBlocks(css, '(width < 40rem)'),
     ].join('\n');
     expect(blocks).not.toMatch(/#[0-9a-fA-F]{3,8}\b|oklch\(|rgba?\(|hsla?\(/);
